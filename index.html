@@ -73,6 +73,7 @@ body{color:var(--text-primary);font-family:var(--sans);font-size:14px;line-heigh
 
 select{font:400 12px/16px var(--sans);color:var(--text-primary);background:#1e222d;
   border:1px solid var(--line);border-radius:var(--r-sm);padding:var(--s4) var(--s7);cursor:pointer}
+#langsel{font-weight:500}
 .fold{font:500 12px/16px var(--sans);color:var(--text-muted);background:transparent;border:1px solid var(--line);
   border-radius:var(--r-sm);padding:var(--s4) var(--s8);cursor:pointer;transition:color var(--dur)}
 .fold:hover{color:var(--text-strong)}
@@ -89,6 +90,28 @@ select{font:400 12px/16px var(--sans);color:var(--text-primary);background:#1e22
 .chartwrap{flex:1 1 auto;min-height:0;position:relative}
 .chartwrap svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
 .flowtile .fnote{flex:none;margin-top:4px;font-size:10.5px;line-height:14px;color:var(--text-muted)}
+
+.gtoggle{all:unset;box-sizing:border-box;cursor:pointer;display:inline-flex;align-items:center;
+  gap:6px;color:var(--text-primary);font:inherit;padding:2px 0}
+.gtoggle:hover{color:var(--text-strong)}
+.gtoggle:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:var(--r-xs)}
+.gtoggle .arrow{display:inline-block;width:9px;flex:none;transition:transform var(--dur);color:var(--text-muted)}
+.gtoggle[aria-expanded="true"] .arrow{transform:rotate(90deg)}
+tr.subrow td:first-child{padding-left:26px;color:var(--text-muted)}
+
+.linkbtn{text-decoration:none;display:inline-block}
+#flowtop{margin-top:10px}
+.panelhead{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin-bottom:6px}
+.panelhead h3{margin:0;font-size:12.5px;font-weight:600;color:var(--text-primary)}
+#flowtop td.dir{width:20px;text-align:center;padding-right:0}
+
+#chainmix{margin-top:12px}
+.mixbar{display:flex;height:9px;border-radius:4px;overflow:hidden;background:var(--line);margin-bottom:8px}
+.mixbar i{height:100%;flex:none}
+.mixlegend{display:flex;flex-wrap:wrap;gap:8px 16px;font-size:11.5px;color:var(--text-primary);
+  margin:0 0 6px;padding:0;list-style:none}
+.mixlegend li{display:flex;align-items:center;gap:5px}
+.mixlegend i{width:9px;height:9px;border-radius:2px;flex:none}
 
 #tvwrap{height:min(64vh,540px);min-height:340px;border-radius:var(--r-md);overflow:hidden;background:var(--bg)}
 #tv-chart{height:100%;width:100%}
@@ -147,11 +170,15 @@ footer p{margin:0 0 var(--s7);max-width:76ch}
     <div class="brand"><span class="dot" aria-hidden="true"></span><h1 data-i18n="title">KUB Flow Desk</h1></div>
     <span class="pair">KUB_THB · BITKUB</span>
     <div class="tools">
-      <div class="seg" role="group" aria-label="Language">
-        <button type="button" data-lang="th">ไทย</button>
-        <button type="button" data-lang="en">EN</button>
-        <button type="button" data-lang="zh">中文</button>
-      </div>
+      <select id="langsel" aria-label="Language">
+        <option value="th">ไทย</option>
+        <option value="en">English</option>
+        <option value="zh">中文</option>
+        <option value="ms">Bahasa Melayu</option>
+        <option value="vi">Tiếng Việt</option>
+        <option value="id">Bahasa Indonesia</option>
+        <option value="fil">Filipino</option>
+      </select>
       <span class="stamp" id="stamp"></span>
     </div>
   </header>
@@ -172,9 +199,11 @@ footer p{margin:0 0 var(--s7);max-width:76ch}
   <section class="card">
     <div class="ch">
       <h2 data-i18n="h_tech"></h2><button class="i" type="button" aria-expanded="false" data-info="l_tech"></button>
-      <div class="right"><span class="fresh" id="techtf"></span><span class="fresh" data-fresh="hourly"></span></div>
+      <div class="right"><div class="seg" id="techrangeseg" role="group" aria-label="Range"></div>
+        <span class="fresh" id="techtf"></span><span class="fresh" data-fresh="hourly"></span></div>
     </div>
     <div class="tw"><table id="t-tech"></table></div>
+    <p class="note" id="techsrcnote" hidden></p>
     <p class="why"><b data-i18n="why_title"></b><span data-i18n="w_tech"></span></p>
   </section>
 
@@ -214,6 +243,8 @@ footer p{margin:0 0 var(--s7);max-width:76ch}
       <div class="right">
         <label class="fresh" for="dexsize" data-i18n="dex_size"></label>
         <select id="dexsize"></select>
+        <a class="fold linkbtn" href="https://junoswap.trade/swap" target="_blank" rel="noopener"
+           data-i18n="dex_trade"></a>
         <span class="fresh" data-fresh="dex"></span>
       </div>
     </div>
@@ -234,6 +265,12 @@ footer p{margin:0 0 var(--s7);max-width:76ch}
       <li><span class="sw" style="background:var(--accent)"></span><span data-i18n="ex_cum"></span></li>
     </ul>
     <div id="c-exflow"></div>
+    <p class="note" data-i18n="ex_top10_hint"></p>
+    <div class="tw" id="flowtop" hidden>
+      <div class="panelhead"><h3 id="flowtopTitle"></h3>
+        <button class="fold" type="button" id="flowtopClose" data-i18n="ex_close"></button></div>
+      <table id="t-flowtop"></table>
+    </div>
     <p class="why"><b data-i18n="why_title"></b><span data-i18n="w_ex"></span></p>
   </section>
 
@@ -249,6 +286,7 @@ footer p{margin:0 0 var(--s7);max-width:76ch}
     </ul>
     <div id="c-chain"></div>
     <p class="note" id="chainnote"></p>
+    <div id="chainmix"></div>
     <p class="why"><b data-i18n="why_title"></b><span data-i18n="w_chain"></span></p>
   </section>
 
@@ -284,200 +322,8 @@ footer p{margin:0 0 var(--s7);max-width:76ch}
 <div id="pop" role="note"></div>
 <div id="tip" role="status" aria-live="polite"></div>
 <script src="https://s3.tradingview.com/tv.js"></script>
+<script src="i18n.js"></script>
 <script>
-const I18N={
-en:{ch_txfrom:"Transaction counts begin {d}: kubscan's chart returns 31 days and ignores a date range, while fees are fetched a day at a time and reach further back. Earlier days show fees only.",ex_cum:"Cumulative net out",ex_days:"{n} days shown",ex_cold:"cold",ex_hot:"hot",title:"KUB Flow Desk",info:"More information",why_title:"What this tells you",
- fresh_at:"read {t}",fresh_none:"no data yet",
- src:"Bitkub public API v3 every 5 min · kubscan v2 (41 wallets) every 5 min · KUB Chain RPC (5 DEXes) every 15 min · chain activity from kubscan hourly · price chart by TradingView",
- k_offer:"Lowest offer",k_vol:"24 h volume",k_sell:"Sell 10k KUB",k_nf:"Left the exchange",k_taker:"Buyers crossing",
- k_spread:"spread",k_lv:"levels",k_trades:"trades",k_bid:"bid",k_last:"last",k_ticker:"Bitkub ticker",
- h_chart:"KUB / THB",
- n_tv:"The chart is provided by TradingView from Bitkub's own KUBTHB feed, which carries years of history and a complete set of drawing tools, beyond what the data KUB Flow collects can offer. Every panel below the chart is measured by KUB Flow from its own trade record.",
- w_chart:"Where price has been, at a glance, with the history and drawing tools a chart needs. It answers the direction question so the panels below can answer the ones a price chart cannot: what a trade would cost, who is paying the spread, and where the supply sits.",
- h_tech:"Indicator readings",
- l_tech:"These values are calculated by KUB Flow from the bars it collects, and are not read from the chart above, so they reconcile with the execution-cost, sweep and taker panels below. Each row states where the value sits against its conventional threshold, and how many bars were used. An indicator whose period exceeds the bars collected is reported as unavailable rather than estimated.",
- w_tech:"The standard momentum, trend and volatility readings in one table, each with the number of bars behind it. The bar count is the point: a reading computed from too few bars is shown as unavailable, so a number on this page is never more confident than the data under it.",
- tf_bars:"{bars} bars collected at {tf}",
- th_ind:"Indicator",th_val:"Value",th_pos:"Position",th_bars:"Bars",
- p_over:"above {n}",p_under:"below {n}",p_between:"between {a} and {b}",p_na:"not enough bars",
- p_above_sig:"above signal",p_below_sig:"below signal",p_px_above:"price above",p_px_below:"price below",
- p_in_band:"inside bands",p_above_band:"above upper band",p_below_band:"below lower band",p_value:"reading",
- h_flow:"Order flow and execution cost",
- l_flow:"Four views of the same order book and trade record, shown together because they answer one question between them. Any of them can be switched off.",
- l_cost:"Bitkub's own book can be dragged to price a sweep by hand, at the current moment. KUB Flow does it automatically at fixed sizes, every five minutes, keeps the series, and puts the result beside the on-chain venues — the value is the history and the comparison, not the arithmetic.",
- w_flow:"What a trade of a given size would actually cost, how that cost has been moving, which side is paying the spread, and which single orders cleared several price levels at once. Together they describe liquidity: a market can look calm on the chart while the cost of getting out of it is rising.",
- sub_cost:"Cost by order size, current book",
- sub_slipt:"Cost of a 10,000 KUB order, hour by hour",
- sub_taker:"Which side crossed the spread, hourly",
- sub_sweep:"Orders clearing three or more price levels",
- lg_sell:"Sell into the bid side",lg_buy:"Buy into the ask side",
- lg_sell10:"Sell 10k",lg_buy10:"Buy 10k",
- lg_bcross:"Buyers crossing",lg_scross:"Sellers crossing",
- h_dex:"On-chain price across five DEXes",dex_size:"Order size",
- l_dex:"An eth_call is issued directly to each venue's router and quoter, without any third-party API, to compare which venue returns the most for the same size. Each venue is quoted against whichever dollar token it actually holds a pool in, with that token's own decimals.",
- n_dex:"Each venue is quoted as a single pool. Junoswap can split one order across several pools, which KUB Flow does not yet model, so its figure is a floor rather than the best price available. Kublerx prices against Bridged Tether USD rather than Bitkub-Peg KUSDT — a different contract, the same dollar.",
- w_dex:"Whether the on-chain price is worth using instead of the exchange, and where. The comparison is per size, because a venue that wins on 100 KUB can lose badly on 5,000: the gap between them is the cost of routing to the wrong one.",
- no_quote:"no pool",
- th_dex:"DEX",th_out:"USD out",th_px:"Per KUB",th_vs:"vs best",th_tok:"Quoted in",
- h_ex:"KUB held at Bitkub Exchange",
- l_ex:"Only the exchange's own wallets are counted here — its cold wallets and its active hot wallet — read every five minutes. Ecosystem funds, the stake vault and the company reserve are not the exchange's and are left to the supply panel. Transfers in and out are read from the chain, by day, in Bangkok time, and the history is walked backwards a page at a time from kubscan.",
- n_ex:"Days before the history walk reached them are marked as uncollected rather than drawn as zero flow, and are left out of both the total and the cumulative line. The exchange moves KUB between its own wallets too; only transfers crossing the boundary are counted. The line is read against the right-hand axis and starts from zero at the left edge of the range, so it shows the change across the period rather than a balance.",
- w_ex:"Whether coins are moving onto the exchange or away from it. Sustained flow onto an exchange puts sellable supply within reach of the order book; flow away from it takes supply out of immediate circulation. Neither predicts price, but both change what the book can absorb.",
- ex_in:"Onto the exchange",ex_out:"Off the exchange",ex_net:"Net out, period",
- ex_bal:"Held by the exchange",ex_nodata:"not collected",
- h_chain:"Chain activity",
- l_chain:"Daily totals from kubscan. Fees are fetched one day at a time and reach as far back as the backfill has walked. Transaction counts come from its chart endpoint, which returns the last 31 days and ignores any date range asked of it, so the line stops where that window does while the bars carry on.",
- n_chain:"Gas units are deliberately not shown. kubscan quotes a flat 25 gwei, but that is the price offered for a new transaction, not the average actually paid: on 19 Sep it measured 9,466,430,334 gas against 190.41 KUB of fees, an effective 20.1 gwei. Dividing fees by 25 gwei would understate gas by about a fifth, and there is no per-day gas figure to use instead.",
- w_chain:"How much the chain is actually being used, in fees paid and transactions settled. It is the demand side behind everything else on this page: a market's depth and an exchange's flow both sit on top of a chain that people are either using or not. The newest day here is the last one kubscan has closed, so it trails the running totals on their front page by a day.",
- ch_fees:"Fees paid, KUB",ch_tx:"Transactions",ch_avg:"Average fee per transaction",
- r_7d:"7d",r_1m:"1M",r_3m:"3M",r_1y:"1Y",
- h_treas:"Distribution of the coin supply",
- l_treas:"Measured against the whole coin supply, not only the wallets under observation, and from balances rather than transfers: the stake vault is a contract whose KUB moves as internal transactions that never appear in the transaction list, so the balance is the only reliable measure.",
- n_treas:"The burn address is excluded. kubscan credits it with more KUB than exists, which follows from how gas is accounted for rather than from any actual holder. Large holders are grouped by the label kubscan publishes for them; addresses it carries no label for are listed by address and counted as unidentified, not given an invented name.",
- w_treas:"How much of the supply is parked and where. Coins in a stake vault, a fund's cold wallet or the KKUB wrapper are not sitting on an order book, so the share that is genuinely free to trade is smaller than the total supply suggests.",
- g_stake:"Stake vault",g_fund:"Ecosystem & development funds",g_cold:"Bitkub Exchange wallets",
- g_kkub:"Wrapped as KKUB",g_reserve:"KUB Company Reserve",g_unid:"Unidentified large holders",g_rest:"Other holders",
- t_supply:"{watched} of {total} KUB held in the wallets under observation ({pct}%)",
- th_wallet:"Wallet",th_group:"Group",th_bal:"Balance, KUB",th_share:"Share",
- h_health:"Collection integrity",
- l_health:"Every collection round is recorded, whether it succeeds or fails, so gaps remain visible rather than hidden. Counts are compared against how many rounds the schedule should have produced in 24 hours.",
- w_health:"Whether the numbers above are standing on complete data. A collector that has been failing quietly turns every panel it feeds into a confident half-truth, so its record is kept where it can be checked.",
- th_job:"Collection job",th_runs:"Rounds, 24 h",th_fail:"Failed",th_state:"State",
- st_ok:"healthy",st_ramp:"ramping up",st_fail:"failed",
- fold_show:"Show",fold_hide:"Hide",health_sum:"{ok} of {n} jobs healthy",
- f1:"The figures on this page are measured by KUB Flow from the order book, the trade record and the chain. Where a figure originates elsewhere, the panel states so.",
- f2:"The order book is captured 60 levels deep; sizes beyond that depth cannot be priced from it. Windows longer than the data actually collected are labelled as such, and are never back-filled.",
- f3:"Not investment advice.",
- snap:"Showing the built-in snapshot, as the live feed is unavailable.",
- apierr:"Unable to load live data: ",loading:"Loading…"},
-th:{ch_txfrom:"จำนวนธุรกรรมมีตั้งแต่ {d} เป็นต้นมา เพราะ chart ของ kubscan คืนข้อมูลได้ 31 วันและไม่รับช่วงวันที่ ส่วนค่าธรรมเนียมดึงทีละวันจึงย้อนได้ไกลกว่า วันก่อนหน้านั้นจึงมีเฉพาะค่าธรรมเนียม",ex_cum:"ไหลออกสุทธิสะสม",ex_days:"แสดง {n} วัน",ex_cold:"cold",ex_hot:"hot",title:"KUB Flow Desk",info:"รายละเอียด",why_title:"ข้อมูลนี้บอกอะไร",
- fresh_at:"ข้อมูล ณ {t}",fresh_none:"ยังไม่มีข้อมูล",
- src:"Bitkub public API v3 ทุก 5 นาที · kubscan v2 (41 กระเป๋า) ทุก 5 นาที · KUB Chain RPC (5 DEX) ทุก 15 นาที · กิจกรรมบนเชนจาก kubscan รายชั่วโมง · กราฟราคาโดย TradingView",
- k_offer:"ราคาเสนอขายต่ำสุด",k_vol:"วอลุ่ม 24 ชม.",k_sell:"ขาย 10k KUB",k_nf:"ไหลออกจากศูนย์ซื้อขาย",k_taker:"ฝั่งซื้อข้ามสเปรด",
- k_spread:"สเปรด",k_lv:"ระดับราคา",k_trades:"รายการ",k_bid:"bid",k_last:"ล่าสุด",k_ticker:"ticker ของ Bitkub",
- h_chart:"KUB / THB",
- n_tv:"กราฟนี้จัดทำโดย TradingView จากฟีด KUBTHB ของ Bitkub ซึ่งมีข้อมูลย้อนหลังหลายปีและมีเครื่องมือวิเคราะห์ครบถ้วน เกินกว่าชุดข้อมูลที่ KUB Flow จัดเก็บเองจะให้ได้ ส่วนทุกแผงที่อยู่ใต้กราฟ KUB Flow วัดจากข้อมูลการซื้อขายที่จัดเก็บเอง",
- w_chart:"ดูทิศทางราคาย้อนหลังได้ในภาพเดียว พร้อมประวัติและเครื่องมือวาดที่ครบ เมื่อคำถามเรื่องทิศทางถูกตอบแล้ว แผงด้านล่างจึงตอบสิ่งที่กราฟราคาตอบไม่ได้ คือการซื้อขายจริงมีต้นทุนเท่าไร ใครเป็นผู้จ่ายสเปรด และเหรียญทั้งหมดอยู่ที่ไหน",
- h_tech:"ค่าอินดิเคเตอร์",
- l_tech:"ค่าทั้งหมด KUB Flow คำนวณจากแท่งราคาที่จัดเก็บเอง มิได้อ่านค่าจากกราฟด้านบน ตัวเลขจึงสอดคล้องกับแผงต้นทุนการซื้อขาย แผงคำสั่งขนาดใหญ่ และแผงฝั่งที่ข้ามสเปรดด้านล่าง แต่ละรายการแสดงตำแหน่งของค่าเทียบกับเกณฑ์มาตรฐาน พร้อมจำนวนแท่งราคาที่ใช้คำนวณ อินดิเคเตอร์ที่ต้องใช้แท่งมากกว่าที่จัดเก็บได้จะรายงานว่ายังคำนวณไม่ได้ แทนการประมาณค่า",
- w_tech:"ค่ามาตรฐานด้านโมเมนตัม แนวโน้ม และความผันผวน รวมในตารางเดียว พร้อมจำนวนแท่งราคาที่ใช้คำนวณกำกับทุกบรรทัด จำนวนแท่งคือสาระสำคัญ เพราะค่าที่คำนวณจากแท่งไม่พอจะถูกระบุว่ายังใช้ไม่ได้ ตัวเลขบนหน้านี้จึงไม่มั่นใจเกินกว่าข้อมูลที่รองรับอยู่",
- tf_bars:"จัดเก็บได้ {bars} แท่งราคาที่ {tf}",
- th_ind:"อินดิเคเตอร์",th_val:"ค่า",th_pos:"ตำแหน่ง",th_bars:"แท่งราคา",
- p_over:"เหนือ {n}",p_under:"ใต้ {n}",p_between:"อยู่ระหว่าง {a} ถึง {b}",p_na:"แท่งราคาไม่เพียงพอ",
- p_above_sig:"เหนือเส้น signal",p_below_sig:"ใต้เส้น signal",p_px_above:"ราคาอยู่เหนือ",p_px_below:"ราคาอยู่ใต้",
- p_in_band:"อยู่ในกรอบ",p_above_band:"เหนือกรอบบน",p_below_band:"ใต้กรอบล่าง",p_value:"ค่าที่อ่านได้",
- h_flow:"กระแสคำสั่งและต้นทุนการซื้อขาย",
- l_flow:"สี่มุมมองจากสมุดคำสั่งและรายการซื้อขายชุดเดียวกัน จัดไว้ด้วยกันเพราะร่วมกันตอบคำถามเดียว และปิดกราฟใดก็ได้",
- l_cost:"สมุดคำสั่งของ Bitkub เองลากคลุมเพื่อดูต้นทุนการกวาดด้วยมือได้ ณ ขณะนั้น สิ่งที่ KUB Flow ทำเพิ่มคือทำอัตโนมัติที่ขนาดคงที่ทุกห้านาที เก็บเป็นอนุกรมเวลา และวางเทียบกับแหล่งบนเชน คุณค่าจึงอยู่ที่ประวัติและการเปรียบเทียบ มิใช่ตัวการคำนวณ",
- w_flow:"คำสั่งขนาดหนึ่ง ๆ มีต้นทุนจริงเท่าไร ต้นทุนนั้นเปลี่ยนไปอย่างไร ฝั่งใดเป็นผู้จ่ายสเปรด และคำสั่งใดกินหลายระดับราคาในครั้งเดียว ทั้งสี่รวมกันอธิบายสภาพคล่อง ตลาดอาจดูสงบบนกราฟราคา ขณะที่ต้นทุนของการออกจากตลาดกำลังสูงขึ้น",
- sub_cost:"ต้นทุนตามขนาดคำสั่ง จากสมุดคำสั่งปัจจุบัน",
- sub_slipt:"ต้นทุนของคำสั่ง 10,000 KUB รายชั่วโมง",
- sub_taker:"ฝั่งที่ข้ามสเปรด รายชั่วโมง",
- sub_sweep:"คำสั่งที่กินตั้งแต่สามระดับราคาขึ้นไป",
- lg_sell:"ขายเข้าฝั่งเสนอซื้อ",lg_buy:"ซื้อเข้าฝั่งเสนอขาย",
- lg_sell10:"ขาย 10k",lg_buy10:"ซื้อ 10k",
- lg_bcross:"ฝั่งซื้อข้ามสเปรด",lg_scross:"ฝั่งขายข้ามสเปรด",
- h_dex:"ราคาบนเชน เทียบ 5 DEX",dex_size:"ขนาดคำสั่ง",
- l_dex:"เรียก eth_call ไปยัง router และ quoter ของแต่ละ DEX โดยตรง ไม่ผ่าน API ของผู้ให้บริการรายใด เพื่อเปรียบเทียบว่าปริมาณเท่ากันนี้ แหล่งใดให้ผลตอบแทนสูงสุด แต่ละแหล่งคิดราคากับ token ดอลลาร์ตัวที่มี pool อยู่จริง ตามจำนวนทศนิยมของ token นั้น",
- n_dex:"แต่ละแหล่งคิดราคาแบบ pool เดียว Junoswap สามารถแบ่งคำสั่งไปยังหลาย pool ได้ ซึ่ง KUB Flow ยังมิได้จำลองส่วนนี้ ค่าที่แสดงจึงเป็นค่าต่ำสุด มิใช่ราคาที่ดีที่สุดที่ทำได้จริง ส่วน Kublerx คิดราคากับ Bridged Tether USD แทน Bitkub-Peg KUSDT คนละ contract แต่เป็นดอลลาร์เดียวกัน",
- w_dex:"ราคาบนเชนคุ้มกว่าศูนย์ซื้อขายหรือไม่ และที่แหล่งใด การเปรียบเทียบแยกตามขนาด เพราะแหล่งที่ชนะที่ 100 KUB อาจแพ้ขาดที่ 5,000 KUB ส่วนต่างระหว่างแหล่งคือต้นทุนของการส่งคำสั่งผิดที่",
- no_quote:"ไม่มี pool",
- th_dex:"DEX",th_out:"ได้ USD",th_px:"ต่อ 1 KUB",th_vs:"เทียบที่ดีที่สุด",th_tok:"คิดราคากับ",
- h_ex:"KUB ที่อยู่บน Bitkub Exchange",
- l_ex:"นับเฉพาะกระเป๋าของศูนย์ซื้อขายเท่านั้น คือกระเป๋าเย็นทั้งหมดและกระเป๋าร้อนที่ใช้งานอยู่ อ่านค่าทุกห้านาที ส่วนกองทุนระบบนิเวศ stake vault และ KUB Company Reserve ไม่ใช่ของศูนย์ซื้อขาย จึงไปอยู่ในแผงการกระจายตัวของเหรียญแทน ขณะที่รายการโอนเข้าออกอ่านจากเชนโดยตรง แยกรายวันตามเวลาไทย และประวัติย้อนหลังไล่ดึงจาก kubscan ทีละหน้า",
- n_ex:"วันที่การไล่ประวัติยังไปไม่ถึงจะระบุว่ายังไม่ได้จัดเก็บ แทนการวาดเป็นศูนย์ และไม่ถูกนับทั้งในยอดรวมและเส้นสะสม · ศูนย์ซื้อขายมีการโอนระหว่างกระเป๋าของตนเองด้วย ตรงนี้นับเฉพาะรายการที่ข้ามขอบเขตเข้าออก · เส้นอ่านจากแกนขวา และเริ่มนับจากศูนย์ที่ขอบซ้ายของช่วงที่เลือก จึงแสดงการเปลี่ยนแปลงตลอดช่วง ไม่ใช่ยอดคงเหลือ",
- w_ex:"เหรียญกำลังไหลเข้าหรือออกจากศูนย์ซื้อขาย การไหลเข้าต่อเนื่องหมายถึงอุปทานที่พร้อมขายเข้ามาอยู่ใกล้สมุดคำสั่งมากขึ้น ส่วนการไหลออกคือการนำอุปทานออกจากการหมุนเวียนทันที ทั้งสองอย่างไม่ได้ทำนายราคา แต่เปลี่ยนปริมาณที่สมุดคำสั่งรับไหว",
- ex_in:"ไหลเข้าศูนย์ซื้อขาย",ex_out:"ไหลออกจากศูนย์ซื้อขาย",ex_net:"ไหลออกสุทธิในช่วงที่เลือก",
- ex_bal:"ศูนย์ซื้อขายถือครอง",ex_nodata:"ยังไม่ได้จัดเก็บ",
- h_chain:"กิจกรรมบนเชน",
- l_chain:"ยอดรวมรายวันจาก kubscan · ค่าธรรมเนียมดึงทีละวันจึงย้อนหลังได้เท่าที่การเติมข้อมูลเดินไปถึง ส่วนจำนวนธุรกรรมมาจาก chart endpoint ซึ่งคืนได้แค่ 31 วันล่าสุดและไม่รับช่วงวันที่ที่ขอไป เส้นจึงหยุดตรงที่หน้าต่างนั้นหมด ขณะที่แท่งยังต่อไปได้",
- n_chain:"ตั้งใจไม่แสดงหน่วย gas เนื่องจาก kubscan ระบุราคา gas คงที่ 25 gwei ซึ่งเป็นราคาที่เสนอสำหรับธุรกรรมใหม่ มิใช่ค่าเฉลี่ยที่จ่ายจริง วันที่ 19 ก.ย. kubscan วัด gas ได้ 9,466,430,334 เทียบกับค่าธรรมเนียม 190.41 KUB คิดเป็น 20.1 gwei การหารค่าธรรมเนียมด้วย 25 gwei จึงให้ค่า gas ต่ำกว่าจริงราวหนึ่งในห้า และไม่มีตัวเลข gas รายวันให้ใช้แทน",
- w_chain:"เชนถูกใช้งานจริงมากน้อยเพียงใด วัดจากค่าธรรมเนียมที่จ่ายและจำนวนธุรกรรมที่สำเร็จ นี่คือฝั่งอุปสงค์ที่รองรับทุกอย่างบนหน้านี้ ทั้งความลึกของตลาดและกระแสเงินของศูนย์ซื้อขายล้วนตั้งอยู่บนเชนที่มีคนใช้หรือไม่มี · วันล่าสุดที่แสดงคือวันล่าสุดที่ kubscan ปิดยอดแล้ว จึงช้ากว่ายอดที่วิ่งอยู่บนหน้าแรกของเขาหนึ่งวัน",
- ch_fees:"ค่าธรรมเนียม KUB",ch_tx:"จำนวนธุรกรรม",ch_avg:"ค่าธรรมเนียมเฉลี่ยต่อธุรกรรม",
- r_7d:"7 วัน",r_1m:"1 เดือน",r_3m:"3 เดือน",r_1y:"1 ปี",
- h_treas:"การกระจายตัวของเหรียญทั้งหมด",
- l_treas:"พิจารณาจากปริมาณเหรียญทั้งเครือข่าย มิใช่เฉพาะกระเป๋าที่ติดตาม และใช้ยอดคงเหลือแทนรายการโอน เนื่องจาก stake vault เป็นสัญญาอัจฉริยะที่เหรียญเคลื่อนไหวในรูป internal transaction ซึ่งไม่ปรากฏในรายการธุรกรรม ยอดคงเหลือจึงเป็นวิธีเดียวที่เชื่อถือได้",
- n_treas:"ไม่นับรวม burn address เนื่องจาก kubscan บันทึกยอดไว้สูงกว่าปริมาณเหรียญทั้งหมด อันเป็นผลจากวิธีบันทึกค่าธรรมเนียม มิใช่ผู้ถือครองจริง ผู้ถือรายใหญ่จัดหมวดตามป้ายชื่อที่ kubscan เผยแพร่ ส่วนกระเป๋าที่ไม่มีป้ายชื่อจะแสดงเป็นเลขที่กระเป๋าและนับเป็นรายที่ยังระบุไม่ได้ ไม่มีการตั้งชื่อเอง",
- w_treas:"อุปทานถูกพักไว้เท่าใดและอยู่ที่ใด เหรียญที่อยู่ใน stake vault กระเป๋าเย็นของกองทุน หรือในสัญญา KKUB ไม่ได้อยู่บนสมุดคำสั่ง สัดส่วนที่ซื้อขายได้จริงจึงน้อยกว่าที่ปริมาณรวมทำให้เข้าใจ",
- g_stake:"Stake vault",g_fund:"กองทุนระบบนิเวศและการพัฒนา",g_cold:"กระเป๋าของ Bitkub Exchange",
- g_kkub:"ห่อเป็น KKUB",g_reserve:"KUB Company Reserve",g_unid:"รายใหญ่ที่ยังระบุไม่ได้",g_rest:"ผู้ถือครองรายอื่น",
- t_supply:"กระเป๋าที่ติดตามถือครอง {watched} จาก {total} KUB ({pct}%)",
- th_wallet:"กระเป๋า",th_group:"กลุ่ม",th_bal:"ยอดคงเหลือ KUB",th_share:"สัดส่วน",
- h_health:"ความครบถ้วนของการจัดเก็บข้อมูล",
- l_health:"ทุกรอบการจัดเก็บจะบันทึกผลไว้ ทั้งกรณีสำเร็จและล้มเหลว ช่วงข้อมูลที่ขาดหายจึงปรากฏให้เห็น ไม่ถูกปกปิด จำนวนรอบเทียบกับจำนวนที่ตารางเวลาควรทำได้ใน 24 ชั่วโมง",
- w_health:"ตัวเลขด้านบนตั้งอยู่บนข้อมูลที่ครบถ้วนหรือไม่ ตัวจัดเก็บที่ล้มเหลวอย่างเงียบ ๆ จะทำให้ทุกแผงที่ใช้ข้อมูลนั้นกลายเป็นความจริงครึ่งเดียวที่ดูน่าเชื่อ บันทึกจึงถูกเก็บไว้ให้ตรวจสอบได้",
- th_job:"งานจัดเก็บ",th_runs:"รอบ 24 ชม.",th_fail:"ล้มเหลว",th_state:"สถานะ",
- st_ok:"ปกติ",st_ramp:"อยู่ระหว่างเริ่มต้น",st_fail:"ล้มเหลว",
- fold_show:"แสดง",fold_hide:"ซ่อน",health_sum:"ปกติ {ok} จาก {n} งาน",
- f1:"ตัวเลขบนหน้านี้ KUB Flow วัดจากสมุดคำสั่งซื้อขาย รายการซื้อขาย และข้อมูลบนเครือข่าย หากตัวเลขใดมาจากแหล่งอื่น จะระบุไว้ในแผงนั้น",
- f2:"สมุดคำสั่งจัดเก็บลึก 60 ระดับราคา ปริมาณที่เกินกว่านั้นไม่สามารถคำนวณต้นทุนได้ ช่วงเวลาที่ยาวกว่าข้อมูลที่จัดเก็บจริงจะระบุกำกับไว้ และไม่มีการเติมตัวเลขย้อนหลัง",
- f3:"ไม่ใช่คำแนะนำการลงทุน",
- snap:"กำลังแสดงข้อมูลสำรองที่ฝังมากับหน้าเว็บ เนื่องจากไม่สามารถเชื่อมต่อข้อมูลสดได้",
- apierr:"ไม่สามารถเชื่อมต่อข้อมูลสดได้: ",loading:"กำลังโหลด…"},
-zh:{ch_txfrom:"交易笔数自 {d} 起才有：kubscan 的图表接口只返回 31 天且忽略日期范围，而手续费按日逐条获取，可回溯更久。更早的日期只有手续费。",ex_cum:"累计净流出",ex_days:"显示 {n} 天",ex_cold:"冷钱包",ex_hot:"热钱包",title:"KUB 流动性看板",info:"说明",why_title:"这一面板说明什么",
- fresh_at:"数据截至 {t}",fresh_none:"暂无数据",
- src:"Bitkub 公开 API v3 每 5 分钟 · kubscan v2（41 个钱包）每 5 分钟 · KUB 链 RPC（5 个 DEX）每 15 分钟 · 链上活动每小时取自 kubscan · 价格图表由 TradingView 提供",
- k_offer:"最低卖价",k_vol:"24 小时成交量",k_sell:"卖出 1 万 KUB",k_nf:"流出交易所",k_taker:"买方主动成交",
- k_spread:"价差",k_lv:"档位",k_trades:"笔",k_bid:"买一",k_last:"最新",k_ticker:"Bitkub 行情接口",
- h_chart:"KUB / 泰铢",
- n_tv:"图表由 TradingView 提供，采用 Bitkub 自有的 KUBTHB 数据源，具备数年历史数据与完整绘图工具，超出 KUB Flow 自行采集的数据所能提供的范围。图表以下各面板均由 KUB Flow 基于自采成交记录测算。",
- w_chart:"一眼看清价格走过的路径，并具备图表应有的历史与绘图工具。方向的问题由它回答，下方面板才能回答价格图表无法回答的部分：一笔交易的真实成本、谁在支付价差、以及供应量究竟在哪里。",
- h_tech:"指标读数",
- l_tech:"各项数值由 KUB Flow 基于自采K线计算，并非读取上方图表，因此可与下方的执行成本、扫单与主动成交面板相互印证。每一行标明该值相对常规阈值的位置，以及参与计算的K线数量。所需周期超出已采集K线的指标会标注为暂不可用，而不做估算。",
- w_tech:"动量、趋势与波动率的标准读数集中于一张表，每一行都附带其背后的K线数量。K线数量正是关键：由不足的K线算出的读数会被标为不可用，因此本页的数字不会比支撑它的数据更自信。",
- tf_bars:"在 {tf} 周期已采集 {bars} 根K线",
- th_ind:"指标",th_val:"数值",th_pos:"位置",th_bars:"K线数",
- p_over:"高于 {n}",p_under:"低于 {n}",p_between:"介于 {a} 与 {b} 之间",p_na:"K线不足",
- p_above_sig:"位于信号线上方",p_below_sig:"位于信号线下方",p_px_above:"价格在其上方",p_px_below:"价格在其下方",
- p_in_band:"位于通道内",p_above_band:"高于上轨",p_below_band:"低于下轨",p_value:"读数",
- h_flow:"订单流与执行成本",
- l_flow:"同一份订单簿与成交记录的四个视角，放在一起是因为它们共同回答同一个问题。其中任何一个都可以关闭。",
- l_cost:"Bitkub 自己的订单簿可以手动拖选，估算当下扫单的成本。KUB Flow 额外做的是：按固定规模每五分钟自动计算、保留时间序列，并与链上场所并列比较。价值在于历史与对比，而非这道算术本身。",
- w_flow:"特定规模的订单实际成本是多少、该成本如何变化、哪一方在支付价差、哪些单笔订单一次吃掉了多档价格。四者合起来描述流动性：价格图表上市场可能风平浪静，而离场的成本正在上升。",
- sub_cost:"按订单规模的成本（当前订单簿）",
- sub_slipt:"10,000 KUB 订单的逐小时成本",
- sub_taker:"逐小时主动跨越价差的一方",
- sub_sweep:"吃掉三档及以上价格的订单",
- lg_sell:"卖向买盘",lg_buy:"买向卖盘",
- lg_sell10:"卖出 1 万",lg_buy10:"买入 1 万",
- lg_bcross:"买方主动",lg_scross:"卖方主动",
- h_dex:"链上价格：5 个 DEX 对比",dex_size:"订单规模",
- l_dex:"直接向各场所的 router 与 quoter 发起 eth_call，不经任何第三方 API，以比较同等数量下何处回报最高。各场所按其实际持有流动性池的那种美元代币计价，并采用该代币自身的精度。",
- n_dex:"各场所均按单一流动性池计价。Junoswap 可将一笔订单拆分至多个池，KUB Flow 尚未对此建模，故其数值为下限，而非实际可得的最优价格。Kublerx 以 Bridged Tether USD 计价，而非 Bitkub-Peg KUSDT —— 合约不同，但同为美元。",
- w_dex:"链上价格是否值得取代交易所，以及应当选择哪一家。比较按规模分别进行，因为在 100 KUB 上胜出的场所，在 5,000 KUB 上可能大幅落后：两者的差距就是选错路由的代价。",
- no_quote:"无流动性池",
- th_dex:"DEX",th_out:"获得美元",th_px:"每 KUB",th_vs:"对比最优",th_tok:"计价代币",
- h_ex:"存放于 Bitkub Exchange 的 KUB",
- l_ex:"此处只统计交易所自有的钱包 —— 其全部冷钱包与在用的热钱包 —— 每五分钟读取一次。生态基金、质押金库与公司储备并不属于交易所，归入供应量分布面板。进出转账直接读自链上，按曼谷时间逐日统计，历史数据则自 kubscan 逐页向前回溯。",
- n_ex:"历史回溯尚未到达的日期标注为未采集，而不是画成零流量，且不计入合计与累计曲线。交易所在自有钱包之间也会划转，此处只统计跨越进出边界的转账。曲线以右侧坐标轴读取，并自所选区间左端从零起算，因此它表示整个区间的变化量，而非余额。",
- w_ex:"代币正在流入还是流出交易所。持续流入意味着可供抛售的供应更贴近订单簿；流出则把供应移出即时流通。两者都不预测价格，但都会改变订单簿所能承接的量。",
- ex_in:"流入交易所",ex_out:"流出交易所",ex_net:"所选区间净流出",
- ex_bal:"交易所持有量",ex_nodata:"未采集",
- h_chain:"链上活动",
- l_chain:"取自 kubscan 的每日合计。手续费按日逐条获取，回溯范围取决于补数进度；交易笔数来自其图表接口，只返回最近 31 天且忽略所请求的日期范围，因此曲线在该窗口处中断，而柱状图继续延伸。",
- n_chain:"此处刻意不显示 gas 用量。kubscan 标示 25 gwei 的固定 gas 价格，但那是新交易的报价，并非实际支付的均价：9 月 19 日其测得 9,466,430,334 gas，对应 190.41 KUB 手续费，折合 20.1 gwei。以 25 gwei 相除会把 gas 低估约五分之一，而又没有可替代的逐日 gas 数据。",
- w_chain:"这条链实际被使用的程度，以支付的手续费与结算的交易笔数衡量。它是本页其余一切背后的需求侧：市场深度与交易所资金流，都建立在一条有人使用或无人使用的链之上。此处最新的一天是 kubscan 已结算的最后一天，因此比其首页的滚动数字晚一天。",
- ch_fees:"手续费（KUB）",ch_tx:"交易笔数",ch_avg:"每笔交易平均手续费",
- r_7d:"7 天",r_1m:"1 个月",r_3m:"3 个月",r_1y:"1 年",
- h_treas:"代币供应量的分布",
- l_treas:"以全网代币供应量为基准，而非仅限受监控钱包，并以余额而非转账计量：质押金库为智能合约，其 KUB 以内部交易形式流动，不会出现在交易列表中，因此余额是唯一可靠的观测方式。",
- n_treas:"不计入销毁地址。kubscan 记于其名下的 KUB 超过实际总量，此系 gas 记账方式所致，并非真实持有。大额持有者按 kubscan 公布的标签归类；没有标签的地址以地址本身列出并计为未识别，不会被臆造名称。",
- w_treas:"有多少供应量处于闲置状态、又存放在何处。存于质押金库、基金冷钱包或 KKUB 合约中的代币并不在订单簿上，因此真正可自由交易的份额，比总量所暗示的要小。",
- g_stake:"质押金库",g_fund:"生态与发展基金",g_cold:"Bitkub Exchange 钱包",
- g_kkub:"包装为 KKUB",g_reserve:"KUB 公司储备",g_unid:"未识别的大额持有者",g_rest:"其他持有者",
- t_supply:"监控钱包持有 {watched} / 共 {total} KUB（{pct}%）",
- th_wallet:"钱包",th_group:"分组",th_bal:"余额（KUB）",th_share:"占比",
- h_health:"采集完整性",
- l_health:"每一轮采集无论成功与否均有记录，故数据缺口始终可见，不被掩盖。轮次数量与排程在 24 小时内应产生的数量作对比。",
- w_health:"上方的数字是否建立在完整的数据之上。一个悄然失败的采集器，会让它所供给的每一个面板都变成看似可信的半真半假，因此它的记录被保留下来以供核查。",
- th_job:"采集任务",th_runs:"24 小时轮次",th_fail:"失败",th_state:"状态",
- st_ok:"正常",st_ramp:"刚启动",st_fail:"失败",
- fold_show:"展开",fold_hide:"收起",health_sum:"{n} 项任务中 {ok} 项正常",
- f1:"本页数字由 KUB Flow 基于订单簿、成交记录与链上数据测算。若某项数字来自其他来源，相应面板将予以注明。",
- f2:"订单簿采集深度为 60 档，超出该深度的数量无法据此定价。超出实际采集时长的时间窗将予以标注，且不进行回填。",
- f3:"非投资建议。",
- snap:"正在显示内置快照，因无法连接实时数据。",
- apierr:"无法加载实时数据：",loading:"加载中…"}};
 
 const SNAP={generated_at:"2026-09-20T11:15:00Z",
  now:{price_thb:20.23,best_bid:20.12,best_ask:20.23,spread_bps:54.52,vol_24h_kub:205991.02,vol_24h_thb:4199104.49,
@@ -505,13 +351,16 @@ const SNAP={generated_at:"2026-09-20T11:15:00Z",
         {day:"2026-09-18",tx:37334,fees:181.3769,gas:7255075843},
         {day:"2026-09-19",tx:39079,fees:190.4081,gas:7616325322}],
  asOf:{},
+ chainTypes:[{day:"2026-09-20",native:1,token:35,contract:21,other:0,n:57}],
+ dailyOhlc:[["2026-09-18",20.5,20.6,20.3,20.44],["2026-09-19",20.44,20.6,20.3,20.49],["2026-09-20",20.49,20.5,20.0,20.08]],
  candles:{tf:"15m",bars:0,candles:[]}};
 
 const COLLECT_START=Date.parse("2026-09-19T08:10:00Z");
 const TFS=[["5m",300,"5"],["15m",900,"15"],["1h",3600,"60"],["4h",14400,"240"],["1d",86400,"D"]];
+const TV_LOCALE={th:"th",zh:"zh_CN",ms:"ms_MY",vi:"vi_VN",id:"id_ID"};
 const RANGES=[["7d",7,"r_7d"],["1m",30,"r_1m"],["3m",90,"r_3m"],["1y",365,"r_1y"]];
 const MIN_BARS=35;
-let L="en",D=SNAP,LIVE=false,TF="15m",CANDLES=[],DEXSIZE=null,RANGE="1m",EXRANGE="7d";
+let L="en",D=SNAP,LIVE=false,TF="15m",CANDLES=[],DEXSIZE=null,RANGE="1m",EXRANGE="7d",TECHRANGE="tf";
 
 const $=s=>document.querySelector(s),NS="http://www.w3.org/2000/svg";
 const T=k=>(I18N[L]&&I18N[L][k])||I18N.en[k]||k;
@@ -562,7 +411,7 @@ function mountTV(){
   new TradingView.widget({
     container_id:"tv-chart",symbol:"BITKUB:KUBTHB",interval:tvi,
     timezone:"Asia/Bangkok",theme:"dark",style:"1",
-    locale:L==="th"?"th":L==="zh"?"zh_CN":"en",
+    locale:TV_LOCALE[L]||"en",
     autosize:true,hide_side_toolbar:false,allow_symbol_change:false,
     withdateranges:true,details:false,
     backgroundColor:"#000000",gridColor:"#2a2e39"
@@ -607,7 +456,7 @@ function paintStatic(){
   document.documentElement.lang=L==="zh"?"zh":L;
   document.title=T("title");
   document.querySelectorAll("[data-i18n]").forEach(n=>{n.textContent=T(n.getAttribute("data-i18n"))});
-  document.querySelectorAll(".seg button[data-lang]").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.lang===L)));
+  { const ls=$("#langsel"); if(ls&&ls.value!==L)ls.value=L; }
   document.querySelectorAll(".i").forEach(b=>b.setAttribute("aria-label",T("info")));
   closePop();
   const b=$("#banner");
@@ -615,7 +464,7 @@ function paintStatic(){
   else if(!LIVE){b.hidden=false;b.textContent=T("snap")}
   else b.hidden=true;
   $("#stamp").textContent=bkk(LIVE?D.generated_at:SNAP.generated_at)+" UTC+7";
-  $("#techtf").textContent=TF;
+  $("#techtf").textContent=techLabel();
   freshness();
 }
 function segButtons(sel,items,isOn,onClick){
@@ -633,6 +482,21 @@ function tfButtons(){
   segButtons("#tfseg",TFS.map(([tf,secs])=>({k:tf,label:tf,
     title:elapsed/secs<MIN_BARS?tpl("tf_bars",{bars:Math.floor(elapsed/secs),tf}):null})),
     k=>k===TF,setTF);
+}
+// "tf" mode reads the same bars the chart uses; the four longer ranges switch
+// to Bitkub's own daily price history, which reaches back further than the
+// tape collected here does.
+function techLabel(){
+  if(TECHRANGE==="tf")return TF;
+  const r=RANGES.find(x=>x[0]===TECHRANGE);return r?T(r[2]):TECHRANGE;
+}
+function techRangeButtons(){
+  const items=[{k:"tf",label:TF}].concat(RANGES.map(([k,,lab])=>({k,label:T(lab)})));
+  segButtons("#techrangeseg",items,k=>k===TECHRANGE,k=>{
+    TECHRANGE=k;try{localStorage.setItem("kfd-techrange",k)}catch(e){}
+    techRangeButtons();tech();
+    $("#techtf").textContent=techLabel();
+  });
 }
 function exRangeButtons(){
   segButtons("#exseg",RANGES.map(([k,,lab])=>({k,label:T(lab)})),k=>k===EXRANGE,k=>{
@@ -671,7 +535,22 @@ function kpis(){
   +k(T("k_taker"),(isNaN(tk)?"—":tk.toFixed(1))+"%","24 h · "+fmt(t24.fills)+" "+T("k_trades"));
 }
 function tech(){
-  const c=CANDLES.map(r=>r[4]),h=CANDLES.map(r=>r[2]),l=CANDLES.map(r=>r[3]),N=c.length,px=c[N-1];
+  let c,h,l;
+  if(TECHRANGE==="tf"){
+    c=CANDLES.map(r=>r[4]);h=CANDLES.map(r=>r[2]);l=CANDLES.map(r=>r[3]);
+  }else{
+    // Bitkub's own daily history — the on-chain tape collected here only
+    // starts 2026-09-19, far short of what a year-long window needs.
+    const days=(RANGES.find(r=>r[0]===TECHRANGE)||[])[1]||30;
+    const rows=(D.dailyOhlc||[]).slice(-days);
+    c=rows.map(r=>+r[4]);h=rows.map(r=>+r[2]);l=rows.map(r=>+r[3]);
+  }
+  const N=c.length,px=c[N-1];
+  const note=$("#techsrcnote");
+  if(note){
+    if(TECHRANGE==="tf"){note.hidden=true}
+    else{note.hidden=false;note.textContent=T("tech_daily_note")}
+  }
   const chip=(cl,t)=>`<span class="chip ${cl}">${t}</span>`;
   const na=`<td class="n">—</td><td>${chip("na",T("p_na"))}</td>`;
   const R=[];
@@ -856,15 +735,42 @@ function exchange(){
     {cx:Lx+slot*i+slot/2,cy:y2(cum[i]),r:3,fill:"var(--accent)",stroke:"var(--bg)","stroke-width":1.5},s));
   flow.forEach((r,i)=>{
     const cx=Lx+slot*i+slot/2;
-    hov(el("rect",{x:cx-slot/2,y:Tp,width:Math.max(3,slot),height:H-B-Tp,class:"hit"},s),
+    const hit=el("rect",{x:cx-slot/2,y:Tp,width:Math.max(3,slot),height:H-B-Tp,class:"hit",style:"cursor:pointer"},s);
+    hov(hit,
       uncovered(r)?`<b>${dmy(r.day)}</b><br>${T("ex_nodata")}<br><span class="k">${T("ex_cum")}</span> ${fmt(cum[i])}`
       :`<b>${dmy(r.day)}</b><br><span class="k">${T("ex_in")}</span> ${fmt(r.in)} (${r.in_tx})<br><span class="k">${T("ex_out")}</span> ${fmt(r.out)} (${r.out_tx})<br><span class="k">net</span> ${fmt(r.net)}<br><span class="k">${T("ex_cum")}</span> ${fmt(cum[i])}`);
+    hit.addEventListener("click",()=>showFlowTop(r.day));
   });
   if(sparse){
     el("text",{class:"tick",x:Lx,y:H-B+18},s).textContent=dmy(flow[0].day);
     el("text",{class:"tick",x:W-R,y:H-B+18,"text-anchor":"end"},s).textContent=dmy(flow[flow.length-1].day);
   }
 }
+// The chart shows a day's totals; clicking it answers the next question —
+// which transfers actually made up that total.
+let flowTopReq=0;
+function showFlowTop(dayStr){
+  const panel=$("#flowtop"),title=$("#flowtopTitle"),tbl=$("#t-flowtop");
+  panel.hidden=false;title.textContent=tpl("ex_top10_title",{d:dmy(dayStr)});
+  tbl.innerHTML=`<tbody><tr><td>${T("loading")}</td></tr></tbody>`;
+  panel.scrollIntoView({block:"nearest",behavior:"smooth"});
+  const myReq=++flowTopReq;
+  fetch(`/api/flow-day?day=${dayStr}`).then(r=>r.json()).then(j=>{
+    if(myReq!==flowTopReq)return;
+    const rows=(j&&j.rows)||[];
+    if(!rows.length){tbl.innerHTML=`<tbody><tr><td>${T("ex_flow_empty")}</td></tr></tbody>`;return}
+    let h=`<thead><tr><th>${T("th_time")}</th><th></th><th>${T("th_from")}</th><th>${T("th_to")}</th><th class="n">${T("th_kub")}</th></tr></thead><tbody>`;
+    rows.forEach(r=>{
+      const inbound=r.dir==="exchange_in";
+      h+=`<tr><td>${bkk(r.ts)}</td><td class="dir" style="color:${inbound?"var(--up)":"var(--down)"}">${inbound?"↓":"↑"}</td>
+        <td>${r.fromLabel?r.fromLabel:`<span class="addr">${short(r.from)}</span>`}</td>
+        <td>${r.toLabel?r.toLabel:`<span class="addr">${short(r.to)}</span>`}</td>
+        <td class="n">${fmt(r.kub)}</td></tr>`;
+    });
+    tbl.innerHTML=h+"</tbody>";
+  }).catch(()=>{if(myReq===flowTopReq)tbl.innerHTML=`<tbody><tr><td>${T("ex_flow_empty")}</td></tr></tbody>`});
+}
+
 // Two measured quantities divided by each other, rather than a fee total
 // scaled by a gas price nobody actually paid.
 function avgFee(r){
@@ -912,6 +818,26 @@ function cChain(){
   const firstTx=rs.find(r=>r.tx!=null);
   const gap=firstTx&&firstTx!==rs[0]?tpl("ch_txfrom",{d:dmy(firstTx.day)})+"<br>":"";
   if(note)note.innerHTML=(last.fees!=null?`<b>${dmy(last.day)}</b> — ${T("ch_fees")}: ${fmt(last.fees,2)} KUB · ${T("ch_avg")}: ${avgFee(last)}<br>`:"")+gap+T("n_chain");
+  chainMix(rs);
+}
+// A rolling sample of validated transactions, classified by kubscan's own
+// tx_types, aggregated over whatever days the current chart range covers.
+function chainMix(rs){
+  const box=$("#chainmix");if(!box)return;
+  const from=rs[0].day,to=rs[rs.length-1].day;
+  const rows=(D.chainTypes||[]).filter(r=>r.day>=from&&r.day<=to);
+  const tot={native:0,token:0,contract:0,other:0,n:0};
+  rows.forEach(r=>{tot.native+=r.native;tot.token+=r.token;tot.contract+=r.contract;tot.other+=r.other;tot.n+=r.n});
+  if(!tot.n){box.innerHTML=`<p class="note">${T("ch_mix_empty")}</p>`;return}
+  const segs=[["native",T("ch_native"),"var(--up)",tot.native],["token",T("ch_token"),"var(--accent)",tot.token],
+              ["contract",T("ch_contract"),"var(--warn)",tot.contract],["other",T("ch_other"),"#7f8694",tot.other]]
+    .filter(g=>g[3]>0);
+  const bar=segs.map(g=>`<i style="background:${g[2]};width:${(g[3]/tot.n*100).toFixed(2)}%"></i>`).join("");
+  const legend=segs.map(g=>
+    `<li><i style="background:${g[2]}"></i>${g[1]} · ${(g[3]/tot.n*100).toFixed(1)}%</li>`).join("");
+  box.innerHTML=`<h3 style="margin:0 0 8px;font-size:12.5px;font-weight:600;color:var(--text-primary)">${T("ch_mix")}</h3>
+    <div class="mixbar">${bar}</div><ul class="mixlegend">${legend}</ul>
+    <p class="note">${tpl("ch_sample_note",{n:fmt(tot.n)})}</p>`;
 }
 function treasury(){
   const MAP={stake:"stake",fund:"fund",cex_cold:"cex",cex_hot:"cex",reserve:"reserve"};
@@ -950,15 +876,53 @@ function treasury(){
   el("text",{class:"tick",x:0,y:Tp+56},s).textContent=
     tpl("t_supply",{watched:fmt(watched),total:fmt(grand),pct:(watched/grand*100).toFixed(1)});
 
+  // A category held by several wallets shows one combined row, named by the
+  // tag kubscan publishes for it with the "#7" / "(Cold-3)" instance suffix
+  // stripped, and opens to the individual wallets underneath. A category with
+  // only one wallet just shows that wallet directly.
+  const grpName=label=>{
+    if(!label)return null;
+    const g=label.replace(/\s*#\d+\s*$/,"").replace(/\s*\((?:cold|hot)[^)]*\)\s*$/i,"").trim();
+    return g||label;
+  };
+  const groups=new Map();
+  const addTo=(cat,label,kub)=>{
+    const key=cat+"|"+grpName(label);
+    if(!groups.has(key))groups.set(key,{cat,name:grpName(label),kub:0,members:[]});
+    const e=groups.get(key);e.kub+=kub;e.members.push({label,kub});
+  };
+  (D.treasury||[]).forEach(t=>addTo(t.cat,t.label,t.kub));
+  const kkubRow=(D.other||[]).find(r=>r.kkub);
+  if(kkub>0)addTo(kkubRow?kkubRow.cat:"wrapped",kkubRow?kkubRow.label:"Wrapped KUB (KKUB)",kkub);
+  const groupRows=[...groups.values()].sort((a,b)=>b.kub-a.kub);
+
   let h=`<thead><tr><th>${T("th_wallet")}</th><th>${T("th_group")}</th><th class="n">${T("th_bal")}</th><th class="n">${T("th_share")}</th></tr></thead><tbody>`;
-  const row=(name,cat,kub)=>`<tr><td>${name}</td><td><span class="tag">${cat}</span></td>
-    <td class="n">${fmt(kub)}</td><td class="n">${(kub/grand*100).toFixed(1)}%</td></tr>`;
-  (D.treasury||[]).slice(0,6).forEach(t=>{h+=row(t.label||"—",t.cat,t.kub)});
+  const pct=kub=>(kub/grand*100).toFixed(1)+"%";
+  groupRows.forEach((g,gi)=>{
+    if(g.members.length>1){
+      const gid="g"+gi;
+      h+=`<tr class="grouprow"><td><button class="gtoggle" type="button" data-g="${gid}" aria-expanded="false" aria-label="${T("grp_toggle")}"><span class="arrow">▸</span>${g.name}<span style="color:var(--text-muted);font-weight:400"> · ${tpl("grp_wallets",{n:g.members.length})}</span></button></td>
+        <td><span class="tag">${g.cat}</span></td><td class="n">${fmt(g.kub)}</td><td class="n">${pct(g.kub)}</td></tr>`;
+      g.members.sort((a,b)=>b.kub-a.kub).forEach(m=>{
+        h+=`<tr class="subrow" data-g="${gid}" hidden><td>${m.label||"—"}</td><td></td><td class="n">${fmt(m.kub)}</td><td class="n">${pct(m.kub)}</td></tr>`;
+      });
+    }else{
+      const m=g.members[0];
+      h+=`<tr><td>${m.label||g.name}</td><td><span class="tag">${g.cat}</span></td><td class="n">${fmt(g.kub)}</td><td class="n">${pct(g.kub)}</td></tr>`;
+    }
+  });
   // An address kubscan carries no label for is shown as the address itself —
   // no placeholder text standing in for a name nobody has.
-  (D.other||[]).slice(0,8).forEach(r=>{
-    h+=row(r.label?r.label:`<span class="addr">${short(r.address)}</span>`,r.cat||"unidentified",r.kub)});
+  unid.slice(0,8).forEach(r=>{
+    h+=`<tr><td>${r.label?r.label:`<span class="addr">${short(r.address)}</span>`}</td><td><span class="tag">${r.cat||"unidentified"}</span></td>
+      <td class="n">${fmt(r.kub)}</td><td class="n">${pct(r.kub)}</td></tr>`;
+  });
   $("#t-treas").innerHTML=h+"</tbody>";
+  $("#t-treas").querySelectorAll(".gtoggle").forEach(b=>b.addEventListener("click",()=>{
+    const open=b.getAttribute("aria-expanded")!=="true";
+    b.setAttribute("aria-expanded",String(open));
+    document.querySelectorAll(`tr.subrow[data-g="${b.dataset.g}"]`).forEach(tr=>{tr.hidden=!open});
+  }));
 }
 function health(){
   const exp={"cex":288,"chain:cex_hot":288,"chain:cex_cold,fund,stake":24,"watch_balance":288,"whales":1,
@@ -979,23 +943,24 @@ function health(){
 }
 
 function render(){
-  paintStatic();tfButtons();rangeButtons();exRangeButtons();
+  paintStatic();tfButtons();rangeButtons();exRangeButtons();techRangeButtons();
   kpis();tech();cSlip();cSlipT();cTaker();cSweep();
   dexSelect();tDex();exchange();cChain();treasury();health();
 }
 function setTF(tf){
   TF=tf;try{localStorage.setItem("kfd-tf",tf)}catch(e){}
   document.querySelectorAll("#tfseg button").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.k===tf)));
-  $("#techtf").textContent=tf;
+  $("#techtf").textContent=techLabel();
   mountTV();
   if(!LIVE){render();return}
   fetch(`/api/candles?tf=${tf}&limit=300`).then(r=>r.json())
     .then(j=>{CANDLES=(j.candles||[]).map(c=>[c[0],+c[1],+c[2],+c[3],+c[4],+c[5],c[6]]);render()})
     .catch(()=>render());
 }
-document.querySelectorAll(".seg button[data-lang]").forEach(b=>
-  b.addEventListener("click",()=>{L=b.dataset.lang;try{localStorage.setItem("kfd-lang",L)}catch(e){}render();mountTV()}));
+$("#langsel").addEventListener("change",e=>{
+  L=e.target.value;try{localStorage.setItem("kfd-lang",L)}catch(e){}render();mountTV()});
 $("#dexsize").addEventListener("change",e=>{DEXSIZE=+e.target.value;tDex()});
+$("#flowtopClose").addEventListener("click",()=>{$("#flowtop").hidden=true;flowTopReq++});
 $("#healthfold").addEventListener("click",()=>{
   const body=$("#healthbody");body.hidden=!body.hidden;
   $("#healthfold").textContent=body.hidden?T("fold_show"):T("fold_hide");
@@ -1005,11 +970,13 @@ $("#healthfold").addEventListener("click",()=>{
 try{
   const sv=localStorage.getItem("kfd-lang");
   if(sv&&I18N[sv])L=sv;
-  else if((navigator.language||"").startsWith("th"))L="th";
-  else if((navigator.language||"").startsWith("zh"))L="zh";
+  else{const nl=(navigator.language||"").toLowerCase();
+    const hit=["th","zh","ms","vi","id"].find(k=>nl.startsWith(k))||(nl.startsWith("fil")||nl.startsWith("tl")?"fil":null);
+    if(hit)L=hit;}
   const st=localStorage.getItem("kfd-tf");if(st&&TFS.some(t=>t[0]===st))TF=st;
   const sr=localStorage.getItem("kfd-range");if(sr&&RANGES.some(r=>r[0]===sr))RANGE=sr;
   const se=localStorage.getItem("kfd-exrange");if(se&&RANGES.some(r=>r[0]===se))EXRANGE=se;
+  const st2=localStorage.getItem("kfd-techrange");if(st2&&(st2==="tf"||RANGES.some(r=>r[0]===st2)))TECHRANGE=st2;
   if(localStorage.getItem("kfd-health")==="1")$("#healthbody").hidden=false;
 }catch(e){}
 
