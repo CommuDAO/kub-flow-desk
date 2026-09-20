@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>KUB Flow Desk</title>
-<meta name="description" content="KUB market microstructure, candles, execution cost, five-DEX quotes and treasury balances.">
+<meta name="description" content="KUB market microstructure, execution cost, five-DEX quotes and treasury balances.">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anuphan:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
 <style>
@@ -13,11 +13,10 @@
   --ink:#1b1c1b; --ink-2:#464746; --ink-3:#6b6b6a;
   --line:#f1f2ef; --line-2:#e6e7e3;
   --accent:#00b359; --accent-ink:#00994d;
-  --up:#00994d; --down:#d03b3b; --neutral:#6b6b6a;
-  --info:#2a78d6; --warn:#b26a00;
+  --up:#00994d; --down:#d03b3b; --info:#2a78d6; --warn:#b26a00;
   --r-xs:6px; --r-sm:8px; --r-md:16px; --r-lg:24px;
   --sh1:rgba(27,28,27,.08) 0 2px 5px 0; --sh2:rgba(27,28,27,.08) 0 4px 5px 0;
-  --fast:150ms; --slow:200ms;
+  --fast:150ms;
   --sans:"GraphikTH","Anuphan","Noto Sans SC",system-ui,-apple-system,"Segoe UI",sans-serif;
   --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
 }
@@ -26,8 +25,7 @@
   --ink:#f6f6f4; --ink-2:#c4c5c1; --ink-3:#8f918d;
   --line:#262826; --line-2:#303230;
   --accent:#00c964; --accent-ink:#17c46e;
-  --up:#17c46e; --down:#e06464; --neutral:#8f918d;
-  --info:#3987e5; --warn:#d99a1f;
+  --up:#17c46e; --down:#e06464; --info:#3987e5; --warn:#d99a1f;
   --sh1:rgba(0,0,0,.4) 0 2px 5px 0; --sh2:rgba(0,0,0,.45) 0 4px 5px 0;
 }}
 :root[data-theme="dark"]{
@@ -35,80 +33,65 @@
   --ink:#f6f6f4; --ink-2:#c4c5c1; --ink-3:#8f918d;
   --line:#262826; --line-2:#303230;
   --accent:#00c964; --accent-ink:#17c46e;
-  --up:#17c46e; --down:#e06464; --neutral:#8f918d;
-  --info:#3987e5; --warn:#d99a1f;
+  --up:#17c46e; --down:#e06464; --info:#3987e5; --warn:#d99a1f;
   --sh1:rgba(0,0,0,.4) 0 2px 5px 0; --sh2:rgba(0,0,0,.45) 0 4px 5px 0;
 }
 *{box-sizing:border-box}
 html,body{margin:0}
-body{background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:14px;line-height:22px;font-weight:400;
+body{background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:14px;line-height:22px;
   -webkit-font-smoothing:antialiased;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
 .wrap{max-width:1120px;margin:0 auto;padding-block:20px 56px;padding-left:16px;padding-right:16px}
-a{color:var(--accent-ink)}
 :focus-visible{outline:2px solid var(--accent-ink);outline-offset:2px;border-radius:var(--r-xs)}
-
 .mast{display:flex;flex-wrap:wrap;align-items:center;gap:8px 16px;padding:12px 0 16px}
 .brand{display:flex;align-items:center;gap:10px}
 .dot{width:22px;height:22px;border-radius:var(--r-xs);background:var(--accent);flex:none}
 .mast h1{margin:0;font-size:20px;line-height:26px;font-weight:600;letter-spacing:-.01em}
 .mast .pair{font-family:var(--mono);font-size:12px;color:var(--ink-3);padding:2px 8px;border:1px solid var(--line-2);border-radius:999px}
-.tools{margin-left:auto;display:flex;align-items:center;gap:10px}
+.tools{margin-left:auto;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
 .seg{display:flex;background:var(--card);border:1px solid var(--line-2);border-radius:var(--r-sm);padding:2px;gap:2px;box-shadow:var(--sh1)}
 .seg button{font:500 12px/18px var(--sans);padding:5px 10px;background:transparent;color:var(--ink-2);border:0;border-radius:var(--r-xs);cursor:pointer;transition:background var(--fast),color var(--fast)}
 .seg button:hover:not(:disabled){background:var(--card-2)}
 .seg button[aria-pressed="true"]{background:var(--accent);color:#fff}
 .seg button:disabled{color:var(--ink-3);opacity:.45;cursor:not-allowed}
 .stamp{font-family:var(--mono);font-size:12px;color:var(--ink-3)}
-
 .srcline{font-size:12px;color:var(--ink-3);padding-bottom:16px}
 .banner{background:var(--card);border:1px solid var(--line-2);border-left:3px solid var(--warn);
   border-radius:var(--r-sm);padding:10px 14px;font-size:13px;color:var(--ink-2);margin-bottom:16px;box-shadow:var(--sh1)}
-
 .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(168px,1fr));gap:12px;margin-bottom:20px}
 .kpi{background:var(--card);border:1px solid var(--line);border-radius:var(--r-md);padding:14px 16px;box-shadow:var(--sh1)}
 .kpi dt{margin:0;font-size:12px;color:var(--ink-3);font-weight:500}
 .kpi dd{margin:6px 0 0;font-family:var(--mono);font-size:20px;line-height:26px;font-weight:600;letter-spacing:-.01em}
 .kpi .sub{font-size:12px;color:var(--ink-3);margin-top:3px}
-
 .card{background:var(--card);border:1px solid var(--line);border-radius:var(--r-md);padding:18px 18px 14px;margin-bottom:16px;box-shadow:var(--sh1)}
 .ch{display:flex;flex-wrap:wrap;align-items:center;gap:8px 14px;margin-bottom:6px}
 .ch h2{margin:0;font-size:16px;line-height:24px;font-weight:600}
 .ch .when{font-size:12px;color:var(--ink-3);margin-left:auto}
 .lede{margin:0 0 14px;font-size:13px;line-height:21px;color:var(--ink-2);max-width:66ch}
-.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:18px}
 .legend{display:flex;flex-wrap:wrap;gap:6px 16px;margin:0 0 10px;padding:0;list-style:none;font-size:12px;color:var(--ink-2)}
 .legend li{display:flex;align-items:center;gap:7px}
 .sw{width:20px;height:3px;border-radius:2px;flex:none}
 .sw.dot{width:10px;height:10px;border-radius:50%}
-.sw.hollow{width:10px;height:10px;border-radius:2px;background:transparent;border:2px solid var(--up)}
-.sw.solid{width:10px;height:10px;border-radius:2px;background:var(--down)}
-
+#tvwrap{height:min(62vh,520px);min-height:340px;border-radius:var(--r-sm);overflow:hidden;background:var(--card-2)}
+#tv-chart{height:100%;width:100%}
 svg{display:block;width:100%;height:auto;overflow:visible}
 .gl{stroke:var(--line-2);stroke-width:1}
 .ax{stroke:var(--line-2);stroke-width:1}
 .tick{font-family:var(--mono);font-size:10.5px;fill:var(--ink-3)}
 .dlab{font-family:var(--mono);font-size:11px;font-weight:600}
 .hit{fill:transparent;cursor:crosshair}
-
 table{width:100%;border-collapse:collapse;font-size:13px}
 .tw{overflow-x:auto}
 th{text-align:left;font-size:12px;font-weight:500;color:var(--ink-3);padding:0 12px 8px 0;border-bottom:1px solid var(--line-2);white-space:nowrap}
 td{padding:9px 12px 9px 0;border-bottom:1px solid var(--line);vertical-align:baseline}
 td.n,th.n{text-align:right;font-family:var(--mono);font-variant-numeric:tabular-nums;padding-right:0}
 tr:last-child td{border-bottom:0}
-
+tr.noquote td{color:var(--ink-3)}
 .chip{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:500;padding:2px 9px;border-radius:999px;border:1px solid var(--line-2);white-space:nowrap;color:var(--ink-2)}
-.chip.up{color:var(--up);border-color:color-mix(in srgb,var(--up) 35%,transparent)}
-.chip.down{color:var(--down);border-color:color-mix(in srgb,var(--down) 35%,transparent)}
-.chip.mid{color:var(--ink-3)}
-.chip.na{color:var(--ink-3);opacity:.7}
+.chip.up{color:var(--up)}.chip.down{color:var(--down)}.chip.mid{color:var(--ink-3)}.chip.na{color:var(--ink-3);opacity:.7}
 .best{background:var(--accent);color:#fff;font-size:11px;font-weight:600;padding:1px 7px;border-radius:var(--r-xs)}
 .tag{font-family:var(--mono);font-size:11px;padding:1px 7px;border-radius:var(--r-xs);background:var(--card-2);color:var(--ink-2);border:1px solid var(--line)}
 .note{font-size:12.5px;line-height:20px;color:var(--ink-2);margin:12px 0 0;padding-top:12px;border-top:1px solid var(--line)}
 .note b{font-weight:600;color:var(--ink)}
-.caps{font-size:12px;color:var(--ink-3);margin-bottom:8px}
-.empty{font-size:13px;color:var(--ink-3);padding:26px 0;text-align:center}
-
 #tip{position:fixed;z-index:30;pointer-events:none;opacity:0;transition:opacity var(--fast);
   background:var(--card);border:1px solid var(--line-2);border-radius:var(--r-sm);padding:9px 11px;
   font-family:var(--mono);font-size:11.5px;line-height:17px;color:var(--ink);box-shadow:var(--sh2);max-width:250px}
@@ -141,21 +124,15 @@ footer p{margin:0 0 8px;max-width:74ch}
       <h2 data-i18n="h_chart"></h2>
       <div class="seg" id="tfseg" role="group" aria-label="Timeframe"></div>
     </div>
-    <ul class="legend">
-      <li><span class="sw hollow"></span><span data-i18n="lg_up"></span></li>
-      <li><span class="sw solid"></span><span data-i18n="lg_down"></span></li>
-    </ul>
-    <div id="c-candle"></div>
-    <div class="caps" style="margin-top:10px" data-i18n="c_vol"></div>
-    <div id="c-cvol"></div>
-    <p class="note" id="tfnote"></p>
+    <div id="tvwrap"><div id="tv-chart"></div></div>
+    <p class="note" data-i18n="n_tv"></p>
   </section>
 
   <section class="card">
     <div class="ch"><h2 data-i18n="h_tech"></h2><span class="when" id="techwhen"></span></div>
     <p class="lede" data-i18n="l_tech"></p>
     <div class="tw"><table id="t-tech"></table></div>
-    <p class="note" data-i18n="n_tech"></p>
+    <p class="note" id="technote"></p>
   </section>
 
   <section class="card">
@@ -223,18 +200,19 @@ footer p{margin:0 0 8px;max-width:74ch}
 </div>
 <div id="tip" role="status" aria-live="polite"></div>
 
+<script src="https://s3.tradingview.com/tv.js"></script>
 <script>
-/* ---------------- i18n ---------------- */
 const I18N={
 en:{title:"KUB Flow Desk",
- src:"Bitkub public API v3 every 5 min · kubscan v2 (41 wallets) every 5 min · KUB Chain RPC (5 DEXes) every 15 min · collected in Postgres, no third-party feed",
+ src:"Bitkub public API v3 every 5 min · kubscan v2 (41 wallets) every 5 min · KUB Chain RPC (5 DEXes) every 15 min · price chart by TradingView",
  k_price:"Price",k_vol:"24 h volume",k_sell:"Sell 10k KUB",k_nf:"Left the exchange",k_taker:"Buyers crossing",
  k_spread:"spread",k_lv:"levels",k_trades:"trades",
- h_chart:"KUB / THB",lg_up:"Up bar (hollow)",lg_down:"Down bar (filled)",c_vol:"Volume, KUB",
- tf_note:"Showing {bars} bars at {tf}. Collection began 19 Sep 2026.",
- tf_soon:"{tf} needs about {days} more days of collection",
- h_tech:"Indicator readings",l_tech:"Computed from the same bars the chart above draws, so the numbers and the chart always agree. Each row shows where the value sits against its conventional threshold, and how many bars it had to work with.",
- n_tech:"There is no aggregated buy / sell verdict here on purpose. Reporting that RSI reads 72 and sits above the conventional 70 line is a measurement; collapsing twelve indicators into one instruction to trade is a recommendation, and this page reports data only.",
+ h_chart:"KUB / THB",
+ n_tv:"Chart by TradingView, on Bitkub's own KUBTHB feed — it carries years of history and its own drawing tools, which our 25 hours of collection cannot match. Everything below this chart is measured from our own tape.",
+ h_tech:"Indicator readings",
+ l_tech:"Computed from our own collected bars, not from the chart above, so these numbers reconcile with the slippage, sweep and taker panels further down. Each row shows where the value sits against its conventional threshold and how many bars it had.",
+ n_tech:"No aggregated buy / sell verdict, on purpose. Reporting that RSI reads 72 and sits above the conventional 70 line is a measurement; collapsing a dozen indicators into one instruction to trade is a recommendation, and this page reports data only.",
+ tf_bars:"{bars} bars collected at {tf}",
  th_ind:"Indicator",th_val:"Value",th_pos:"Position",th_bars:"Bars",
  p_over:"above {n}",p_under:"below {n}",p_between:"between {a} and {b}",p_na:"not enough bars",
  p_above_sig:"above signal",p_below_sig:"below signal",p_px_above:"price above",p_px_below:"price below",
@@ -244,7 +222,8 @@ en:{title:"KUB Flow Desk",
  lg_sell:"Sell into bids",lg_buy:"Buy into asks",
  h_dex:"On-chain price across five DEXes",
  l_dex:"Direct eth_call to each router and quoter, no third-party API. Shows which venue returns the most for a given size.",
- n_dex:"Kublerx has no KKUB/KUSDT pool, so it returns no quote. For V3 venues the best fee tier is picked automatically.",
+ n_dex:"Kublerx returns no quote because it has no KKUB/KUSDT pool — all four fee tiers revert, so the blank is a finding, not a gap. V3 venues use their best fee tier automatically.",
+ no_quote:"no pool",
  h_slipt:"How the cost has moved",w_hourly:"hourly",
  l_slipt:"Cost of a 10,000 KUB order, hour by hour. A rising line means the book thinned and the same order now costs more.",
  lg_sell10:"Sell 10k",lg_buy10:"Buy 10k",
@@ -257,8 +236,8 @@ en:{title:"KUB Flow Desk",
  l_treas:"Balances, not transfers. The stake vault is a contract: its KUB moves as internal transactions the transaction list never shows, so the balance is the only honest way to watch it.",
  h_health:"Is this data trustworthy yet",w_log:"collector log",
  l_health:"Every round writes a row whether it succeeds or fails, so gaps stay visible instead of hidden.",
- f1:"This page reports measured numbers and nothing else: no forecast, no target, no read on where price goes next.",
- f2:"Depth is captured 60 levels deep; sizes beyond that cannot be priced from it. Timeframes and windows longer than what has been collected are disabled or labelled, never back-filled.",
+ f1:"Everything below the chart reports measured numbers and nothing else: no forecast, no target, no read on where price goes next.",
+ f2:"Depth is captured 60 levels deep; sizes beyond that cannot be priced from it. Windows longer than what has been collected are labelled, never back-filled.",
  f3:"Data report only. Not investment advice.",
  th_dex:"DEX",th_out:"KUSDT out",th_px:"Per KUB",th_vs:"vs best",th_size:"Size",
  th_wallet:"Wallet",th_group:"Group",th_bal:"Balance, KUB",th_share:"Share",
@@ -266,17 +245,18 @@ en:{title:"KUB Flow Desk",
  st_ok:"healthy",st_ramp:"ramping up",st_fail:"failed",
  g_stake:"Stake vault",g_fund:"Ecosystem & development funds",g_cold:"Bitkub cold wallets",
  t_watched:"KUB watched across 41 wallets",
- snap:"Showing the built-in snapshot — SUPABASE_SERVICE_KEY is not set on Vercel yet.",
- loading:"Loading…"},
+ snap:"Showing the built-in snapshot — the live feed is unavailable.",
+ apierr:"Live feed error: ",loading:"Loading…"},
 th:{title:"KUB Flow Desk",
- src:"Bitkub public API v3 ทุก 5 นาที · kubscan v2 (41 กระเป๋า) ทุก 5 นาที · KUB Chain RPC (5 DEX) ทุก 15 นาที · เก็บใน Postgres ไม่ผ่านผู้ให้บริการข้อมูลรายอื่น",
+ src:"Bitkub public API v3 ทุก 5 นาที · kubscan v2 (41 กระเป๋า) ทุก 5 นาที · KUB Chain RPC (5 DEX) ทุก 15 นาที · กราฟราคาโดย TradingView",
  k_price:"ราคา",k_vol:"วอลุ่ม 24 ชม.",k_sell:"ขาย 10k KUB",k_nf:"ไหลออกจากตลาด",k_taker:"ฝั่งซื้อไล่ราคา",
  k_spread:"สเปรด",k_lv:"ระดับบุ๊ก",k_trades:"รายการ",
- h_chart:"KUB / THB",lg_up:"แท่งขึ้น (โปร่ง)",lg_down:"แท่งลง (ทึบ)",c_vol:"ปริมาณ KUB",
- tf_note:"แสดง {bars} แท่งที่ {tf} · เริ่มเก็บข้อมูล 19 ก.ย. 2026",
- tf_soon:"{tf} ต้องเก็บข้อมูลอีกประมาณ {days} วัน",
- h_tech:"ค่าอินดิเคเตอร์",l_tech:"คำนวณจากแท่งชุดเดียวกับกราฟด้านบน ตัวเลขกับกราฟจึงตรงกันเสมอ แต่ละแถวบอกว่าค่าอยู่ตรงไหนเทียบเส้นมาตรฐาน และใช้กี่แท่งในการคำนวณ",
- n_tech:"ที่นี่ไม่มีป้ายสรุปว่าซื้อหรือขาย และตั้งใจไม่ใส่ การบอกว่า RSI อ่านได้ 72 และอยู่เหนือเส้น 70 คือการรายงานค่า แต่การยุบอินดิเคเตอร์สิบกว่าตัวให้เหลือคำสั่งเดียวว่าให้เทรด คือคำแนะนำ หน้านี้รายงานข้อมูลอย่างเดียว",
+ h_chart:"KUB / THB",
+ n_tv:"กราฟจาก TradingView ใช้ฟีด KUBTHB ของ Bitkub เอง — มีประวัติย้อนหลังเป็นปีและเครื่องมือวาดครบ ซึ่งข้อมูล 25 ชั่วโมงของเราสู้ไม่ได้ ส่วนทุกอย่างใต้กราฟนี้วัดจาก tape ที่เราเก็บเอง",
+ h_tech:"ค่าอินดิเคเตอร์",
+ l_tech:"คำนวณจากแท่งที่เราเก็บเอง ไม่ใช่จากกราฟด้านบน ตัวเลขจึงตรงกับแผง slippage, sweep และ taker ด้านล่าง แต่ละแถวบอกว่าค่าอยู่ตรงไหนเทียบเส้นมาตรฐาน และใช้กี่แท่ง",
+ n_tech:"ไม่มีป้ายสรุปว่าซื้อหรือขาย และตั้งใจไม่ใส่ การบอกว่า RSI อ่านได้ 72 และอยู่เหนือเส้น 70 คือการรายงานค่า แต่การยุบอินดิเคเตอร์สิบกว่าตัวให้เหลือคำสั่งเดียวว่าให้เทรด คือคำแนะนำ หน้านี้รายงานข้อมูลอย่างเดียว",
+ tf_bars:"เก็บได้ {bars} แท่งที่ {tf}",
  th_ind:"อินดิเคเตอร์",th_val:"ค่า",th_pos:"ตำแหน่ง",th_bars:"แท่ง",
  p_over:"เหนือ {n}",p_under:"ใต้ {n}",p_between:"อยู่ระหว่าง {a} ถึง {b}",p_na:"แท่งไม่พอ",
  p_above_sig:"เหนือเส้น signal",p_below_sig:"ใต้เส้น signal",p_px_above:"ราคาอยู่เหนือ",p_px_below:"ราคาอยู่ใต้",
@@ -286,7 +266,8 @@ th:{title:"KUB Flow Desk",
  lg_sell:"ขายชนฝั่ง bid",lg_buy:"ซื้อชนฝั่ง ask",
  h_dex:"ราคาบนเชน เทียบ 5 DEX",
  l_dex:"ยิง eth_call ตรงไปที่ router และ quoter ของแต่ละ DEX ไม่ผ่าน API ใคร เทียบว่าไซซ์เท่านี้ที่ไหนได้ของมากที่สุด",
- n_dex:"Kublerx ไม่มี pool KKUB/KUSDT จึงไม่มี quote · V3 เลือก fee tier ที่ดีที่สุดให้อัตโนมัติ",
+ n_dex:"Kublerx ไม่มี quote เพราะไม่มี pool KKUB/KUSDT — ตรวจครบทั้ง 4 fee tier แล้ว revert ทุกตัว ช่องว่างนี้จึงเป็นข้อค้นพบ ไม่ใช่ข้อมูลขาด · ฝั่ง V3 เลือก fee tier ที่ดีที่สุดให้อัตโนมัติ",
+ no_quote:"ไม่มี pool",
  h_slipt:"ต้นทุนเปลี่ยนไปยังไง",w_hourly:"รายชั่วโมง",
  l_slipt:"ต้นทุนของออเดอร์ 10,000 KUB ในแต่ละชั่วโมง ถ้าเส้นขึ้น แปลว่าบุ๊กบางลง ออเดอร์เดิมแพงขึ้น",
  lg_sell10:"ขาย 10k",lg_buy10:"ซื้อ 10k",
@@ -299,8 +280,8 @@ th:{title:"KUB Flow Desk",
  l_treas:"ดูที่ยอดคงเหลือ ไม่ใช่ตัว transfer — stake vault เป็น contract เงินวิ่งเป็น internal transaction ที่รายการ tx ไม่แสดง ยอดคงเหลือจึงเป็นทางเดียวที่เชื่อได้",
  h_health:"ข้อมูลนี้เชื่อได้แค่ไหน",w_log:"log การเก็บข้อมูล",
  l_health:"ทุกรอบเขียน log ไว้ทั้งที่สำเร็จและล้มเหลว ช่องว่างจึงมองเห็น ไม่ถูกซ่อน",
- f1:"หน้านี้รายงานตัวเลขที่วัดได้เท่านั้น ไม่มีการพยากรณ์ ไม่มีราคาเป้าหมาย และไม่บอกทิศทางราคา",
- f2:"บุ๊กเก็บ 60 ระดับ ไซซ์ที่ใหญ่กว่านั้นคำนวณต้นทุนไม่ได้ · timeframe และ window ที่ยาวกว่าข้อมูลที่เก็บมาจริงจะถูกปิดหรือระบุไว้ ไม่เติมตัวเลขเอง",
+ f1:"ทุกอย่างใต้กราฟรายงานตัวเลขที่วัดได้เท่านั้น ไม่มีการพยากรณ์ ไม่มีราคาเป้าหมาย และไม่บอกทิศทางราคา",
+ f2:"บุ๊กเก็บ 60 ระดับ ไซซ์ที่ใหญ่กว่านั้นคำนวณต้นทุนไม่ได้ · window ที่ยาวกว่าข้อมูลที่เก็บมาจริงจะถูกระบุไว้ ไม่เติมตัวเลขเอง",
  f3:"รายงานข้อมูลเท่านั้น ไม่ใช่คำแนะนำลงทุน",
  th_dex:"DEX",th_out:"ได้ KUSDT",th_px:"ต่อ 1 KUB",th_vs:"เทียบที่ดีที่สุด",th_size:"ไซซ์",
  th_wallet:"กระเป๋า",th_group:"กลุ่ม",th_bal:"ยอดคงเหลือ KUB",th_share:"สัดส่วน",
@@ -308,17 +289,18 @@ th:{title:"KUB Flow Desk",
  st_ok:"ปกติ",st_ramp:"เพิ่งเริ่ม",st_fail:"ล้มเหลว",
  g_stake:"Stake vault",g_fund:"กองทุน",g_cold:"Cold wallet ของ Bitkub",
  t_watched:"KUB ที่เฝ้าอยู่ใน 41 กระเป๋า",
- snap:"กำลังแสดงข้อมูลสำรองที่ฝังมากับหน้า — ยังไม่ได้ตั้งค่า SUPABASE_SERVICE_KEY บน Vercel",
- loading:"กำลังโหลด…"},
+ snap:"กำลังแสดงข้อมูลสำรองที่ฝังมากับหน้า — ต่อข้อมูลสดไม่ได้",
+ apierr:"ต่อข้อมูลสดไม่ได้: ",loading:"กำลังโหลด…"},
 zh:{title:"KUB 流动性看板",
- src:"Bitkub 公开 API v3 每 5 分钟 · kubscan v2（41 个钱包）每 5 分钟 · KUB 链 RPC（5 个 DEX）每 15 分钟 · 数据存于 Postgres，不经第三方数据源",
+ src:"Bitkub 公开 API v3 每 5 分钟 · kubscan v2（41 个钱包）每 5 分钟 · KUB 链 RPC（5 个 DEX）每 15 分钟 · 价格图表由 TradingView 提供",
  k_price:"价格",k_vol:"24 小时成交量",k_sell:"卖出 1 万 KUB",k_nf:"流出交易所",k_taker:"买方主动成交",
  k_spread:"价差",k_lv:"档位",k_trades:"笔",
- h_chart:"KUB / 泰铢",lg_up:"上涨（空心）",lg_down:"下跌（实心）",c_vol:"成交量（KUB）",
- tf_note:"显示 {tf} 周期的 {bars} 根K线 · 自 2026 年 9 月 19 日开始采集",
- tf_soon:"{tf} 还需要约 {days} 天的数据",
- h_tech:"指标读数",l_tech:"与上方图表使用同一批K线计算，因此数字与图形始终一致。每行标明该值相对常规阈值的位置，以及参与计算的K线数量。",
- n_tech:"此处刻意不提供买卖综合评级。指出 RSI 为 72、位于常规的 70 线之上，是在陈述测量结果；把十几个指标汇总成一个交易指令，则属于投资建议。本页只报告数据。",
+ h_chart:"KUB / 泰铢",
+ n_tv:"图表由 TradingView 提供，使用 Bitkub 自有的 KUBTHB 数据源 —— 它拥有数年历史与完整绘图工具，这是我们 25 小时的采集无法比拟的。此图以下的所有内容均来自我们自己采集的成交记录。",
+ h_tech:"指标读数",
+ l_tech:"基于我们自己采集的K线计算，而非上方图表，因此这些数字与下方的滑点、扫单与主动成交面板互相对得上。每行标明该值相对常规阈值的位置，以及参与计算的K线数量。",
+ n_tech:"刻意不提供买卖综合评级。指出 RSI 为 72、位于常规的 70 线之上，是在陈述测量结果；把十几个指标汇总成一个交易指令，则属于投资建议。本页只报告数据。",
+ tf_bars:"在 {tf} 周期已采集 {bars} 根K线",
  th_ind:"指标",th_val:"数值",th_pos:"位置",th_bars:"K线数",
  p_over:"高于 {n}",p_under:"低于 {n}",p_between:"介于 {a} 与 {b} 之间",p_na:"K线不足",
  p_above_sig:"位于信号线上方",p_below_sig:"位于信号线下方",p_px_above:"价格在其上方",p_px_below:"价格在其下方",
@@ -328,7 +310,8 @@ zh:{title:"KUB 流动性看板",
  lg_sell:"卖向买盘",lg_buy:"买向卖盘",
  h_dex:"链上价格：5 个 DEX 对比",
  l_dex:"直接对各 DEX 的 router 与 quoter 发起 eth_call，不经任何第三方 API，比较同一数量在哪家换得最多。",
- n_dex:"Kublerx 没有 KKUB/KUSDT 池，因此没有报价 · V3 场所会自动选取最优费率档。",
+ n_dex:"Kublerx 没有报价，因为它没有 KKUB/KUSDT 池 —— 四个费率档全部 revert，所以这个空白是结论，不是数据缺失 · V3 场所会自动选取最优费率档。",
+ no_quote:"无流动性池",
  h_slipt:"成本如何变化",w_hourly:"每小时",
  l_slipt:"每小时 10,000 KUB 订单的成本。曲线上升意味着订单簿变薄，同样的单子变贵了。",
  lg_sell10:"卖出 1 万",lg_buy10:"买入 1 万",
@@ -341,8 +324,8 @@ zh:{title:"KUB 流动性看板",
  l_treas:"看余额，而不是转账。质押金库是合约，其 KUB 以内部交易流动，交易列表根本不显示，因此余额是唯一可靠的观察方式。",
  h_health:"这些数据可信吗",w_log:"采集日志",
  l_health:"每一轮采集无论成功与否都会留下记录，所以缺口是可见的，而不是被掩盖。",
- f1:"本页只报告实测数据：没有预测，没有目标价，也不判断价格走向。",
- f2:"订单簿采集 60 档，超出该深度的数量无法定价 · 超出实际采集时长的周期与时间窗会被禁用或标注，绝不臆填。",
+ f1:"图表以下的内容只报告实测数据：没有预测，没有目标价，也不判断价格走向。",
+ f2:"订单簿采集 60 档，超出该深度的数量无法定价 · 超出实际采集时长的时间窗会被标注，绝不臆填。",
  f3:"仅供数据参考，非投资建议。",
  th_dex:"DEX",th_out:"获得 KUSDT",th_px:"每 KUB",th_vs:"对比最优",th_size:"数量",
  th_wallet:"钱包",th_group:"分组",th_bal:"余额（KUB）",th_share:"占比",
@@ -350,26 +333,28 @@ zh:{title:"KUB 流动性看板",
  st_ok:"正常",st_ramp:"刚启动",st_fail:"失败",
  g_stake:"质押金库",g_fund:"生态与发展基金",g_cold:"Bitkub 冷钱包",
  t_watched:"个 KUB，分布于 41 个钱包",
- snap:"正在显示内置快照 —— Vercel 上尚未设置 SUPABASE_SERVICE_KEY。",
- loading:"加载中…"}};
+ snap:"正在显示内置快照 —— 无法连接实时数据。",
+ apierr:"实时数据错误：",loading:"加载中…"}};
 
-/* ---------------- snapshot fallback ---------------- */
 const SNAP={generated_at:"2026-09-20T09:00:00Z",
  now:{price_thb:20.24,spread_bps:44.57,vol_24h_kub:233115.95,bid_share_1pct:65.05,taker_buy_pct_24h:51.46,netflow_out_24h_kub:31222.31},
  taker:[{win:"24h",taker_buy_pct:51.46,fills:706}],
  netflow:[{win:"24h",net_out_kub:31222.31,into_exchange_kub:10926.42,out_of_exchange_kub:42148.73,tx_count:40}],
  slipNow:[{side:"SELL",size_kub:500,slippage_pct:.4041,vwap:20.1134,levels_used:3},{side:"SELL",size_kub:1000,slippage_pct:.4125,vwap:20.1117,levels_used:3},{side:"SELL",size_kub:5000,slippage_pct:.4812,vwap:20.0978,levels_used:8},{side:"SELL",size_kub:10000,slippage_pct:.6553,vwap:20.0627,levels_used:11},{side:"SELL",size_kub:30000,slippage_pct:.8902,vwap:20.0152,levels_used:20},{side:"BUY",size_kub:500,slippage_pct:.2228,vwap:20.24,levels_used:1},{side:"BUY",size_kub:1000,slippage_pct:.2267,vwap:20.2408,levels_used:2},{side:"BUY",size_kub:5000,slippage_pct:.2913,vwap:20.2538,levels_used:3},{side:"BUY",size_kub:10000,slippage_pct:.4867,vwap:20.2933,levels_used:10},{side:"BUY",size_kub:30000,slippage_pct:.8376,vwap:20.3642,levels_used:11}],
  hourly:[],sweeps:[],
- dex:[{size_kub:100,dex:"ponder",usdt_out:61.149293,px_usdt:.611493,vs_best_pct:0,is_best:true},{size_kub:100,dex:"udonswap",usdt_out:60.808688,px_usdt:.608087,vs_best_pct:-.56,is_best:false},{size_kub:100,dex:"junoswap",usdt_out:60.795607,px_usdt:.607956,vs_best_pct:-.58,is_best:false},{size_kub:100,dex:"diamon",usdt_out:10.519823,px_usdt:.105198,vs_best_pct:-82.8,is_best:false}],
- health:[{job:"cex",runs:288,failed:0},{job:"chain:cex_hot",runs:288,failed:0},{job:"dex_quotes",runs:1,failed:0},{job:"watch_balance",runs:22,failed:0}],
+ dex:[{size_kub:100,dex:"ponder",usdt_out:61.149293,px_usdt:.611493,vs_best_pct:0,quoted:true,is_best:true},
+      {size_kub:100,dex:"udonswap",usdt_out:60.808689,px_usdt:.608087,vs_best_pct:-.56,quoted:true,is_best:false},
+      {size_kub:100,dex:"junoswap",fee:3000,usdt_out:60.795607,px_usdt:.607956,vs_best_pct:-.58,quoted:true,is_best:false},
+      {size_kub:100,dex:"diamon",usdt_out:10.519824,px_usdt:.105198,vs_best_pct:-82.8,quoted:true,is_best:false},
+      {size_kub:100,dex:"kublerx",usdt_out:null,px_usdt:null,vs_best_pct:null,quoted:false,is_best:false}],
+ health:[{job:"cex",runs:288,failed:0},{job:"chain:cex_hot",runs:288,failed:0},{job:"dex_quotes",runs:96,failed:0},{job:"watch_balance",runs:288,failed:0}],
  treasury:[{label:"StakeManagerVault",cat:"stake",kub:10924864},{label:"Bitkub Exchange (Cold Wallet) #1",cat:"cex_cold",kub:2288828},{label:"Sustainable Blockchain Development Fund (Cold-4)",cat:"fund",kub:2000001}],
  candles:{tf:"15m",bars:0,candles:[]}};
 
-/* ---------------- state + helpers ---------------- */
 const COLLECT_START=Date.parse("2026-09-19T08:10:00Z");
-const TFS=[["5m",300],["15m",900],["1h",3600],["4h",14400],["1d",86400]];
+const TFS=[["5m",300,"5"],["15m",900,"15"],["1h",3600,"60"],["4h",14400,"240"],["1d",86400,"D"]];
 const MIN_BARS=35;
-let L="en",D=SNAP,LIVE=false,TF="15m",CANDLES=[],CBARS=0;
+let L="en",D=SNAP,LIVE=false,TF="15m",CANDLES=[],CBARS=0,TV=null;
 
 const $=s=>document.querySelector(s),NS="http://www.w3.org/2000/svg";
 const T=k=>(I18N[L]&&I18N[L][k])||I18N.en[k]||k;
@@ -377,70 +362,82 @@ const tpl=(k,o)=>T(k).replace(/\{(\w+)\}/g,(_,p)=>o[p]??"");
 const fmt=(n,d=0)=>n==null||isNaN(n)?"—":Number(n).toLocaleString("en-US",{minimumFractionDigits:d,maximumFractionDigits:d});
 const el=(t,a={},p)=>{const e=document.createElementNS(NS,t);for(const k in a)e.setAttribute(k,a[k]);if(p)p.appendChild(e);return e};
 const mk=(h,w,ht)=>{const n=$(h);if(!n)return null;n.innerHTML="";const s=el("svg",{viewBox:`0 0 ${w} ${ht}`,role:"img"});n.appendChild(s);return s};
-const bkk=(v,withDate=true)=>{const d=new Date(v);const o={timeZone:"Asia/Bangkok",hour:"2-digit",minute:"2-digit",hour12:false};if(withDate){o.day="2-digit";o.month="2-digit"}
-  return new Intl.DateTimeFormat("en-GB",o).format(d).replace(",","")};
+const bkk=v=>new Intl.DateTimeFormat("en-GB",{timeZone:"Asia/Bangkok",day:"2-digit",month:"2-digit",hour:"2-digit",minute:"2-digit",hour12:false}).format(new Date(v)).replace(",","");
 const tip=$("#tip");
 function showTip(ev,html){tip.innerHTML=html;tip.style.opacity=1;const r=tip.getBoundingClientRect();
   let x=ev.clientX+14,y=ev.clientY-10;if(x+r.width>innerWidth-8)x=ev.clientX-r.width-14;
   if(y+r.height>innerHeight-8)y=innerHeight-r.height-8;if(y<8)y=8;tip.style.left=x+"px";tip.style.top=y+"px"}
 const hideTip=()=>tip.style.opacity=0;
 function hov(n,h){n.addEventListener("pointerenter",e=>showTip(e,h));n.addEventListener("pointermove",e=>showTip(e,h));n.addEventListener("pointerleave",hideTip)}
+const isDark=()=>document.documentElement.dataset.theme==="dark"||
+  (document.documentElement.dataset.theme!=="light"&&matchMedia("(prefers-color-scheme: dark)").matches);
 
-/* ---------------- indicators ---------------- */
+/* indicators */
 const SMA=(a,n)=>a.length<n?null:a.slice(-n).reduce((s,v)=>s+v,0)/n;
-function EMAseries(a,n){if(a.length<n)return[];const k=2/(n+1);let e=a.slice(0,n).reduce((s,v)=>s+v,0)/n;const out=[e];
-  for(let i=n;i<a.length;i++){e=a[i]*k+e*(1-k);out.push(e)}return out}
-const EMA=(a,n)=>{const s=EMAseries(a,n);return s.length?s[s.length-1]:null};
+function EMAs(a,n){if(a.length<n)return[];const k=2/(n+1);let e=a.slice(0,n).reduce((s,v)=>s+v,0)/n;const o=[e];
+  for(let i=n;i<a.length;i++){e=a[i]*k+e*(1-k);o.push(e)}return o}
+const EMA=(a,n)=>{const s=EMAs(a,n);return s.length?s[s.length-1]:null};
 function RSI(c,n=14){if(c.length<n+1)return null;let g=0,l=0;
   for(let i=1;i<=n;i++){const d=c[i]-c[i-1];d>=0?g+=d:l-=d}g/=n;l/=n;
   for(let i=n+1;i<c.length;i++){const d=c[i]-c[i-1];g=(g*(n-1)+(d>0?d:0))/n;l=(l*(n-1)+(d<0?-d:0))/n}
-  if(l===0)return 100;return 100-100/(1+g/l)}
-function MACD(c,f=12,s=26,sig=9){if(c.length<s+sig)return null;
-  const ef=EMAseries(c,f),es=EMAseries(c,s);const off=ef.length-es.length;
-  const line=es.map((v,i)=>ef[i+off]-v);if(line.length<sig)return null;
-  const sg=EMAseries(line,sig);const L1=line[line.length-1],S1=sg[sg.length-1];
-  return{line:L1,signal:S1,hist:L1-S1}}
+  return l===0?100:100-100/(1+g/l)}
+function MACD(c){if(c.length<35)return null;const ef=EMAs(c,12),es=EMAs(c,26),off=ef.length-es.length;
+  const line=es.map((v,i)=>ef[i+off]-v);if(line.length<9)return null;
+  const sg=EMAs(line,9),L1=line[line.length-1],S1=sg[sg.length-1];return{line:L1,signal:S1,hist:L1-S1}}
 function STOCH(h,l,c,n=14,d=3){if(c.length<n+d)return null;const ks=[];
   for(let i=n-1;i<c.length;i++){const hh=Math.max(...h.slice(i-n+1,i+1)),ll=Math.min(...l.slice(i-n+1,i+1));
-    ks.push(hh===ll?50:(c[i]-ll)/(hh-ll)*100)}
-  return{k:ks[ks.length-1],d:SMA(ks,d)}}
+    ks.push(hh===ll?50:(c[i]-ll)/(hh-ll)*100)}return{k:ks[ks.length-1],d:SMA(ks,d)}}
 function CCI(h,l,c,n=20){if(c.length<n)return null;const tp=c.map((v,i)=>(h[i]+l[i]+v)/3);
-  const m=SMA(tp,n),w=tp.slice(-n);const md=w.reduce((s,v)=>s+Math.abs(v-m),0)/n;
+  const m=SMA(tp,n),w=tp.slice(-n),md=w.reduce((s,v)=>s+Math.abs(v-m),0)/n;
   return md===0?0:(tp[tp.length-1]-m)/(.015*md)}
-function WILLR(h,l,c,n=14){if(c.length<n)return null;
-  const hh=Math.max(...h.slice(-n)),ll=Math.min(...l.slice(-n));
+function WILLR(h,l,c,n=14){if(c.length<n)return null;const hh=Math.max(...h.slice(-n)),ll=Math.min(...l.slice(-n));
   return hh===ll?-50:(hh-c[c.length-1])/(hh-ll)*-100}
 function ATR(h,l,c,n=14){if(c.length<n+1)return null;const tr=[];
   for(let i=1;i<c.length;i++)tr.push(Math.max(h[i]-l[i],Math.abs(h[i]-c[i-1]),Math.abs(l[i]-c[i-1])));
-  let a=tr.slice(0,n).reduce((s,v)=>s+v,0)/n;
-  for(let i=n;i<tr.length;i++)a=(a*(n-1)+tr[i])/n;return a}
+  let a=tr.slice(0,n).reduce((s,v)=>s+v,0)/n;for(let i=n;i<tr.length;i++)a=(a*(n-1)+tr[i])/n;return a}
 function BB(c,n=20,k=2){if(c.length<n)return null;const m=SMA(c,n),w=c.slice(-n);
   const sd=Math.sqrt(w.reduce((s,v)=>s+(v-m)*(v-m),0)/n);return{mid:m,up:m+k*sd,low:m-k*sd}}
 
-/* ---------------- render: static ---------------- */
+/* TradingView */
+function mountTV(){
+  const tvi=(TFS.find(t=>t[0]===TF)||[])[2]||"15";
+  if(!window.TradingView){$("#tvwrap").innerHTML=`<div style="padding:40px;text-align:center;color:var(--ink-3)">${T("loading")}</div>`;return}
+  $("#tvwrap").innerHTML='<div id="tv-chart" style="height:100%"></div>';
+  TV=new TradingView.widget({
+    container_id:"tv-chart",symbol:"BITKUB:KUBTHB",interval:tvi,
+    timezone:"Asia/Bangkok",theme:isDark()?"dark":"light",style:"1",
+    locale:L==="th"?"th":L==="zh"?"zh_CN":"en",
+    autosize:true,hide_side_toolbar:false,allow_symbol_change:false,
+    withdateranges:true,details:false,
+    backgroundColor:isDark()?"#191b19":"#ffffff",
+    gridColor:isDark()?"#262826":"#f1f2ef"
+  });
+}
+
 function paintStatic(){
   document.documentElement.lang=L==="zh"?"zh":L;
   document.title=T("title");
   document.querySelectorAll("[data-i18n]").forEach(n=>{n.textContent=T(n.getAttribute("data-i18n"))});
   document.querySelectorAll(".seg button[data-lang]").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.lang===L)));
-  const b=$("#banner");b.hidden=LIVE;if(!LIVE)b.textContent=T("snap");
+  const b=$("#banner");
+  if(LIVE&&D.errors&&D.errors.length){b.hidden=false;b.textContent=T("apierr")+D.errors.join(" · ")}
+  else if(!LIVE){b.hidden=false;b.textContent=T("snap")}
+  else b.hidden=true;
   $("#stamp").textContent=bkk(LIVE?D.generated_at:SNAP.generated_at)+" UTC+7";
   $("#techwhen").textContent=TF;
+  $("#technote").textContent=T("n_tech");
 }
 function tfButtons(){
   const seg=$("#tfseg");seg.innerHTML="";
   const elapsed=(Date.now()-COLLECT_START)/1000;
   TFS.forEach(([tf,secs])=>{
-    const ok=elapsed/secs>=MIN_BARS;
     const b=document.createElement("button");
-    b.type="button";b.id="tf-"+tf;b.textContent=tf;b.dataset.tf=tf;b.disabled=!ok;
+    b.type="button";b.textContent=tf;b.dataset.tf=tf;
     b.setAttribute("aria-pressed",String(tf===TF));
-    if(!ok){const days=Math.ceil((MIN_BARS*secs-elapsed)/86400);b.title=tpl("tf_soon",{tf,days})}
+    if(elapsed/secs<MIN_BARS)b.title=tpl("tf_bars",{bars:Math.floor(elapsed/secs),tf});
     b.addEventListener("click",()=>setTF(tf));
     seg.appendChild(b)});
 }
-
-/* ---------------- render: KPIs ---------------- */
 function kpis(){
   const n=D.now||{},px=+n.price_thb,sp=+n.spread_bps/100,vol=+n.vol_24h_kub,nf=+n.netflow_out_24h_kub,tk=+n.taker_buy_pct_24h;
   const s10=(D.slipNow||[]).find(r=>r.side==="SELL"&&+r.size_kub===10000);
@@ -454,93 +451,34 @@ function kpis(){
   +k(T("k_nf"),fmt(nf)+" KUB",fmt(nf24.out_of_exchange_kub)+" / "+fmt(nf24.into_exchange_kub))
   +k(T("k_taker"),(isNaN(tk)?"—":tk.toFixed(1))+"%","24 h · "+fmt(t24.fills)+" "+T("k_trades"));
 }
-
-/* ---------------- render: candles ---------------- */
-function cCandles(){
-  const W=900,H=400,Lx=8,R=62,Tp=14,B=26;
-  const s=mk("#c-candle",W,H),sv=mk("#c-cvol",W,110);
-  if(!s||!sv)return;
-  const cs=CANDLES.slice(-140);
-  if(!cs.length){el("text",{class:"tick",x:W/2,y:H/2,"text-anchor":"middle"},s).textContent=T("loading");return}
-  const hi=Math.max(...cs.map(c=>c[2])),lo=Math.min(...cs.map(c=>c[3]));
-  const pad=(hi-lo)*.08||.05,top=hi+pad,bot=lo-pad;
-  const x=i=>Lx+(i+.5)*(W-Lx-R)/cs.length, y=v=>Tp+(top-v)/(top-bot)*(H-Tp-B);
-  const bw=Math.max(2,Math.min(13,(W-Lx-R)/cs.length-2));
-  const ticks=5;
-  for(let i=0;i<=ticks;i++){const v=bot+(top-bot)*i/ticks;
-    el("line",{class:"gl",x1:Lx,x2:W-R,y1:y(v),y2:y(v)},s);
-    el("text",{class:"tick",x:W-R+8,y:y(v)+3.5},s).textContent="฿"+v.toFixed(2)}
-  const last=cs[cs.length-1];
-  el("line",{x1:Lx,x2:W-R,y1:y(last[4]),y2:y(last[4]),stroke:"var(--ink-3)","stroke-width":1,"stroke-dasharray":"3 3"},s);
-  el("rect",{x:W-R+2,y:y(last[4])-9,width:R-6,height:18,rx:4,fill:last[4]>=last[1]?"var(--up)":"var(--down)"},s);
-  el("text",{class:"dlab",x:W-R+8,y:y(last[4])+4,fill:"#fff"},s).textContent=last[4].toFixed(2);
-  cs.forEach((c,i)=>{
-    const up=c[4]>=c[1],col=up?"var(--up)":"var(--down)",X=x(i);
-    el("line",{x1:X,x2:X,y1:y(c[2]),y2:y(c[3]),stroke:col,"stroke-width":1.4},s);
-    const yo=y(Math.max(c[1],c[4])),yc=y(Math.min(c[1],c[4])),h=Math.max(1.4,yc-yo);
-    el("rect",{x:X-bw/2,y:yo,width:bw,height:h,rx:1,
-      fill:up?"var(--card)":col,stroke:col,"stroke-width":1.4},s);
-    hov(el("rect",{x:X-(W-Lx-R)/cs.length/2,y:Tp,width:(W-Lx-R)/cs.length,height:H-Tp-B,class:"hit"},s),
-      `<b>${bkk(c[0])}</b><br><span class="k">O</span> ${c[1].toFixed(2)} <span class="k">H</span> ${c[2].toFixed(2)}<br>
-       <span class="k">L</span> ${c[3].toFixed(2)} <span class="k">C</span> ${c[4].toFixed(2)}<br>
-       <span class="k">vol</span> ${fmt(c[5])} KUB · ${c[6]} ${T("k_trades")}`)});
-  [0,Math.floor(cs.length/2),cs.length-1].forEach((i,k)=>
-    el("text",{class:"tick",x:x(i),y:H-B+16,"text-anchor":k===0?"start":k===2?"end":"middle"},s)
-      .textContent=bkk(cs[i][0]));
-  const vh=Math.max(...cs.map(c=>c[5]))||1;
-  el("line",{class:"ax",x1:Lx,x2:W-R,y1:92,y2:92},sv);
-  el("text",{class:"tick",x:W-R+8,y:26},sv).textContent=fmt(vh);
-  cs.forEach((c,i)=>{const up=c[4]>=c[1],hgt=Math.max(1,(c[5]/vh)*76);
-    el("rect",{x:x(i)-bw/2,y:92-hgt,width:bw,height:hgt,rx:1,
-      fill:up?"var(--up)":"var(--down)","fill-opacity":up?.5:.55},sv)});
-  $("#tfnote").textContent=tpl("tf_note",{bars:CBARS||cs.length,tf:TF});
-}
-
-/* ---------------- render: indicators ---------------- */
 function tech(){
-  const c=CANDLES.map(r=>r[4]),h=CANDLES.map(r=>r[2]),l=CANDLES.map(r=>r[3]),N=c.length;
-  const px=c[N-1];
-  const chip=(cls,txt)=>`<span class="chip ${cls}">${txt}</span>`;
+  const c=CANDLES.map(r=>r[4]),h=CANDLES.map(r=>r[2]),l=CANDLES.map(r=>r[3]),N=c.length,px=c[N-1];
+  const chip=(cl,t)=>`<span class="chip ${cl}">${t}</span>`;
   const na=`<td class="n">—</td><td>${chip("na",T("p_na"))}</td>`;
-  const rows=[];
-  const rsi=RSI(c);
-  rows.push(["RSI (14)",rsi==null?null:rsi.toFixed(1),rsi==null?null:
+  const R=[];
+  const rsi=RSI(c);R.push(["RSI (14)",rsi==null?null:rsi.toFixed(1),rsi==null?null:
     rsi>70?["up",tpl("p_over",{n:70})]:rsi<30?["down",tpl("p_under",{n:30})]:["mid",tpl("p_between",{a:30,b:70})],15]);
-  const m=MACD(c);
-  rows.push(["MACD (12,26,9)",m==null?null:m.line.toFixed(4),m==null?null:
+  const m=MACD(c);R.push(["MACD (12,26,9)",m==null?null:m.line.toFixed(4),m==null?null:
     (m.hist>=0?["up",T("p_above_sig")]:["down",T("p_below_sig")]),35]);
-  const st=STOCH(h,l,c);
-  rows.push(["Stochastic %K (14,3)",st==null?null:st.k.toFixed(1),st==null?null:
+  const st=STOCH(h,l,c);R.push(["Stochastic %K (14,3)",st==null?null:st.k.toFixed(1),st==null?null:
     st.k>80?["up",tpl("p_over",{n:80})]:st.k<20?["down",tpl("p_under",{n:20})]:["mid",tpl("p_between",{a:20,b:80})],17]);
-  const cci=CCI(h,l,c);
-  rows.push(["CCI (20)",cci==null?null:cci.toFixed(1),cci==null?null:
+  const cci=CCI(h,l,c);R.push(["CCI (20)",cci==null?null:cci.toFixed(1),cci==null?null:
     cci>100?["up",tpl("p_over",{n:100})]:cci<-100?["down",tpl("p_under",{n:-100})]:["mid",tpl("p_between",{a:-100,b:100})],20]);
-  const wr=WILLR(h,l,c);
-  rows.push(["Williams %R (14)",wr==null?null:wr.toFixed(1),wr==null?null:
+  const wr=WILLR(h,l,c);R.push(["Williams %R (14)",wr==null?null:wr.toFixed(1),wr==null?null:
     wr>-20?["up",tpl("p_over",{n:-20})]:wr<-80?["down",tpl("p_under",{n:-80})]:["mid",tpl("p_between",{a:-80,b:-20})],14]);
-  const atr=ATR(h,l,c);
-  rows.push(["ATR (14)",atr==null?null:"฿"+atr.toFixed(4),atr==null?null:["mid",T("p_value")],15]);
-  const bb=BB(c);
-  rows.push(["Bollinger (20, 2σ)",bb==null?null:"฿"+bb.up.toFixed(2)+" / ฿"+bb.low.toFixed(2),bb==null?null:
+  const atr=ATR(h,l,c);R.push(["ATR (14)",atr==null?null:"฿"+atr.toFixed(4),atr==null?null:["mid",T("p_value")],15]);
+  const bb=BB(c);R.push(["Bollinger (20, 2σ)",bb==null?null:"฿"+bb.up.toFixed(2)+" / ฿"+bb.low.toFixed(2),bb==null?null:
     px>bb.up?["up",T("p_above_band")]:px<bb.low?["down",T("p_below_band")]:["mid",T("p_in_band")],20]);
-  [["SMA",SMA],["EMA",(a,n)=>EMA(a,n)]].forEach(([nm,fn])=>{
-    [10,20,50].forEach(n=>{const v=fn(c,n);
-      rows.push([`${nm} (${n})`,v==null?null:"฿"+v.toFixed(3),v==null?null:
-        (px>v?["up",T("p_px_above")]:["down",T("p_px_below")]),n])});
-  });
+  [["SMA",SMA],["EMA",EMA]].forEach(([nm,fn])=>[10,20,50].forEach(n=>{const v=fn(c,n);
+    R.push([`${nm} (${n})`,v==null?null:"฿"+v.toFixed(3),v==null?null:(px>v?["up",T("p_px_above")]:["down",T("p_px_below")]),n])}));
   let html=`<thead><tr><th>${T("th_ind")}</th><th class="n">${T("th_val")}</th><th>${T("th_pos")}</th><th class="n">${T("th_bars")}</th></tr></thead><tbody>`;
-  rows.forEach(([nm,val,pos,need])=>{
-    html+=`<tr><td>${nm}</td>`+(val==null?na:`<td class="n">${val}</td><td>${chip(pos[0],pos[1])}</td>`)
-      +`<td class="n" style="color:var(--ink-3)">${N} / ${need}</td></tr>`});
+  R.forEach(([nm,val,pos,need])=>{html+=`<tr><td>${nm}</td>`+(val==null?na:`<td class="n">${val}</td><td>${chip(pos[0],pos[1])}</td>`)
+    +`<td class="n" style="color:var(--ink-3)">${N} / ${need}</td></tr>`});
   $("#t-tech").innerHTML=html+"</tbody>";
 }
-
-/* ---------------- render: other panels ---------------- */
-function hourly(){
-  if(!LIVE)return[];
+function hourly(){if(!LIVE)return[];
   return (D.hourly||[]).map(r=>[bkk(r.hour),r.px_close==null?null:+r.px_close,r.trade_kub==null?null:+r.trade_kub,
-    r.taker_buy_pct==null?null:+r.taker_buy_pct,r.slip_sell_10k==null?null:+r.slip_sell_10k,
-    r.slip_buy_10k==null?null:+r.slip_buy_10k])}
+    r.taker_buy_pct==null?null:+r.taker_buy_pct,r.slip_sell_10k==null?null:+r.slip_sell_10k,r.slip_buy_10k==null?null:+r.slip_buy_10k])}
 function cSlip(){
   const W=880,H=290,Lx=54,R=108,Tp=14,B=42,s=mk("#c-slip",W,H);if(!s)return;
   const all=(D.slipNow||[]).map(r=>({side:r.side,size:+r.size_kub,slip:+r.slippage_pct,vwap:+r.vwap,lv:+r.levels_used}));
@@ -550,8 +488,7 @@ function cSlip(){
   for(let g=0;g<=maxY+1e-9;g+=maxY/4){el("line",{class:"gl",x1:Lx,x2:W-R,y1:y(g),y2:y(g)},s);
     el("text",{class:"tick",x:Lx-9,y:y(g)+3.5,"text-anchor":"end"},s).textContent=g.toFixed(2)+"%"}
   el("line",{class:"ax",x1:Lx,x2:W-R,y1:H-B,y2:H-B},s);
-  sizes.forEach((sz,i)=>el("text",{class:"tick",x:x(i),y:H-B+18,"text-anchor":"middle"},s)
-    .textContent=sz>=1000?sz/1000+"k":sz);
+  sizes.forEach((sz,i)=>el("text",{class:"tick",x:x(i),y:H-B+18,"text-anchor":"middle"},s).textContent=sz>=1000?sz/1000+"k":sz);
   el("text",{class:"tick",x:(Lx+W-R)/2,y:H-B+34,"text-anchor":"middle"},s).textContent="KUB";
   [["SELL","var(--down)",T("lg_sell")],["BUY","var(--info)",T("lg_buy")]].forEach(([side,col,nm])=>{
     const rs=sizes.map(sz=>all.find(r=>r.side===side&&r.size===sz)).filter(Boolean);if(!rs.length)return;
@@ -594,8 +531,7 @@ function cTaker(){
     if(r.v!=null){const up=r.v>=50;
       el("rect",{x:X,y:up?y(r.v):y(50),width:Math.max(1,bw),height:Math.max(1.5,Math.abs(y(r.v)-y(50))),rx:2,
         fill:up?"var(--info)":"var(--down)"},s)}
-    hov(el("rect",{x:X-1.5,y:Tp,width:bw+3,height:H-B-Tp,class:"hit"},s),
-      `<b>${r.t}</b><br>${r.v==null?"—":r.v.toFixed(1)+"%"}`)});
+    hov(el("rect",{x:X-1.5,y:Tp,width:bw+3,height:H-B-Tp,class:"hit"},s),`<b>${r.t}</b><br>${r.v==null?"—":r.v.toFixed(1)+"%"}`)});
   el("text",{class:"tick",x:Lx,y:H-B+16},s).textContent=rs[0].t;
   el("text",{class:"tick",x:W-R,y:H-B+16,"text-anchor":"end"},s).textContent=rs[rs.length-1].t;
 }
@@ -620,9 +556,13 @@ function tDex(){
   const d=D.dex||[],sizes=[...new Set(d.map(r=>+r.size_kub))].sort((a,b)=>a-b);
   let h=`<thead><tr><th>${T("th_size")}</th><th>${T("th_dex")}</th><th class="n">${T("th_out")}</th><th class="n">${T("th_px")}</th><th class="n">${T("th_vs")}</th></tr></thead><tbody>`;
   sizes.forEach(sz=>{d.filter(r=>+r.size_kub===sz).forEach((r,i)=>{
-    h+=`<tr><td>${i===0?fmt(sz)+" KUB":""}</td><td>${r.dex}${r.is_best?' <span class="best">BEST</span>':""}</td>
-      <td class="n">${fmt(r.usdt_out,4)}</td><td class="n">${fmt(r.px_usdt,6)}</td>
-      <td class="n" style="color:${+r.vs_best_pct<-1?"var(--down)":"var(--ink-2)"}">${(+r.vs_best_pct).toFixed(2)}%</td></tr>`})});
+    const q=r.quoted!==false&&r.usdt_out!=null;
+    h+=`<tr class="${q?"":"noquote"}"><td>${i===0?fmt(sz)+" KUB":""}</td>
+      <td>${r.dex}${r.is_best?' <span class="best">BEST</span>':""}${r.fee?` <span class="tag">${r.fee}</span>`:""}</td>`
+      +(q?`<td class="n">${fmt(r.usdt_out,4)}</td><td class="n">${fmt(r.px_usdt,6)}</td>
+           <td class="n" style="color:${+r.vs_best_pct<-1?"var(--down)":"var(--ink-2)"}">${(+r.vs_best_pct).toFixed(2)}%</td>`
+         :`<td class="n" colspan="3" style="text-align:right">${T("no_quote")}</td>`)
+      +`</tr>`})});
   $("#t-dex").innerHTML=h+"</tbody>";
 }
 function treasury(){
@@ -654,20 +594,18 @@ function health(){
   $("#t-health").innerHTML=h+"</tbody>";
 }
 
-/* ---------------- orchestration ---------------- */
-function render(){paintStatic();tfButtons();kpis();cCandles();tech();cSlip();tDex();cSlipT();cTaker();cSweep();treasury();health()}
-
+function render(){paintStatic();tfButtons();kpis();tech();cSlip();tDex();cSlipT();cTaker();cSweep();treasury();health()}
 function setTF(tf){
   TF=tf;try{localStorage.setItem("kfd-tf",tf)}catch(e){}
   document.querySelectorAll("#tfseg button").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.tf===tf)));
+  mountTV();
   if(!LIVE){render();return}
-  fetch(`/api/candles?tf=${tf}&limit=300`).then(r=>r.ok?r.json():Promise.reject(r.status))
-    .then(j=>{CANDLES=(j.candles||[]).map(c=>[c[0],+c[1],+c[2],+c[3],+c[4],+c[5],c[6]]);CBARS=j.bars;render()})
+  fetch(`/api/candles?tf=${tf}&limit=300`).then(r=>r.json())
+    .then(j=>{CANDLES=(j.candles||[]).map(c=>[c[0],+c[1],+c[2],+c[3],+c[4],+c[5],c[6]]);CBARS=j.bars||0;render()})
     .catch(()=>render());
 }
-
 document.querySelectorAll(".seg button[data-lang]").forEach(b=>
-  b.addEventListener("click",()=>{L=b.dataset.lang;try{localStorage.setItem("kfd-lang",L)}catch(e){}render()}));
+  b.addEventListener("click",()=>{L=b.dataset.lang;try{localStorage.setItem("kfd-lang",L)}catch(e){}render();mountTV()}));
 try{
   const sv=localStorage.getItem("kfd-lang");
   if(sv&&I18N[sv])L=sv;
@@ -675,13 +613,16 @@ try{
   else if((navigator.language||"").startsWith("zh"))L="zh";
   const st=localStorage.getItem("kfd-tf");if(st&&TFS.some(t=>t[0]===st))TF=st;
 }catch(e){}
+matchMedia("(prefers-color-scheme: dark)").addEventListener("change",mountTV);
 
-render();
-fetch("/api/data").then(r=>r.ok?r.json():Promise.reject(r.status)).then(j=>{
-  if(!j||!j.now)return;
-  D=j;LIVE=true;
-  if(j.candles&&j.candles.candles){CANDLES=j.candles.candles.map(c=>[c[0],+c[1],+c[2],+c[3],+c[4],+c[5],c[6]]);CBARS=j.candles.bars}
-  if(TF!==(j.candles&&j.candles.tf))setTF(TF);else render();
+render();mountTV();
+fetch("/api/data").then(r=>r.json()).then(j=>{
+  if(!j)return;
+  if(j.now){D=j;LIVE=true;
+    if(j.candles&&j.candles.candles){CANDLES=j.candles.candles.map(c=>[c[0],+c[1],+c[2],+c[3],+c[4],+c[5],c[6]]);CBARS=j.candles.bars}
+    if(TF!==(j.candles&&j.candles.tf))setTF(TF);else render();
+  }else if(j.error){D=SNAP;LIVE=false;D.errors=[j.error];render();
+    $("#banner").hidden=false;$("#banner").textContent=T("apierr")+j.error}
 }).catch(()=>{});
 </script>
 </body>
