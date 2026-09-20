@@ -287,7 +287,7 @@ footer p{margin:0 0 var(--s7);max-width:76ch}
 <script src="https://s3.tradingview.com/tv.js"></script>
 <script>
 const I18N={
-en:{title:"KUB Flow Desk",info:"More information",why_title:"What this tells you",
+en:{ex_cold:"cold",ex_hot:"hot",title:"KUB Flow Desk",info:"More information",why_title:"What this tells you",
  fresh_at:"read {t}",fresh_none:"no data yet",
  src:"Bitkub public API v3 every 5 min · kubscan v2 (41 wallets) every 5 min · KUB Chain RPC (5 DEXes) every 15 min · chain activity from kubscan hourly · price chart by TradingView",
  k_offer:"Lowest offer",k_vol:"24 h volume",k_sell:"Sell 10k KUB",k_nf:"Left the exchange",k_taker:"Buyers crossing",
@@ -320,23 +320,23 @@ en:{title:"KUB Flow Desk",info:"More information",why_title:"What this tells you
  w_dex:"Whether the on-chain price is worth using instead of the exchange, and where. The comparison is per size, because a venue that wins on 100 KUB can lose badly on 5,000: the gap between them is the cost of routing to the wrong one.",
  no_quote:"no pool",
  th_dex:"DEX",th_out:"USD out",th_px:"Per KUB",th_vs:"vs best",th_tok:"Quoted in",
- h_ex:"KUB held at Bitkub",
- l_ex:"Transfers in and out of the exchange hot wallet, by day, in Bangkok time. The balance is the sum of the cold wallets under observation, read every five minutes; the flow is read from the chain.",
+ h_ex:"KUB held at Bitkub Exchange",
+ l_ex:"Only the exchange's own wallets are counted here — its cold wallets and its active hot wallet — read every five minutes. Ecosystem funds, the stake vault and the company reserve are not the exchange's and are left to the supply panel. Transfers in and out are read from the chain, by day, in Bangkok time.",
  n_ex:"Days before collection began are marked as uncollected rather than drawn as zero flow. The exchange moves KUB between its own wallets too; only transfers crossing the boundary are counted.",
  w_ex:"Whether coins are moving onto the exchange or away from it. Sustained flow onto an exchange puts sellable supply within reach of the order book; flow away from it takes supply out of immediate circulation. Neither predicts price, but both change what the book can absorb.",
  ex_in:"Onto the exchange",ex_out:"Off the exchange",ex_net:"Net out, 7 days",
- ex_bal:"Held in cold wallets",ex_wallets:"wallets",ex_nodata:"not collected",
+ ex_bal:"Held by the exchange",ex_nodata:"not collected",
  h_chain:"Chain activity",
- l_chain:"Daily totals from kubscan. Transaction counts come from its chart endpoint, which reaches back about a month; fees are fetched one day at a time and go back as far as the backfill has walked. Bitkub Chain prices gas at a flat 25 gwei, so gas units are derived from the fee total rather than measured directly.",
- n_chain:"Gas units shown are fees divided by 25 gwei, the chain's flat gas price.",
- w_chain:"How much the chain is actually being used, in fees paid and transactions settled. It is the demand side behind everything else on this page: a market's depth and an exchange's flow both sit on top of a chain that people are either using or not.",
- ch_fees:"Fees paid, KUB",ch_tx:"Transactions",ch_gas:"Gas used",
+ l_chain:"Daily totals from kubscan. Transaction counts come from its chart endpoint, which reaches back about a month; fees are fetched one day at a time and go back as far as the backfill has walked. Both are read from kubscan, so both match what kubscan reports for the same day.",
+ n_chain:"Gas units are deliberately not shown. kubscan quotes a flat 25 gwei, but that is the price offered for a new transaction, not the average actually paid: on 19 Sep it measured 9,466,430,334 gas against 190.41 KUB of fees, an effective 20.1 gwei. Dividing fees by 25 gwei would understate gas by about a fifth, and there is no per-day gas figure to use instead.",
+ w_chain:"How much the chain is actually being used, in fees paid and transactions settled. It is the demand side behind everything else on this page: a market's depth and an exchange's flow both sit on top of a chain that people are either using or not. The newest day here is the last one kubscan has closed, so it trails the running totals on their front page by a day.",
+ ch_fees:"Fees paid, KUB",ch_tx:"Transactions",ch_avg:"Average fee per transaction",
  r_7d:"7d",r_1m:"1M",r_3m:"3M",r_1y:"1Y",
  h_treas:"Distribution of the coin supply",
  l_treas:"Measured against the whole coin supply, not only the wallets under observation, and from balances rather than transfers: the stake vault is a contract whose KUB moves as internal transactions that never appear in the transaction list, so the balance is the only reliable measure.",
  n_treas:"The burn address is excluded. kubscan credits it with more KUB than exists, which follows from how gas is accounted for rather than from any actual holder. Large holders are grouped by the label kubscan publishes for them; addresses it carries no label for are listed by address and counted as unidentified, not given an invented name.",
  w_treas:"How much of the supply is parked and where. Coins in a stake vault, a fund's cold wallet or the KKUB wrapper are not sitting on an order book, so the share that is genuinely free to trade is smaller than the total supply suggests.",
- g_stake:"Stake vault",g_fund:"Ecosystem & development funds",g_cold:"Bitkub cold wallets",
+ g_stake:"Stake vault",g_fund:"Ecosystem & development funds",g_cold:"Bitkub Exchange wallets",
  g_kkub:"Wrapped as KKUB",g_reserve:"KUB Company Reserve",g_unid:"Unidentified large holders",g_rest:"Other holders",
  t_supply:"{watched} of {total} KUB held in the wallets under observation ({pct}%)",
  th_wallet:"Wallet",th_group:"Group",th_bal:"Balance, KUB",th_share:"Share",
@@ -351,7 +351,7 @@ en:{title:"KUB Flow Desk",info:"More information",why_title:"What this tells you
  f3:"Not investment advice.",
  snap:"Showing the built-in snapshot, as the live feed is unavailable.",
  apierr:"Unable to load live data: ",loading:"Loading…"},
-th:{title:"KUB Flow Desk",info:"รายละเอียด",why_title:"ข้อมูลนี้บอกอะไร",
+th:{ex_cold:"cold",ex_hot:"hot",title:"KUB Flow Desk",info:"รายละเอียด",why_title:"ข้อมูลนี้บอกอะไร",
  fresh_at:"ข้อมูล ณ {t}",fresh_none:"ยังไม่มีข้อมูล",
  src:"Bitkub public API v3 ทุก 5 นาที · kubscan v2 (41 กระเป๋า) ทุก 5 นาที · KUB Chain RPC (5 DEX) ทุก 15 นาที · กิจกรรมบนเชนจาก kubscan รายชั่วโมง · กราฟราคาโดย TradingView",
  k_offer:"ราคาเสนอขายต่ำสุด",k_vol:"วอลุ่ม 24 ชม.",k_sell:"ขาย 10k KUB",k_nf:"ไหลออกจากศูนย์ซื้อขาย",k_taker:"ฝั่งซื้อข้ามสเปรด",
@@ -384,23 +384,23 @@ th:{title:"KUB Flow Desk",info:"รายละเอียด",why_title:"ข�
  w_dex:"ราคาบนเชนคุ้มกว่าศูนย์ซื้อขายหรือไม่ และที่แหล่งใด การเปรียบเทียบแยกตามขนาด เพราะแหล่งที่ชนะที่ 100 KUB อาจแพ้ขาดที่ 5,000 KUB ส่วนต่างระหว่างแหล่งคือต้นทุนของการส่งคำสั่งผิดที่",
  no_quote:"ไม่มี pool",
  th_dex:"DEX",th_out:"ได้ USD",th_px:"ต่อ 1 KUB",th_vs:"เทียบที่ดีที่สุด",th_tok:"คิดราคากับ",
- h_ex:"KUB ที่อยู่บน Bitkub",
- l_ex:"รายการโอนเข้าและออกจากกระเป๋า hot wallet ของศูนย์ซื้อขาย แยกรายวันตามเวลาไทย ส่วนยอดคงเหลือคือผลรวมของ cold wallet ที่ติดตาม อ่านค่าทุกห้านาที ขณะที่กระแสการโอนอ่านจากเชนโดยตรง",
+ h_ex:"KUB ที่อยู่บน Bitkub Exchange",
+ l_ex:"นับเฉพาะกระเป๋าของศูนย์ซื้อขายเท่านั้น คือกระเป๋าเย็นทั้งหมดและกระเป๋าร้อนที่ใช้งานอยู่ อ่านค่าทุกห้านาที ส่วนกองทุนระบบนิเวศ stake vault และ KUB Company Reserve ไม่ใช่ของศูนย์ซื้อขาย จึงไปอยู่ในแผงการกระจายตัวของเหรียญแทน ขณะที่รายการโอนเข้าออกอ่านจากเชนโดยตรง แยกรายวันตามเวลาไทย",
  n_ex:"วันก่อนเริ่มจัดเก็บจะระบุว่ายังไม่ได้จัดเก็บ แทนการวาดเป็นศูนย์ และศูนย์ซื้อขายมีการโอนระหว่างกระเป๋าของตนเองด้วย ตรงนี้นับเฉพาะรายการที่ข้ามขอบเขตเข้าออกเท่านั้น",
  w_ex:"เหรียญกำลังไหลเข้าหรือออกจากศูนย์ซื้อขาย การไหลเข้าต่อเนื่องหมายถึงอุปทานที่พร้อมขายเข้ามาอยู่ใกล้สมุดคำสั่งมากขึ้น ส่วนการไหลออกคือการนำอุปทานออกจากการหมุนเวียนทันที ทั้งสองอย่างไม่ได้ทำนายราคา แต่เปลี่ยนปริมาณที่สมุดคำสั่งรับไหว",
  ex_in:"ไหลเข้าศูนย์ซื้อขาย",ex_out:"ไหลออกจากศูนย์ซื้อขาย",ex_net:"ไหลออกสุทธิ 7 วัน",
- ex_bal:"ยอดใน cold wallet",ex_wallets:"กระเป๋า",ex_nodata:"ยังไม่ได้จัดเก็บ",
+ ex_bal:"ศูนย์ซื้อขายถือครอง",ex_nodata:"ยังไม่ได้จัดเก็บ",
  h_chain:"กิจกรรมบนเชน",
- l_chain:"ยอดรวมรายวันจาก kubscan จำนวนธุรกรรมมาจาก chart endpoint ซึ่งย้อนหลังได้ราวหนึ่งเดือน ส่วนค่าธรรมเนียมดึงทีละวันจึงย้อนหลังได้เท่าที่การเติมข้อมูลเดินไปถึง Bitkub Chain คิดค่า gas คงที่ที่ 25 gwei หน่วย gas จึงคำนวณย้อนจากยอดค่าธรรมเนียม มิได้วัดโดยตรง",
- n_chain:"หน่วย gas ที่แสดงคือค่าธรรมเนียมหารด้วย 25 gwei ซึ่งเป็นราคา gas คงที่ของเชนนี้",
- w_chain:"เชนถูกใช้งานจริงมากน้อยเพียงใด วัดจากค่าธรรมเนียมที่จ่ายและจำนวนธุรกรรมที่สำเร็จ นี่คือฝั่งอุปสงค์ที่รองรับทุกอย่างบนหน้านี้ ทั้งความลึกของตลาดและกระแสเงินของศูนย์ซื้อขายล้วนตั้งอยู่บนเชนที่มีคนใช้หรือไม่มี",
- ch_fees:"ค่าธรรมเนียม KUB",ch_tx:"จำนวนธุรกรรม",ch_gas:"gas ที่ใช้",
+ l_chain:"ยอดรวมรายวันจาก kubscan จำนวนธุรกรรมมาจาก chart endpoint ซึ่งย้อนหลังได้ราวหนึ่งเดือน ส่วนค่าธรรมเนียมดึงทีละวันจึงย้อนหลังได้เท่าที่การเติมข้อมูลเดินไปถึง ทั้งสองค่าอ่านจาก kubscan โดยตรง จึงตรงกับที่ kubscan รายงานในวันเดียวกัน",
+ n_chain:"ตั้งใจไม่แสดงหน่วย gas เนื่องจาก kubscan ระบุราคา gas คงที่ 25 gwei ซึ่งเป็นราคาที่เสนอสำหรับธุรกรรมใหม่ มิใช่ค่าเฉลี่ยที่จ่ายจริง วันที่ 19 ก.ย. kubscan วัด gas ได้ 9,466,430,334 เทียบกับค่าธรรมเนียม 190.41 KUB คิดเป็น 20.1 gwei การหารค่าธรรมเนียมด้วย 25 gwei จึงให้ค่า gas ต่ำกว่าจริงราวหนึ่งในห้า และไม่มีตัวเลข gas รายวันให้ใช้แทน",
+ w_chain:"เชนถูกใช้งานจริงมากน้อยเพียงใด วัดจากค่าธรรมเนียมที่จ่ายและจำนวนธุรกรรมที่สำเร็จ นี่คือฝั่งอุปสงค์ที่รองรับทุกอย่างบนหน้านี้ ทั้งความลึกของตลาดและกระแสเงินของศูนย์ซื้อขายล้วนตั้งอยู่บนเชนที่มีคนใช้หรือไม่มี · วันล่าสุดที่แสดงคือวันล่าสุดที่ kubscan ปิดยอดแล้ว จึงช้ากว่ายอดที่วิ่งอยู่บนหน้าแรกของเขาหนึ่งวัน",
+ ch_fees:"ค่าธรรมเนียม KUB",ch_tx:"จำนวนธุรกรรม",ch_avg:"ค่าธรรมเนียมเฉลี่ยต่อธุรกรรม",
  r_7d:"7 วัน",r_1m:"1 เดือน",r_3m:"3 เดือน",r_1y:"1 ปี",
  h_treas:"การกระจายตัวของเหรียญทั้งหมด",
  l_treas:"พิจารณาจากปริมาณเหรียญทั้งเครือข่าย มิใช่เฉพาะกระเป๋าที่ติดตาม และใช้ยอดคงเหลือแทนรายการโอน เนื่องจาก stake vault เป็นสัญญาอัจฉริยะที่เหรียญเคลื่อนไหวในรูป internal transaction ซึ่งไม่ปรากฏในรายการธุรกรรม ยอดคงเหลือจึงเป็นวิธีเดียวที่เชื่อถือได้",
  n_treas:"ไม่นับรวม burn address เนื่องจาก kubscan บันทึกยอดไว้สูงกว่าปริมาณเหรียญทั้งหมด อันเป็นผลจากวิธีบันทึกค่าธรรมเนียม มิใช่ผู้ถือครองจริง ผู้ถือรายใหญ่จัดหมวดตามป้ายชื่อที่ kubscan เผยแพร่ ส่วนกระเป๋าที่ไม่มีป้ายชื่อจะแสดงเป็นเลขที่กระเป๋าและนับเป็นรายที่ยังระบุไม่ได้ ไม่มีการตั้งชื่อเอง",
  w_treas:"อุปทานถูกพักไว้เท่าใดและอยู่ที่ใด เหรียญที่อยู่ใน stake vault กระเป๋าเย็นของกองทุน หรือในสัญญา KKUB ไม่ได้อยู่บนสมุดคำสั่ง สัดส่วนที่ซื้อขายได้จริงจึงน้อยกว่าที่ปริมาณรวมทำให้เข้าใจ",
- g_stake:"Stake vault",g_fund:"กองทุนระบบนิเวศและการพัฒนา",g_cold:"Cold wallet ของ Bitkub",
+ g_stake:"Stake vault",g_fund:"กองทุนระบบนิเวศและการพัฒนา",g_cold:"กระเป๋าของ Bitkub Exchange",
  g_kkub:"ห่อเป็น KKUB",g_reserve:"KUB Company Reserve",g_unid:"รายใหญ่ที่ยังระบุไม่ได้",g_rest:"ผู้ถือครองรายอื่น",
  t_supply:"กระเป๋าที่ติดตามถือครอง {watched} จาก {total} KUB ({pct}%)",
  th_wallet:"กระเป๋า",th_group:"กลุ่ม",th_bal:"ยอดคงเหลือ KUB",th_share:"สัดส่วน",
@@ -415,7 +415,7 @@ th:{title:"KUB Flow Desk",info:"รายละเอียด",why_title:"ข�
  f3:"ไม่ใช่คำแนะนำการลงทุน",
  snap:"กำลังแสดงข้อมูลสำรองที่ฝังมากับหน้าเว็บ เนื่องจากไม่สามารถเชื่อมต่อข้อมูลสดได้",
  apierr:"ไม่สามารถเชื่อมต่อข้อมูลสดได้: ",loading:"กำลังโหลด…"},
-zh:{title:"KUB 流动性看板",info:"说明",why_title:"这一面板说明什么",
+zh:{ex_cold:"冷钱包",ex_hot:"热钱包",title:"KUB 流动性看板",info:"说明",why_title:"这一面板说明什么",
  fresh_at:"数据截至 {t}",fresh_none:"暂无数据",
  src:"Bitkub 公开 API v3 每 5 分钟 · kubscan v2（41 个钱包）每 5 分钟 · KUB 链 RPC（5 个 DEX）每 15 分钟 · 链上活动每小时取自 kubscan · 价格图表由 TradingView 提供",
  k_offer:"最低卖价",k_vol:"24 小时成交量",k_sell:"卖出 1 万 KUB",k_nf:"流出交易所",k_taker:"买方主动成交",
@@ -448,23 +448,23 @@ zh:{title:"KUB 流动性看板",info:"说明",why_title:"这一面板说明什�
  w_dex:"链上价格是否值得取代交易所，以及应当选择哪一家。比较按规模分别进行，因为在 100 KUB 上胜出的场所，在 5,000 KUB 上可能大幅落后：两者的差距就是选错路由的代价。",
  no_quote:"无流动性池",
  th_dex:"DEX",th_out:"获得美元",th_px:"每 KUB",th_vs:"对比最优",th_tok:"计价代币",
- h_ex:"存放于 Bitkub 的 KUB",
- l_ex:"按曼谷时间逐日统计进出交易所热钱包的转账。余额为受监控冷钱包的合计，每五分钟读取一次；流向则直接读自链上。",
+ h_ex:"存放于 Bitkub Exchange 的 KUB",
+ l_ex:"此处只统计交易所自有的钱包 —— 其全部冷钱包与在用的热钱包 —— 每五分钟读取一次。生态基金、质押金库与公司储备并不属于交易所，归入供应量分布面板。进出转账直接读自链上，按曼谷时间逐日统计。",
  n_ex:"采集开始之前的日期标注为未采集，而不是画成零流量。交易所在自有钱包之间也会划转，此处只统计跨越进出边界的转账。",
  w_ex:"代币正在流入还是流出交易所。持续流入意味着可供抛售的供应更贴近订单簿；流出则把供应移出即时流通。两者都不预测价格，但都会改变订单簿所能承接的量。",
  ex_in:"流入交易所",ex_out:"流出交易所",ex_net:"7 日净流出",
- ex_bal:"冷钱包持有量",ex_wallets:"个钱包",ex_nodata:"未采集",
+ ex_bal:"交易所持有量",ex_nodata:"未采集",
  h_chain:"链上活动",
- l_chain:"取自 kubscan 的每日合计。交易笔数来自其图表接口，可回溯约一个月；手续费按日逐条获取，回溯范围取决于补数进度。Bitkub Chain 采用 25 gwei 的固定 gas 价格，因此 gas 用量由手续费总额反推，而非直接测得。",
- n_chain:"所示 gas 用量为手续费除以 25 gwei，即本链的固定 gas 价格。",
- w_chain:"这条链实际被使用的程度，以支付的手续费与结算的交易笔数衡量。它是本页其余一切背后的需求侧：市场深度与交易所资金流，都建立在一条有人使用或无人使用的链之上。",
- ch_fees:"手续费（KUB）",ch_tx:"交易笔数",ch_gas:"gas 用量",
+ l_chain:"取自 kubscan 的每日合计。交易笔数来自其图表接口，可回溯约一个月；手续费按日逐条获取，回溯范围取决于补数进度。两者均直接读自 kubscan，因此与 kubscan 同一天的报告一致。",
+ n_chain:"此处刻意不显示 gas 用量。kubscan 标示 25 gwei 的固定 gas 价格，但那是新交易的报价，并非实际支付的均价：9 月 19 日其测得 9,466,430,334 gas，对应 190.41 KUB 手续费，折合 20.1 gwei。以 25 gwei 相除会把 gas 低估约五分之一，而又没有可替代的逐日 gas 数据。",
+ w_chain:"这条链实际被使用的程度，以支付的手续费与结算的交易笔数衡量。它是本页其余一切背后的需求侧：市场深度与交易所资金流，都建立在一条有人使用或无人使用的链之上。此处最新的一天是 kubscan 已结算的最后一天，因此比其首页的滚动数字晚一天。",
+ ch_fees:"手续费（KUB）",ch_tx:"交易笔数",ch_avg:"每笔交易平均手续费",
  r_7d:"7 天",r_1m:"1 个月",r_3m:"3 个月",r_1y:"1 年",
  h_treas:"代币供应量的分布",
  l_treas:"以全网代币供应量为基准，而非仅限受监控钱包，并以余额而非转账计量：质押金库为智能合约，其 KUB 以内部交易形式流动，不会出现在交易列表中，因此余额是唯一可靠的观测方式。",
  n_treas:"不计入销毁地址。kubscan 记于其名下的 KUB 超过实际总量，此系 gas 记账方式所致，并非真实持有。大额持有者按 kubscan 公布的标签归类；没有标签的地址以地址本身列出并计为未识别，不会被臆造名称。",
  w_treas:"有多少供应量处于闲置状态、又存放在何处。存于质押金库、基金冷钱包或 KKUB 合约中的代币并不在订单簿上，因此真正可自由交易的份额，比总量所暗示的要小。",
- g_stake:"质押金库",g_fund:"生态与发展基金",g_cold:"Bitkub 冷钱包",
+ g_stake:"质押金库",g_fund:"生态与发展基金",g_cold:"Bitkub Exchange 钱包",
  g_kkub:"包装为 KKUB",g_reserve:"KUB 公司储备",g_unid:"未识别的大额持有者",g_rest:"其他持有者",
  t_supply:"监控钱包持有 {watched} / 共 {total} KUB（{pct}%）",
  th_wallet:"钱包",th_group:"分组",th_bal:"余额（KUB）",th_share:"占比",
@@ -493,13 +493,11 @@ const SNAP={generated_at:"2026-09-20T11:15:00Z",
       {size_kub:100,dex:"junoswap",fee:3000,usdt_out:60.795607,px_usdt:.607956,vs_best_pct:-.32,quoted:true,is_best:false,quote_token:"KUSDT"},
       {size_kub:100,dex:"diamon",usdt_out:10.519824,px_usdt:.105198,vs_best_pct:-82.75,quoted:true,is_best:false,quote_token:"KUSDT"}],
  health:[{job:"cex",runs:288,failed:0},{job:"chain:cex_hot",runs:288,failed:0},{job:"dex_quotes",runs:96,failed:0},{job:"watch_balance",runs:288,failed:0}],
- treasury:[{label:"StakeManagerVault",cat:"stake",kub:10925438},{label:"Bitkub Exchange (Cold Wallet) #1",cat:"cex_cold",kub:2288828},{label:"Sustainable Blockchain Development Fund (Cold-4)",cat:"fund",kub:2000001}],
+ treasury:[{label:"StakeManagerVault",cat:"stake",kub:10925438},{label:"Bitkub Exchange (Cold Wallet) #1",cat:"cex_cold",kub:2288828},{label:"Bitkub Exchange (Hot Wallet) #2",cat:"cex_hot",kub:117019},{label:"Sustainable Blockchain Development Fund (Cold-4)",cat:"fund",kub:2000001}],
  supply:{total:109697579,watched:84464267,wallets:41,kkub:10586039},
  other:[{rank:3,address:"0x67ebd850304c70d983b2d1b93ea79c7cd6c3f6b5",label:"Wrapped KUB (KKUB)",cat:"wrapped",kub:10586039,kkub:true},
-        {rank:41,address:"0xfeab40137e5d4db7a7cc62d71ea87ab0f9e66329",label:"KUB Company Reserve (Cold wallet-1)",cat:"reserve",kub:1666666,kkub:false},
-        {rank:42,address:"0xacab0935deb68a23c0bafefbed19df1ab24a14c4",label:"KUB Company Reserve (Cold wallet-2)",cat:"reserve",kub:1666666,kkub:false},
         {rank:40,address:"0xf9d09603690473910529a2c814563e61959b25d8",label:null,cat:"unidentified",kub:1666667,kkub:false}],
- exchange:{balance:50538828,wallets:27,collecting_since:"2026-09-19T08:10:00Z",
+ exchange:{balance:50655847,wallets:28,cold:50538828,hot:117019,collecting_since:"2026-09-19T08:10:00Z",
    flow:[{day:"2026-09-18",in:1320.15,out:8,net:-1312.16,in_tx:3,out_tx:2},
          {day:"2026-09-19",in:9350.84,out:10208.12,net:857.28,in_tx:13,out_tx:35},
          {day:"2026-09-20",in:10923.41,out:40856.13,net:29932.72,in_tx:15,out_tx:22}]},
@@ -804,8 +802,14 @@ function exchange(){
   const since=ex.collecting_since?Date.parse(ex.collecting_since):null;
   const net7=flow.reduce((s,r)=>s+(+r.net||0),0);
   const k=(t,v,s)=>`<div class="kpi"><dt>${t}</dt><dd>${v}</dd><div class="sub">${s}</div></div>`;
+  // Only the exchange's own wallets: its cold wallets plus the live hot one.
+  const exCold=(D.treasury||[]).filter(t=>t.cat==="cex_cold");
+  const exHot=(D.treasury||[]).filter(t=>t.cat==="cex_hot");
+  const sumK=a=>a.reduce((s,r)=>s+r.kub,0);
+  const bal=ex.balance!=null?ex.balance:sumK(exCold)+sumK(exHot);
   $("#exkpis").innerHTML=
-     k(T("ex_bal"),fmt(ex.balance)+" KUB",(ex.wallets||0)+" "+T("ex_wallets"))
+     k(T("ex_bal"),fmt(bal)+" KUB",
+       `${T("ex_cold")} <b>${fmt(sumK(exCold))}</b> (${exCold.length}) · ${T("ex_hot")} <b>${fmt(sumK(exHot))}</b> (${exHot.length})`)
     +k(T("ex_net"),(net7>=0?"+":"")+fmt(net7)+" KUB",T("ex_out")+" / "+T("ex_in"));
 
   const W=880,H=240,Lx=62,R=16,Tp=18,B=40,s=mk("#c-exflow",W,H);if(!s)return;
@@ -831,6 +835,12 @@ function exchange(){
       :`<b>${dmy(r.day)}</b><br><span class="k">${T("ex_in")}</span> ${fmt(r.in)} (${r.in_tx})<br><span class="k">${T("ex_out")}</span> ${fmt(r.out)} (${r.out_tx})<br><span class="k">net</span> ${fmt(r.net)}`);
     el("text",{class:"tick",x:cx,y:H-B+18,"text-anchor":"middle"},s).textContent=dmy(r.day);
   });
+}
+// Two measured quantities divided by each other, rather than a fee total
+// scaled by a gas price nobody actually paid.
+function avgFee(r){
+  if(r.fees==null||!r.tx)return "—";
+  return fmt(r.fees/r.tx,6)+" KUB";
 }
 function chainRows(){
   const days=(RANGES.find(r=>r[0]===RANGE)||[])[1]||30;
@@ -864,16 +874,17 @@ function cChain(){
   if(d)el("path",{d:d.trim(),fill:"none",stroke:"var(--warn)","stroke-width":2,"stroke-linejoin":"round"},s);
   rs.forEach((r,i)=>{const cx=Lx+slot*i;
     hov(el("rect",{x:cx,y:Tp,width:slot,height:H-B-Tp,class:"hit"},s),
-      `<b>${dmy(r.day)}</b><br><span class="k">${T("ch_fees")}</span> ${r.fees==null?"—":fmt(r.fees,2)}<br><span class="k">${T("ch_gas")}</span> ${r.gas==null?"—":fmt(r.gas)}<br><span class="k">${T("ch_tx")}</span> ${r.tx==null?"—":fmt(r.tx)}`)});
+      `<b>${dmy(r.day)}</b><br><span class="k">${T("ch_fees")}</span> ${r.fees==null?"—":fmt(r.fees,2)}<br><span class="k">${T("ch_tx")}</span> ${r.tx==null?"—":fmt(r.tx)}<br><span class="k">${T("ch_avg")}</span> ${avgFee(r)}`)});
   el("text",{class:"tick",x:Lx,y:H-B+18},s).textContent=dmy(rs[0].day);
   el("text",{class:"tick",x:W-R,y:H-B+18,"text-anchor":"end"},s).textContent=dmy(rs[rs.length-1].day);
   const last=rs[rs.length-1];
-  if(note)note.innerHTML=(last.gas!=null?`<b>${dmy(last.day)}</b> — ${T("ch_gas")}: ${fmt(last.gas)} · ${T("ch_fees")}: ${fmt(last.fees,2)}<br>`:"")+T("n_chain");
+  if(note)note.innerHTML=(last.fees!=null?`<b>${dmy(last.day)}</b> — ${T("ch_fees")}: ${fmt(last.fees,2)} KUB · ${T("ch_avg")}: ${avgFee(last)}<br>`:"")+T("n_chain");
 }
 function treasury(){
-  const tot={stake:0,fund:0,cex_cold:0},cnt={stake:0,fund:0,cex_cold:0};
-  (D.treasury||[]).forEach(t=>{if(tot[t.cat]==null)return;tot[t.cat]+=t.kub;cnt[t.cat]++});
-  const watched=tot.stake+tot.fund+tot.cex_cold;
+  const MAP={stake:"stake",fund:"fund",cex_cold:"cex",cex_hot:"cex",reserve:"reserve"};
+  const tot={stake:0,fund:0,cex:0,reserve:0},cnt={stake:0,fund:0,cex:0,reserve:0};
+  (D.treasury||[]).forEach(t=>{const g=MAP[t.cat];if(!g)return;tot[g]+=t.kub;cnt[g]++});
+  const watched=tot.stake+tot.fund+tot.cex+tot.reserve;
   const others=(D.other||[]).filter(r=>!r.kkub);
   const kkub=(D.supply&&D.supply.kkub)||((D.other||[]).find(r=>r.kkub)||{}).kub||0;
   const reserve=others.filter(r=>r.cat==="reserve");
@@ -882,13 +893,13 @@ function treasury(){
   const total=(D.supply&&D.supply.total)||0;
   if(!watched)return;
   const grand=total||watched+kkub+sum(others);
-  const rest=Math.max(0,grand-watched-kkub-sum(others));
+  const rest=Math.max(0,grand-watched-kkub-sum(unid));
 
   const segs=[["stake",T("g_stake"),"var(--up)",tot.stake,cnt.stake],
               ["fund",T("g_fund"),"var(--accent)",tot.fund,cnt.fund],
-              ["cex_cold",T("g_cold"),"var(--warn)",tot.cex_cold,cnt.cex_cold],
+              ["cex",T("g_cold"),"var(--warn)",tot.cex,cnt.cex],
               ["kkub",T("g_kkub"),"var(--alt)",kkub,1],
-              ["reserve",T("g_reserve"),"#e07b39",sum(reserve),reserve.length],
+              ["reserve",T("g_reserve"),"#e07b39",tot.reserve+sum(reserve),cnt.reserve+reserve.length],
               ["unid",T("g_unid"),"#7f8694",sum(unid),unid.length],
               ["rest",T("g_rest"),"#3a3f4b",rest,null]].filter(g=>g[3]>0);
 
