@@ -9,6 +9,9 @@ const maxOf = (rows, field) => {
   }
   return best === null ? null : new Date(best).toISOString()
 }
+// A day, not an instant. Anchor it to Bangkok midnight so a bare date is not
+// read as UTC and shown seven hours out.
+const day = (d) => (d == null ? null : new Date(`${d}T00:00:00+07:00`).toISOString())
 
 export default async function handler(req, res) {
   if (missingKey(res)) return
@@ -124,14 +127,14 @@ export default async function handler(req, res) {
     asOf: {
       page: generated,
       price: iso(out.now && out.now[0] && out.now[0].as_of),
-      book: maxOf(out.slipNow, 'snapshot_at'),
+      book: maxOf(out.slipNow, 'snapshot_ts'),
       hourly: maxOf(out.hourly, 'hour'),
       sweeps: maxOf(out.sweeps, 'ts'),
       dex: iso(out.dex && out.dex[0] && out.dex[0].as_of),
       treasury: maxOf(out.watch, 'snapshot_at'),
       supply: iso(sup && sup.as_of),
       exchange: iso(exBal && exBal.as_of),
-      chain: chain.length ? chain[chain.length - 1].day : null,
+      chain: day(chain.length ? chain[chain.length - 1].day : null),
     },
     candles: {
       tf: '15m',
