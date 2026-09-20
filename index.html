@@ -76,9 +76,19 @@ select{font:400 12px/16px var(--sans);color:var(--text-primary);background:#1e22
 .fold{font:500 12px/16px var(--sans);color:var(--text-muted);background:transparent;border:1px solid var(--line);
   border-radius:var(--r-sm);padding:var(--s4) var(--s8);cursor:pointer;transition:color var(--dur)}
 .fold:hover{color:var(--text-strong)}
-.sub-panel{margin:0 0 22px}
-.sub-panel[hidden]{display:none}
-.sub-panel h3{margin:0 0 var(--s5);font-size:13px;line-height:18px;font-weight:600;color:var(--text-primary)}
+.flowgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:14px;margin:14px 0 4px}
+.flowtile{aspect-ratio:1/1;border:1px solid var(--line);border-radius:var(--r-md);
+  padding:13px 13px 10px;display:flex;flex-direction:column;min-width:0}
+.flowtile .ftop{flex:none;display:flex;align-items:baseline;justify-content:space-between;
+  flex-wrap:wrap;gap:2px 10px;margin-bottom:6px}
+.flowtile h3{margin:0;font-size:12.5px;line-height:16px;font-weight:600;color:var(--text-primary)}
+.tlg{display:flex;gap:10px;font-size:10.5px;color:var(--text-muted);white-space:nowrap}
+.tlg span{display:inline-flex;align-items:center;gap:4px}
+.tlg i{width:8px;height:8px;border-radius:2px;flex:none}
+.tlg i.dot{border-radius:50%}
+.chartwrap{flex:1 1 auto;min-height:0;position:relative}
+.chartwrap svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+.flowtile .fnote{flex:none;margin-top:4px;font-size:10.5px;line-height:14px;color:var(--text-muted)}
 
 #tvwrap{height:min(64vh,540px);min-height:340px;border-radius:var(--r-md);overflow:hidden;background:var(--bg)}
 #tv-chart{height:100%;width:100%}
@@ -173,40 +183,27 @@ footer p{margin:0 0 var(--s7);max-width:76ch}
       <h2 data-i18n="h_flow"></h2><button class="i" type="button" aria-expanded="false" data-info="l_flow l_cost"></button>
       <div class="right"><span class="fresh" data-fresh="book"></span></div>
     </div>
-    <div class="seg" id="subseg" role="group" aria-label="Charts"></div>
-    <div style="height:14px"></div>
-
-    <div class="sub-panel" data-sub="cost">
-      <h3 data-i18n="sub_cost"></h3>
-      <ul class="legend">
-        <li><span class="sw" style="background:var(--down)"></span><span data-i18n="lg_sell"></span></li>
-        <li><span class="sw" style="background:var(--up)"></span><span data-i18n="lg_buy"></span></li>
-      </ul>
-      <div id="c-slip"></div>
-      <p class="note" id="slipnote"></p>
-    </div>
-
-    <div class="sub-panel" data-sub="slipt">
-      <h3 data-i18n="sub_slipt"></h3>
-      <ul class="legend">
-        <li><span class="sw" style="background:var(--down)"></span><span data-i18n="lg_sell10"></span></li>
-        <li><span class="sw" style="background:var(--up)"></span><span data-i18n="lg_buy10"></span></li>
-      </ul>
-      <div id="c-slipt"></div>
-    </div>
-
-    <div class="sub-panel" data-sub="taker">
-      <h3 data-i18n="sub_taker"></h3>
-      <ul class="legend">
-        <li><span class="sw dot" style="background:var(--up)"></span><span data-i18n="lg_bcross"></span></li>
-        <li><span class="sw dot" style="background:var(--down)"></span><span data-i18n="lg_scross"></span></li>
-      </ul>
-      <div id="c-taker"></div>
-    </div>
-
-    <div class="sub-panel" data-sub="sweep">
-      <h3 data-i18n="sub_sweep"></h3>
-      <div id="c-sweep"></div>
+    <div class="flowgrid">
+      <div class="flowtile">
+        <div class="ftop"><h3 data-i18n="sub_cost"></h3>
+          <span class="tlg"><span><i style="background:var(--down)"></i><span data-i18n="lg_sell"></span></span><span><i style="background:var(--up)"></i><span data-i18n="lg_buy"></span></span></span></div>
+        <div id="c-slip" class="chartwrap"></div>
+        <p class="fnote" id="slipnote"></p>
+      </div>
+      <div class="flowtile">
+        <div class="ftop"><h3 data-i18n="sub_slipt"></h3>
+          <span class="tlg"><span><i style="background:var(--down)"></i><span data-i18n="lg_sell10"></span></span><span><i style="background:var(--up)"></i><span data-i18n="lg_buy10"></span></span></span></div>
+        <div id="c-slipt" class="chartwrap"></div>
+      </div>
+      <div class="flowtile">
+        <div class="ftop"><h3 data-i18n="sub_taker"></h3>
+          <span class="tlg"><span><i class="dot" style="background:var(--up)"></i><span data-i18n="lg_bcross"></span></span><span><i class="dot" style="background:var(--down)"></i><span data-i18n="lg_scross"></span></span></span></div>
+        <div id="c-taker" class="chartwrap"></div>
+      </div>
+      <div class="flowtile">
+        <div class="ftop"><h3 data-i18n="sub_sweep"></h3></div>
+        <div id="c-sweep" class="chartwrap"></div>
+      </div>
     </div>
     <p class="why"><b data-i18n="why_title"></b><span data-i18n="w_flow"></span></p>
   </section>
@@ -512,11 +509,9 @@ const SNAP={generated_at:"2026-09-20T11:15:00Z",
 
 const COLLECT_START=Date.parse("2026-09-19T08:10:00Z");
 const TFS=[["5m",300,"5"],["15m",900,"15"],["1h",3600,"60"],["4h",14400,"240"],["1d",86400,"D"]];
-const SUBS=["cost","slipt","taker","sweep"];
 const RANGES=[["7d",7,"r_7d"],["1m",30,"r_1m"],["3m",90,"r_3m"],["1y",365,"r_1y"]];
 const MIN_BARS=35;
 let L="en",D=SNAP,LIVE=false,TF="15m",CANDLES=[],DEXSIZE=null,RANGE="1m",EXRANGE="7d";
-let SUBON={cost:true,slipt:true,taker:true,sweep:true};
 
 const $=s=>document.querySelector(s),NS="http://www.w3.org/2000/svg";
 const T=k=>(I18N[L]&&I18N[L][k])||I18N.en[k]||k;
@@ -639,16 +634,6 @@ function tfButtons(){
     title:elapsed/secs<MIN_BARS?tpl("tf_bars",{bars:Math.floor(elapsed/secs),tf}):null})),
     k=>k===TF,setTF);
 }
-function subButtons(){
-  segButtons("#subseg",SUBS.map(s=>({k:s,label:T("sub_"+s)})),k=>SUBON[k],k=>{
-    SUBON[k]=!SUBON[k];
-    try{localStorage.setItem("kfd-subs",JSON.stringify(SUBON))}catch(e){}
-    subButtons();applySubs();
-  });
-}
-function applySubs(){
-  SUBS.forEach(s=>{const n=document.querySelector(`.sub-panel[data-sub="${s}"]`);if(n)n.hidden=!SUBON[s]});
-}
 function exRangeButtons(){
   segButtons("#exseg",RANGES.map(([k,,lab])=>({k,label:T(lab)})),k=>k===EXRANGE,k=>{
     EXRANGE=k;try{localStorage.setItem("kfd-exrange",k)}catch(e){}
@@ -713,76 +698,84 @@ function tech(){
 function hourly(){if(!LIVE)return[];
   return (D.hourly||[]).map(r=>[bkk(r.hour),r.px_close==null?null:+r.px_close,r.trade_kub==null?null:+r.trade_kub,
     r.taker_buy_pct==null?null:+r.taker_buy_pct,r.slip_sell_10k==null?null:+r.slip_sell_10k,r.slip_buy_10k==null?null:+r.slip_buy_10k])}
+// The four order-flow charts live in fixed-aspect square tiles rather than
+// full-width cards, so each one is built to the tile's own measured pixel box
+// instead of a fixed design width — one viewBox unit is one real pixel, so
+// nothing has to stretch or letterbox to fit.
+function mkFit(sel){
+  const n=$(sel);if(!n)return null;
+  n.innerHTML="";
+  const w=Math.max(60,Math.round(n.clientWidth||220)),h=Math.max(60,Math.round(n.clientHeight||150));
+  const s=el("svg",{viewBox:`0 0 ${w} ${h}`,role:"img"});
+  s.style.cssText="display:block;width:100%;height:100%";
+  n.appendChild(s);
+  return{s,w,h};
+}
 function cSlip(){
-  const W=880,H=290,Lx=54,R=24,Tp=14,B=42,s=mk("#c-slip",W,H);if(!s)return;
+  const box=mkFit("#c-slip");if(!box)return;const{s,w:W,h:H}=box;
+  const Lx=30,R=6,Tp=6,B=16;
   const all=(D.slipNow||[]).map(r=>({side:r.side,size:+r.size_kub,slip:+r.slippage_pct,vwap:+r.vwap,lv:+r.levels_used}));
   const sizes=[...new Set(all.map(r=>r.size))].sort((a,b)=>a-b);if(!sizes.length)return;
   const maxY=Math.max(.5,Math.ceil(Math.max(...all.map(r=>r.slip))*4)/4);
   const x=i=>Lx+i*(W-Lx-R)/Math.max(1,sizes.length-1),y=v=>H-B-(v/maxY)*(H-B-Tp);
-  for(let g=0;g<=maxY+1e-9;g+=maxY/4){el("line",{class:"gl",x1:Lx,x2:W-R,y1:y(g),y2:y(g)},s);
-    el("text",{class:"tick",x:Lx-9,y:y(g)+3.5,"text-anchor":"end"},s).textContent=g.toFixed(2)+"%"}
+  [0,maxY].forEach(g=>{el("line",{class:"gl",x1:Lx,x2:W-R,y1:y(g),y2:y(g)},s);
+    el("text",{class:"tick",x:Lx-6,y:y(g)+3,"text-anchor":"end"},s).textContent=g.toFixed(1)+"%"});
   el("line",{class:"ax",x1:Lx,x2:W-R,y1:H-B,y2:H-B},s);
-  sizes.forEach((sz,i)=>el("text",{class:"tick",x:x(i),y:H-B+18,"text-anchor":"middle"},s).textContent=sz>=1000?sz/1000+"k":sz);
-  el("text",{class:"tick",x:(Lx+W-R)/2,y:H-B+34,"text-anchor":"middle"},s).textContent="KUB";
   [["SELL","var(--down)",T("lg_sell")],["BUY","var(--up)",T("lg_buy")]].forEach(([side,col,nm])=>{
     const rs=sizes.map(sz=>all.find(r=>r.side===side&&r.size===sz)).filter(Boolean);if(!rs.length)return;
     const pts=rs.map(r=>[x(sizes.indexOf(r.size)),y(r.slip)]);
     el("path",{d:"M"+pts.map(p=>p.join(" ")).join(" L "),fill:"none",stroke:col,"stroke-width":2,"stroke-linejoin":"round"},s);
-    rs.forEach((r,i)=>{el("circle",{cx:pts[i][0],cy:pts[i][1],r:5,fill:col,stroke:"var(--bg)","stroke-width":2},s);
-      hov(el("circle",{cx:pts[i][0],cy:pts[i][1],r:15,class:"hit"},s),
+    rs.forEach((r,i)=>{el("circle",{cx:pts[i][0],cy:pts[i][1],r:3.2,fill:col,stroke:"var(--bg)","stroke-width":1.3},s);
+      hov(el("circle",{cx:pts[i][0],cy:pts[i][1],r:10,class:"hit"},s),
         `<b>${nm} ${fmt(r.size)} KUB</b><br><span class="k">cost</span> ${r.slip.toFixed(2)}%<br><span class="k">avg</span> ฿${r.vwap.toFixed(4)}<br><span class="k">levels</span> ${r.lv}`)})});
   const a=all.find(r=>r.side==="SELL"&&r.size===10000),b=all.find(r=>r.side==="BUY"&&r.size===10000);
-  $("#slipnote").innerHTML=a&&b?`<b>10,000 KUB</b> — ${T("lg_sell")}: ${a.slip.toFixed(2)}% · ${T("lg_buy")}: ${b.slip.toFixed(2)}%`:"";
+  $("#slipnote").innerHTML=a&&b?`<b>10k</b> ${T("lg_sell")} ${a.slip.toFixed(2)}% · ${T("lg_buy")} ${b.slip.toFixed(2)}%`:"";
 }
 function cSlipT(){
-  const W=880,H=210,Lx=50,R=14,Tp=12,B=32,s=mk("#c-slipt",W,H);if(!s)return;
+  const box=mkFit("#c-slipt");if(!box)return;const{s,w:W,h:H}=box;
+  const Lx=28,R=6,Tp=6,B=6;
   const rs=hourly().map((r,i)=>({i,t:r[0],a:r[4],b:r[5]})),has=rs.filter(r=>r.a!=null||r.b!=null);
   if(!has.length){el("text",{class:"tick",x:W/2,y:H/2,"text-anchor":"middle"},s).textContent=T("loading");return}
   const hi=Math.max(.5,...has.flatMap(r=>[r.a||0,r.b||0]))*1.2;
   const x=i=>Lx+i*(W-Lx-R)/Math.max(1,rs.length-1),y=v=>H-B-(v/hi)*(H-B-Tp);
-  [0,hi/2,hi].forEach(g=>{el("line",{class:"gl",x1:Lx,x2:W-R,y1:y(g),y2:y(g)},s);
-    el("text",{class:"tick",x:Lx-8,y:y(g)+3.5,"text-anchor":"end"},s).textContent=g.toFixed(2)+"%"});
+  [0,hi].forEach(g=>{el("line",{class:"gl",x1:Lx,x2:W-R,y1:y(g),y2:y(g)},s);
+    el("text",{class:"tick",x:Lx-6,y:y(g)+3,"text-anchor":"end"},s).textContent=g.toFixed(1)+"%"});
   el("line",{class:"ax",x1:Lx,x2:W-R,y1:H-B,y2:H-B},s);
   [["a","var(--down)"],["b","var(--up)"]].forEach(([k,col])=>{let d="",open=false;
     rs.forEach(r=>{if(r[k]==null){open=false;return}d+=(open?" L ":" M ")+x(r.i)+" "+y(r[k]);open=true});
     if(d)el("path",{d:d.trim(),fill:"none",stroke:col,"stroke-width":2,"stroke-linejoin":"round"},s)});
   rs.forEach(r=>{if(r.a==null&&r.b==null)return;
-    hov(el("rect",{x:x(r.i)-7,y:Tp,width:14,height:H-B-Tp,class:"hit"},s),
+    hov(el("rect",{x:x(r.i)-4,y:Tp,width:8,height:H-B-Tp,class:"hit"},s),
       `<b>${r.t}</b><br><span class="k">${T("lg_sell10")}</span> ${r.a==null?"—":r.a.toFixed(2)+"%"}<br><span class="k">${T("lg_buy10")}</span> ${r.b==null?"—":r.b.toFixed(2)+"%"}`)});
-  el("text",{class:"tick",x:Lx,y:H-B+16},s).textContent=rs[0].t;
-  el("text",{class:"tick",x:W-R,y:H-B+16,"text-anchor":"end"},s).textContent=rs[rs.length-1].t;
 }
 function cTaker(){
-  const W=880,H=230,Lx=46,R=14,Tp=16,B=34,s=mk("#c-taker",W,H);if(!s)return;
+  const box=mkFit("#c-taker");if(!box)return;const{s,w:W,h:H}=box;
+  const Lx=28,R=6,Tp=6,B=6;
   const rs=hourly().map((r,i)=>({i,t:r[0],v:r[3]}));
   if(!rs.length){el("text",{class:"tick",x:W/2,y:H/2,"text-anchor":"middle"},s).textContent=T("loading");return}
-  const mid=(H-B+Tp)/2,y=v=>mid-((v-50)/50)*(mid-Tp),bw=(W-Lx-R)/rs.length-3;
-  [0,25,50,75,100].forEach(g=>{el("line",{class:g===50?"ax":"gl",x1:Lx,x2:W-R,y1:y(g),y2:y(g)},s);
-    el("text",{class:"tick",x:Lx-9,y:y(g)+3.5,"text-anchor":"end"},s).textContent=g+"%"});
-  rs.forEach(r=>{const X=Lx+r.i*(W-Lx-R)/rs.length+1.5;
+  const mid=(H-B+Tp)/2,y=v=>mid-((v-50)/50)*(mid-Tp),bw=(W-Lx-R)/rs.length-1.2;
+  el("line",{class:"ax",x1:Lx,x2:W-R,y1:mid,y2:mid},s);
+  el("text",{class:"tick",x:Lx-6,y:mid+3,"text-anchor":"end"},s).textContent="50%";
+  rs.forEach(r=>{const X=Lx+r.i*(W-Lx-R)/rs.length+.6;
     if(r.v!=null){const up=r.v>=50;
-      el("rect",{x:X,y:up?y(r.v):y(50),width:Math.max(1,bw),height:Math.max(1.5,Math.abs(y(r.v)-y(50))),rx:2,
+      el("rect",{x:X,y:up?y(r.v):mid,width:Math.max(.6,bw),height:Math.max(1,Math.abs(y(r.v)-mid)),
         fill:up?"var(--up)":"var(--down)"},s)}
-    hov(el("rect",{x:X-1.5,y:Tp,width:bw+3,height:H-B-Tp,class:"hit"},s),`<b>${r.t}</b><br>${r.v==null?"—":r.v.toFixed(1)+"%"}`)});
-  el("text",{class:"tick",x:Lx,y:H-B+16},s).textContent=rs[0].t;
-  el("text",{class:"tick",x:W-R,y:H-B+16,"text-anchor":"end"},s).textContent=rs[rs.length-1].t;
+    hov(el("rect",{x:X-.6,y:Tp,width:bw+1.2,height:H-B-Tp,class:"hit"},s),`<b>${r.t}</b><br>${r.v==null?"—":r.v.toFixed(1)+"%"}`)});
 }
 function cSweep(){
-  const W=880,H=250,Lx=54,R=70,Tp=18,B=32,s=mk("#c-sweep",W,H);if(!s)return;
+  const box=mkFit("#c-sweep");if(!box)return;const{s,w:W,h:H}=box;
+  const Lx=30,R=6,Tp=6,B=6;
   const sw=(D.sweeps||[]).map(r=>[bkk(r.ts),r.side,Math.round(+r.total_kub),r.levels]);
   if(!sw.length){el("text",{class:"tick",x:W/2,y:H/2,"text-anchor":"middle"},s).textContent=T("loading");return}
   const lo=Math.log10(180),hi=Math.log10(Math.max(40000,...sw.map(r=>r[2])));
   const x=i=>Lx+i*(W-Lx-R)/Math.max(1,sw.length-1),y=v=>H-B-((Math.log10(v)-lo)/(hi-lo))*(H-B-Tp);
-  [200,1000,5000,30000].forEach(g=>{el("line",{class:"gl",x1:Lx,x2:W-R,y1:y(g),y2:y(g)},s);
-    el("text",{class:"tick",x:Lx-9,y:y(g)+3.5,"text-anchor":"end"},s).textContent=g>=1000?g/1000+"k":g});
+  [200,30000].forEach(g=>{el("line",{class:"gl",x1:Lx,x2:W-R,y1:y(g),y2:y(g)},s);
+    el("text",{class:"tick",x:Lx-6,y:y(g)+3,"text-anchor":"end"},s).textContent=g>=1000?g/1000+"k":g});
   el("line",{class:"ax",x1:Lx,x2:W-R,y1:H-B,y2:H-B},s);
-  let big=0,bi=0;sw.forEach((r,i)=>{if(r[2]>big){big=r[2];bi=i}});
   sw.forEach((r,i)=>{const col=r[1]==="BUY"?"var(--up)":"var(--down)";
-    el("circle",{cx:x(i),cy:y(r[2]),r:5.5,fill:col,stroke:"var(--bg)","stroke-width":2},s);
-    hov(el("circle",{cx:x(i),cy:y(r[2]),r:14,class:"hit"},s),
+    el("circle",{cx:x(i),cy:y(r[2]),r:3.2,fill:col,stroke:"var(--bg)","stroke-width":1.3},s);
+    hov(el("circle",{cx:x(i),cy:y(r[2]),r:10,class:"hit"},s),
       `<b>${r[1]} ${fmt(r[2])} KUB</b><br><span class="k">at</span> ${r[0]}<br><span class="k">levels</span> ${r[3]}`)});
-  el("text",{class:"dlab",x:Math.min(x(bi)+12,W-R-4),y:y(big)+4,fill:sw[bi][1]==="BUY"?"var(--up)":"var(--down)"},s)
-    .textContent=fmt(big)+" KUB";
 }
 
 function dexSizes(){return [...new Set((D.dex||[]).map(r=>+r.size_kub))].sort((a,b)=>a-b)}
@@ -986,7 +979,7 @@ function health(){
 }
 
 function render(){
-  paintStatic();tfButtons();subButtons();applySubs();rangeButtons();exRangeButtons();
+  paintStatic();tfButtons();rangeButtons();exRangeButtons();
   kpis();tech();cSlip();cSlipT();cTaker();cSweep();
   dexSelect();tDex();exchange();cChain();treasury();health();
 }
@@ -1017,8 +1010,6 @@ try{
   const st=localStorage.getItem("kfd-tf");if(st&&TFS.some(t=>t[0]===st))TF=st;
   const sr=localStorage.getItem("kfd-range");if(sr&&RANGES.some(r=>r[0]===sr))RANGE=sr;
   const se=localStorage.getItem("kfd-exrange");if(se&&RANGES.some(r=>r[0]===se))EXRANGE=se;
-  const ss=localStorage.getItem("kfd-subs");
-  if(ss){const o=JSON.parse(ss);SUBS.forEach(k=>{if(typeof o[k]==="boolean")SUBON[k]=o[k]})}
   if(localStorage.getItem("kfd-health")==="1")$("#healthbody").hidden=false;
 }catch(e){}
 
