@@ -25,6 +25,8 @@ export default async function handler(req, res) {
       db.get(
         'kub_watch_balance?select=address,label,category,balance_kub,snapshot_at&order=snapshot_at.desc&limit=250'
       ),
+    supply: () => db.get('kub_supply_now?select=*'),
+    other: () => db.get('kub_top_unwatched?select=*'),
     candles: () => db.rpc('kub_candles', { p_tf: '15m', p_limit: 300 }),
   })
 
@@ -45,6 +47,7 @@ export default async function handler(req, res) {
   treasury.sort((a, b) => b.kub - a.kub)
 
   const candles = out.candles || []
+  const sup = (out.supply && out.supply[0]) || null
 
   res.setHeader('Cache-Control', 'public, s-maxage=60, stale-while-revalidate=300')
   res.status(200).json({
@@ -60,6 +63,22 @@ export default async function handler(req, res) {
     dex: out.dex || [],
     health: Object.values(health).sort((a, b) => a.job.localeCompare(b.job)),
     treasury,
+    supply: sup
+      ? {
+          as_of: sup.as_of,
+          total: Number(sup.total_supply_kub),
+          watched: Number(sup.watched_kub),
+          wallets: Number(sup.watched_wallets),
+          kkub: sup.kkub_wrapper_kub == null ? null : Number(sup.kkub_wrapper_kub),
+        }
+      : null,
+    other: (out.other || []).map((r) => ({
+      rank: r.rank,
+      address: r.address,
+      label: r.label,
+      kub: Number(r.balance_kub),
+      kkub: r.is_kkub_wrapper === true,
+    })),
     candles: {
       tf: '15m',
       bars: candles.length,
