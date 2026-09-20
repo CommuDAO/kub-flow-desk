@@ -234,6 +234,7 @@ footer p{margin:0 0 var(--s7);max-width:76ch}
     <ul class="legend">
       <li><span class="sw box" style="background:var(--up)"></span><span data-i18n="ex_in"></span></li>
       <li><span class="sw box" style="background:var(--down)"></span><span data-i18n="ex_out"></span></li>
+      <li><span class="sw" style="background:var(--accent)"></span><span data-i18n="ex_cum"></span></li>
     </ul>
     <div id="c-exflow"></div>
     <p class="why"><b data-i18n="why_title"></b><span data-i18n="w_ex"></span></p>
@@ -288,7 +289,7 @@ footer p{margin:0 0 var(--s7);max-width:76ch}
 <script src="https://s3.tradingview.com/tv.js"></script>
 <script>
 const I18N={
-en:{ex_days:"{n} days shown",ex_cold:"cold",ex_hot:"hot",title:"KUB Flow Desk",info:"More information",why_title:"What this tells you",
+en:{ch_txfrom:"Transaction counts begin {d}: kubscan's chart returns 31 days and ignores a date range, while fees are fetched a day at a time and reach further back. Earlier days show fees only.",ex_cum:"Cumulative net out",ex_days:"{n} days shown",ex_cold:"cold",ex_hot:"hot",title:"KUB Flow Desk",info:"More information",why_title:"What this tells you",
  fresh_at:"read {t}",fresh_none:"no data yet",
  src:"Bitkub public API v3 every 5 min · kubscan v2 (41 wallets) every 5 min · KUB Chain RPC (5 DEXes) every 15 min · chain activity from kubscan hourly · price chart by TradingView",
  k_offer:"Lowest offer",k_vol:"24 h volume",k_sell:"Sell 10k KUB",k_nf:"Left the exchange",k_taker:"Buyers crossing",
@@ -323,12 +324,12 @@ en:{ex_days:"{n} days shown",ex_cold:"cold",ex_hot:"hot",title:"KUB Flow Desk",i
  th_dex:"DEX",th_out:"USD out",th_px:"Per KUB",th_vs:"vs best",th_tok:"Quoted in",
  h_ex:"KUB held at Bitkub Exchange",
  l_ex:"Only the exchange's own wallets are counted here — its cold wallets and its active hot wallet — read every five minutes. Ecosystem funds, the stake vault and the company reserve are not the exchange's and are left to the supply panel. Transfers in and out are read from the chain, by day, in Bangkok time, and the history is walked backwards a page at a time from kubscan.",
- n_ex:"Days before collection began are marked as uncollected rather than drawn as zero flow. The exchange moves KUB between its own wallets too; only transfers crossing the boundary are counted.",
+ n_ex:"Days before the history walk reached them are marked as uncollected rather than drawn as zero flow, and are left out of both the total and the cumulative line. The exchange moves KUB between its own wallets too; only transfers crossing the boundary are counted. The line is read against the right-hand axis and starts from zero at the left edge of the range, so it shows the change across the period rather than a balance.",
  w_ex:"Whether coins are moving onto the exchange or away from it. Sustained flow onto an exchange puts sellable supply within reach of the order book; flow away from it takes supply out of immediate circulation. Neither predicts price, but both change what the book can absorb.",
  ex_in:"Onto the exchange",ex_out:"Off the exchange",ex_net:"Net out, period",
  ex_bal:"Held by the exchange",ex_nodata:"not collected",
  h_chain:"Chain activity",
- l_chain:"Daily totals from kubscan. Transaction counts come from its chart endpoint, which reaches back about a month; fees are fetched one day at a time and go back as far as the backfill has walked. Both are read from kubscan, so both match what kubscan reports for the same day.",
+ l_chain:"Daily totals from kubscan. Fees are fetched one day at a time and reach as far back as the backfill has walked. Transaction counts come from its chart endpoint, which returns the last 31 days and ignores any date range asked of it, so the line stops where that window does while the bars carry on.",
  n_chain:"Gas units are deliberately not shown. kubscan quotes a flat 25 gwei, but that is the price offered for a new transaction, not the average actually paid: on 19 Sep it measured 9,466,430,334 gas against 190.41 KUB of fees, an effective 20.1 gwei. Dividing fees by 25 gwei would understate gas by about a fifth, and there is no per-day gas figure to use instead.",
  w_chain:"How much the chain is actually being used, in fees paid and transactions settled. It is the demand side behind everything else on this page: a market's depth and an exchange's flow both sit on top of a chain that people are either using or not. The newest day here is the last one kubscan has closed, so it trails the running totals on their front page by a day.",
  ch_fees:"Fees paid, KUB",ch_tx:"Transactions",ch_avg:"Average fee per transaction",
@@ -352,7 +353,7 @@ en:{ex_days:"{n} days shown",ex_cold:"cold",ex_hot:"hot",title:"KUB Flow Desk",i
  f3:"Not investment advice.",
  snap:"Showing the built-in snapshot, as the live feed is unavailable.",
  apierr:"Unable to load live data: ",loading:"Loading…"},
-th:{ex_days:"แสดง {n} วัน",ex_cold:"cold",ex_hot:"hot",title:"KUB Flow Desk",info:"รายละเอียด",why_title:"ข้อมูลนี้บอกอะไร",
+th:{ch_txfrom:"จำนวนธุรกรรมมีตั้งแต่ {d} เป็นต้นมา เพราะ chart ของ kubscan คืนข้อมูลได้ 31 วันและไม่รับช่วงวันที่ ส่วนค่าธรรมเนียมดึงทีละวันจึงย้อนได้ไกลกว่า วันก่อนหน้านั้นจึงมีเฉพาะค่าธรรมเนียม",ex_cum:"ไหลออกสุทธิสะสม",ex_days:"แสดง {n} วัน",ex_cold:"cold",ex_hot:"hot",title:"KUB Flow Desk",info:"รายละเอียด",why_title:"ข้อมูลนี้บอกอะไร",
  fresh_at:"ข้อมูล ณ {t}",fresh_none:"ยังไม่มีข้อมูล",
  src:"Bitkub public API v3 ทุก 5 นาที · kubscan v2 (41 กระเป๋า) ทุก 5 นาที · KUB Chain RPC (5 DEX) ทุก 15 นาที · กิจกรรมบนเชนจาก kubscan รายชั่วโมง · กราฟราคาโดย TradingView",
  k_offer:"ราคาเสนอขายต่ำสุด",k_vol:"วอลุ่ม 24 ชม.",k_sell:"ขาย 10k KUB",k_nf:"ไหลออกจากศูนย์ซื้อขาย",k_taker:"ฝั่งซื้อข้ามสเปรด",
@@ -387,12 +388,12 @@ th:{ex_days:"แสดง {n} วัน",ex_cold:"cold",ex_hot:"hot",title:"KUB 
  th_dex:"DEX",th_out:"ได้ USD",th_px:"ต่อ 1 KUB",th_vs:"เทียบที่ดีที่สุด",th_tok:"คิดราคากับ",
  h_ex:"KUB ที่อยู่บน Bitkub Exchange",
  l_ex:"นับเฉพาะกระเป๋าของศูนย์ซื้อขายเท่านั้น คือกระเป๋าเย็นทั้งหมดและกระเป๋าร้อนที่ใช้งานอยู่ อ่านค่าทุกห้านาที ส่วนกองทุนระบบนิเวศ stake vault และ KUB Company Reserve ไม่ใช่ของศูนย์ซื้อขาย จึงไปอยู่ในแผงการกระจายตัวของเหรียญแทน ขณะที่รายการโอนเข้าออกอ่านจากเชนโดยตรง แยกรายวันตามเวลาไทย และประวัติย้อนหลังไล่ดึงจาก kubscan ทีละหน้า",
- n_ex:"วันก่อนเริ่มจัดเก็บจะระบุว่ายังไม่ได้จัดเก็บ แทนการวาดเป็นศูนย์ และศูนย์ซื้อขายมีการโอนระหว่างกระเป๋าของตนเองด้วย ตรงนี้นับเฉพาะรายการที่ข้ามขอบเขตเข้าออกเท่านั้น",
+ n_ex:"วันที่การไล่ประวัติยังไปไม่ถึงจะระบุว่ายังไม่ได้จัดเก็บ แทนการวาดเป็นศูนย์ และไม่ถูกนับทั้งในยอดรวมและเส้นสะสม · ศูนย์ซื้อขายมีการโอนระหว่างกระเป๋าของตนเองด้วย ตรงนี้นับเฉพาะรายการที่ข้ามขอบเขตเข้าออก · เส้นอ่านจากแกนขวา และเริ่มนับจากศูนย์ที่ขอบซ้ายของช่วงที่เลือก จึงแสดงการเปลี่ยนแปลงตลอดช่วง ไม่ใช่ยอดคงเหลือ",
  w_ex:"เหรียญกำลังไหลเข้าหรือออกจากศูนย์ซื้อขาย การไหลเข้าต่อเนื่องหมายถึงอุปทานที่พร้อมขายเข้ามาอยู่ใกล้สมุดคำสั่งมากขึ้น ส่วนการไหลออกคือการนำอุปทานออกจากการหมุนเวียนทันที ทั้งสองอย่างไม่ได้ทำนายราคา แต่เปลี่ยนปริมาณที่สมุดคำสั่งรับไหว",
  ex_in:"ไหลเข้าศูนย์ซื้อขาย",ex_out:"ไหลออกจากศูนย์ซื้อขาย",ex_net:"ไหลออกสุทธิในช่วงที่เลือก",
  ex_bal:"ศูนย์ซื้อขายถือครอง",ex_nodata:"ยังไม่ได้จัดเก็บ",
  h_chain:"กิจกรรมบนเชน",
- l_chain:"ยอดรวมรายวันจาก kubscan จำนวนธุรกรรมมาจาก chart endpoint ซึ่งย้อนหลังได้ราวหนึ่งเดือน ส่วนค่าธรรมเนียมดึงทีละวันจึงย้อนหลังได้เท่าที่การเติมข้อมูลเดินไปถึง ทั้งสองค่าอ่านจาก kubscan โดยตรง จึงตรงกับที่ kubscan รายงานในวันเดียวกัน",
+ l_chain:"ยอดรวมรายวันจาก kubscan · ค่าธรรมเนียมดึงทีละวันจึงย้อนหลังได้เท่าที่การเติมข้อมูลเดินไปถึง ส่วนจำนวนธุรกรรมมาจาก chart endpoint ซึ่งคืนได้แค่ 31 วันล่าสุดและไม่รับช่วงวันที่ที่ขอไป เส้นจึงหยุดตรงที่หน้าต่างนั้นหมด ขณะที่แท่งยังต่อไปได้",
  n_chain:"ตั้งใจไม่แสดงหน่วย gas เนื่องจาก kubscan ระบุราคา gas คงที่ 25 gwei ซึ่งเป็นราคาที่เสนอสำหรับธุรกรรมใหม่ มิใช่ค่าเฉลี่ยที่จ่ายจริง วันที่ 19 ก.ย. kubscan วัด gas ได้ 9,466,430,334 เทียบกับค่าธรรมเนียม 190.41 KUB คิดเป็น 20.1 gwei การหารค่าธรรมเนียมด้วย 25 gwei จึงให้ค่า gas ต่ำกว่าจริงราวหนึ่งในห้า และไม่มีตัวเลข gas รายวันให้ใช้แทน",
  w_chain:"เชนถูกใช้งานจริงมากน้อยเพียงใด วัดจากค่าธรรมเนียมที่จ่ายและจำนวนธุรกรรมที่สำเร็จ นี่คือฝั่งอุปสงค์ที่รองรับทุกอย่างบนหน้านี้ ทั้งความลึกของตลาดและกระแสเงินของศูนย์ซื้อขายล้วนตั้งอยู่บนเชนที่มีคนใช้หรือไม่มี · วันล่าสุดที่แสดงคือวันล่าสุดที่ kubscan ปิดยอดแล้ว จึงช้ากว่ายอดที่วิ่งอยู่บนหน้าแรกของเขาหนึ่งวัน",
  ch_fees:"ค่าธรรมเนียม KUB",ch_tx:"จำนวนธุรกรรม",ch_avg:"ค่าธรรมเนียมเฉลี่ยต่อธุรกรรม",
@@ -416,7 +417,7 @@ th:{ex_days:"แสดง {n} วัน",ex_cold:"cold",ex_hot:"hot",title:"KUB 
  f3:"ไม่ใช่คำแนะนำการลงทุน",
  snap:"กำลังแสดงข้อมูลสำรองที่ฝังมากับหน้าเว็บ เนื่องจากไม่สามารถเชื่อมต่อข้อมูลสดได้",
  apierr:"ไม่สามารถเชื่อมต่อข้อมูลสดได้: ",loading:"กำลังโหลด…"},
-zh:{ex_days:"显示 {n} 天",ex_cold:"冷钱包",ex_hot:"热钱包",title:"KUB 流动性看板",info:"说明",why_title:"这一面板说明什么",
+zh:{ch_txfrom:"交易笔数自 {d} 起才有：kubscan 的图表接口只返回 31 天且忽略日期范围，而手续费按日逐条获取，可回溯更久。更早的日期只有手续费。",ex_cum:"累计净流出",ex_days:"显示 {n} 天",ex_cold:"冷钱包",ex_hot:"热钱包",title:"KUB 流动性看板",info:"说明",why_title:"这一面板说明什么",
  fresh_at:"数据截至 {t}",fresh_none:"暂无数据",
  src:"Bitkub 公开 API v3 每 5 分钟 · kubscan v2（41 个钱包）每 5 分钟 · KUB 链 RPC（5 个 DEX）每 15 分钟 · 链上活动每小时取自 kubscan · 价格图表由 TradingView 提供",
  k_offer:"最低卖价",k_vol:"24 小时成交量",k_sell:"卖出 1 万 KUB",k_nf:"流出交易所",k_taker:"买方主动成交",
@@ -451,12 +452,12 @@ zh:{ex_days:"显示 {n} 天",ex_cold:"冷钱包",ex_hot:"热钱包",title:"KUB �
  th_dex:"DEX",th_out:"获得美元",th_px:"每 KUB",th_vs:"对比最优",th_tok:"计价代币",
  h_ex:"存放于 Bitkub Exchange 的 KUB",
  l_ex:"此处只统计交易所自有的钱包 —— 其全部冷钱包与在用的热钱包 —— 每五分钟读取一次。生态基金、质押金库与公司储备并不属于交易所，归入供应量分布面板。进出转账直接读自链上，按曼谷时间逐日统计，历史数据则自 kubscan 逐页向前回溯。",
- n_ex:"采集开始之前的日期标注为未采集，而不是画成零流量。交易所在自有钱包之间也会划转，此处只统计跨越进出边界的转账。",
+ n_ex:"历史回溯尚未到达的日期标注为未采集，而不是画成零流量，且不计入合计与累计曲线。交易所在自有钱包之间也会划转，此处只统计跨越进出边界的转账。曲线以右侧坐标轴读取，并自所选区间左端从零起算，因此它表示整个区间的变化量，而非余额。",
  w_ex:"代币正在流入还是流出交易所。持续流入意味着可供抛售的供应更贴近订单簿；流出则把供应移出即时流通。两者都不预测价格，但都会改变订单簿所能承接的量。",
  ex_in:"流入交易所",ex_out:"流出交易所",ex_net:"所选区间净流出",
  ex_bal:"交易所持有量",ex_nodata:"未采集",
  h_chain:"链上活动",
- l_chain:"取自 kubscan 的每日合计。交易笔数来自其图表接口，可回溯约一个月；手续费按日逐条获取，回溯范围取决于补数进度。两者均直接读自 kubscan，因此与 kubscan 同一天的报告一致。",
+ l_chain:"取自 kubscan 的每日合计。手续费按日逐条获取，回溯范围取决于补数进度；交易笔数来自其图表接口，只返回最近 31 天且忽略所请求的日期范围，因此曲线在该窗口处中断，而柱状图继续延伸。",
  n_chain:"此处刻意不显示 gas 用量。kubscan 标示 25 gwei 的固定 gas 价格，但那是新交易的报价，并非实际支付的均价：9 月 19 日其测得 9,466,430,334 gas，对应 190.41 KUB 手续费，折合 20.1 gwei。以 25 gwei 相除会把 gas 低估约五分之一，而又没有可替代的逐日 gas 数据。",
  w_chain:"这条链实际被使用的程度，以支付的手续费与结算的交易笔数衡量。它是本页其余一切背后的需求侧：市场深度与交易所资金流，都建立在一条有人使用或无人使用的链之上。此处最新的一天是 kubscan 已结算的最后一天，因此比其首页的滚动数字晚一天。",
  ch_fees:"手续费（KUB）",ch_tx:"交易笔数",ch_avg:"每笔交易平均手续费",
@@ -823,19 +824,27 @@ function exchange(){
        `${T("ex_cold")} <b>${fmt(sumK(exCold))}</b> (${exCold.length}) · ${T("ex_hot")} <b>${fmt(sumK(exHot))}</b> (${exHot.length})`)
     +k(T("ex_net"),(net7>=0?"+":"")+fmt(net7)+" KUB",tpl("ex_days",{n:flow.filter(r=>!uncovered(r)).length}));
 
-  const W=880,H=240,Lx=62,R=16,Tp=18,B=40,s=mk("#c-exflow",W,H);if(!s)return;
+  const W=880,H=250,Lx=62,R=64,Tp=18,B=40,s=mk("#c-exflow",W,H);if(!s)return;
   if(!flow.length){el("text",{class:"tick",x:W/2,y:H/2,"text-anchor":"middle"},s).textContent=T("loading");return}
   const hi=Math.max(100,...flow.flatMap(r=>[+r.in||0,+r.out||0]));
   const mid=(H-B+Tp)/2,y=v=>mid-(v/hi)*(mid-Tp);
+  // A running total over the range, so the eye does not have to add the bars
+  // up. Uncollected days carry the previous value instead of flattening it.
+  let run=0;
+  const cum=flow.map(r=>{if(!uncovered(r))run+=(+r.net||0);return run});
+  const cHi=Math.max(1,...cum.map(Math.abs));
+  const y2=v=>mid-(v/cHi)*(mid-Tp);
   const slot=(W-Lx-R)/flow.length;
   // Two bars per day while they still fit; below that, one slot-wide pair.
   const paired=slot>=8,bw=paired?Math.min(26,slot/2-2):Math.max(.8,slot*.42);
   const sparse=flow.length>14;
   [hi,hi/2,0,-hi/2,-hi].forEach(g=>{el("line",{class:g===0?"ax":"gl",x1:Lx,x2:W-R,y1:y(g),y2:y(g)},s);
     el("text",{class:"tick",x:Lx-9,y:y(g)+3.5,"text-anchor":"end"},s).textContent=fmt(Math.abs(g))});
+  [cHi,cHi/2,-cHi/2,-cHi].forEach(g=>el("text",{class:"tick",x:W-R+9,y:y2(g)+3.5,fill:"var(--accent)"},s)
+    .textContent=(g>=0?"+":"−")+(Math.abs(g)>=1000?fmt(Math.abs(g)/1000,0)+"k":fmt(Math.abs(g))));
   flow.forEach((r,i)=>{
     const cx=Lx+slot*i+slot/2;
-    const uncollected=since!=null&&Date.parse(r.day+"T23:59:59Z")<since;
+    const uncollected=uncovered(r);
     if(uncollected){
       el("rect",{x:cx-slot/2,y:Tp,width:Math.max(.8,slot),height:H-B-Tp,fill:"#14171f"},s);
       if(!sparse)el("text",{class:"tick",x:cx,y:mid+4,"text-anchor":"middle"},s).textContent=T("ex_nodata");
@@ -846,10 +855,17 @@ function exchange(){
       el("rect",{x:xo,y:mid,width:bw,height:Math.max(1,mid-y(o0)),rx:paired?2:0,fill:"var(--down)",
         "fill-opacity":paired?1:.85},s);
     }
-    hov(el("rect",{x:cx-slot/2,y:Tp,width:Math.max(3,slot),height:H-B-Tp,class:"hit"},s),
-      uncollected?`<b>${dmy(r.day)}</b><br>${T("ex_nodata")}`
-      :`<b>${dmy(r.day)}</b><br><span class="k">${T("ex_in")}</span> ${fmt(r.in)} (${r.in_tx})<br><span class="k">${T("ex_out")}</span> ${fmt(r.out)} (${r.out_tx})<br><span class="k">net</span> ${fmt(r.net)}`);
     if(!sparse)el("text",{class:"tick",x:cx,y:H-B+18,"text-anchor":"middle"},s).textContent=dmy(r.day);
+  });
+  el("path",{d:"M"+flow.map((r,i)=>[Lx+slot*i+slot/2,y2(cum[i])].join(" ")).join(" L "),
+    fill:"none",stroke:"var(--accent)","stroke-width":2,"stroke-linejoin":"round","stroke-linecap":"round"},s);
+  if(flow.length<=31)flow.forEach((r,i)=>el("circle",
+    {cx:Lx+slot*i+slot/2,cy:y2(cum[i]),r:3,fill:"var(--accent)",stroke:"var(--bg)","stroke-width":1.5},s));
+  flow.forEach((r,i)=>{
+    const cx=Lx+slot*i+slot/2;
+    hov(el("rect",{x:cx-slot/2,y:Tp,width:Math.max(3,slot),height:H-B-Tp,class:"hit"},s),
+      uncovered(r)?`<b>${dmy(r.day)}</b><br>${T("ex_nodata")}<br><span class="k">${T("ex_cum")}</span> ${fmt(cum[i])}`
+      :`<b>${dmy(r.day)}</b><br><span class="k">${T("ex_in")}</span> ${fmt(r.in)} (${r.in_tx})<br><span class="k">${T("ex_out")}</span> ${fmt(r.out)} (${r.out_tx})<br><span class="k">net</span> ${fmt(r.net)}<br><span class="k">${T("ex_cum")}</span> ${fmt(cum[i])}`);
   });
   if(sparse){
     el("text",{class:"tick",x:Lx,y:H-B+18},s).textContent=dmy(flow[0].day);
@@ -898,7 +914,11 @@ function cChain(){
   el("text",{class:"tick",x:Lx,y:H-B+18},s).textContent=dmy(rs[0].day);
   el("text",{class:"tick",x:W-R,y:H-B+18,"text-anchor":"end"},s).textContent=dmy(rs[rs.length-1].day);
   const last=rs[rs.length-1];
-  if(note)note.innerHTML=(last.fees!=null?`<b>${dmy(last.day)}</b> — ${T("ch_fees")}: ${fmt(last.fees,2)} KUB · ${T("ch_avg")}: ${avgFee(last)}<br>`:"")+T("n_chain");
+  // If the window reaches back past the transaction series, say so where the
+  // gap is visible rather than only behind the info button.
+  const firstTx=rs.find(r=>r.tx!=null);
+  const gap=firstTx&&firstTx!==rs[0]?tpl("ch_txfrom",{d:dmy(firstTx.day)})+"<br>":"";
+  if(note)note.innerHTML=(last.fees!=null?`<b>${dmy(last.day)}</b> — ${T("ch_fees")}: ${fmt(last.fees,2)} KUB · ${T("ch_avg")}: ${avgFee(last)}<br>`:"")+gap+T("n_chain");
 }
 function treasury(){
   const MAP={stake:"stake",fund:"fund",cex_cold:"cex",cex_hot:"cex",reserve:"reserve"};
