@@ -43,6 +43,8 @@ export default async function handler(req, res) {
     exFlow: () => db.get('kub_exchange_flow_daily?select=*'),
     exBal: () => db.get('kub_exchange_balance?select=*'),
     chain: () => db.get('kub_chain_activity?select=*&order=day.asc'),
+    chainTypes: () => db.get('kub_chain_tx_types?select=*&order=day.asc'),
+    dailyOhlc: () => db.get('kub_daily_ohlc?select=day,open,high,low,close&order=day.asc'),
     candles: () => db.rpc('kub_candles', { p_tf: '15m', p_limit: 300 }),
   })
 
@@ -125,6 +127,19 @@ export default async function handler(req, res) {
       fees: r.fees_kub == null ? null : Number(r.fees_kub),
       gas: r.gas_used == null ? null : Number(r.gas_used),
     })),
+    // A rolling sample of validated transactions, classified by kubscan's own
+    // tx_types. Not exhaustive — the page says so.
+    chainTypes: (out.chainTypes || []).map((r) => ({
+      day: r.day,
+      native: Number(r.native_n),
+      token: Number(r.token_n),
+      contract: Number(r.contract_n),
+      other: Number(r.other_n),
+      n: Number(r.sampled_n),
+    })),
+    // Bitkub's own daily price history, for indicator ranges longer than the
+    // on-chain tape this site has collected itself.
+    dailyOhlc: (out.dailyOhlc || []).map((r) => [r.day, +r.open, +r.high, +r.low, +r.close]),
     // When each panel's data was actually read, so one stale panel beside a
     // fresh one is visible rather than assumed.
     asOf: {
