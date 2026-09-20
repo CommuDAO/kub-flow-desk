@@ -59,6 +59,7 @@ body{color:var(--text-primary);font-family:var(--sans);font-size:14px;line-heigh
 .kpi dd{margin:var(--s5) 0 0;font-family:var(--mono);font-size:20px;line-height:24px;font-weight:600;
   color:var(--text-tertiary);letter-spacing:-.01em}
 .kpi .sub{font-size:12px;line-height:16px;color:var(--text-inverse);margin-top:var(--s3)}
+.kpi .sub b{font-weight:600;font-family:var(--mono)}
 
 .card{background:var(--surface-raised);border:1px solid var(--surface-muted);border-radius:var(--r-lg);
   padding:var(--s8) var(--s8) 10px;margin-bottom:var(--s8);box-shadow:var(--sh1)}
@@ -74,6 +75,9 @@ body{color:var(--text-primary);font-family:var(--sans);font-size:14px;line-heigh
 
 #tvwrap{height:min(64vh,540px);min-height:340px;border-radius:var(--r-md);overflow:hidden;background:var(--surface-base)}
 #tv-chart{height:100%;width:100%}
+#tawrap{min-height:420px}
+#tawrap .tradingview-widget-copyright{font-size:12px;color:var(--text-inverse);padding-top:var(--s5)}
+#tawrap .tradingview-widget-copyright a{color:var(--text-inverse)}
 svg{display:block;width:100%;height:auto;overflow:visible}
 .gl{stroke:var(--surface-muted);stroke-width:1}
 .ax{stroke:var(--text-inverse);stroke-width:1}
@@ -139,10 +143,10 @@ footer p{margin:0 0 var(--s7);max-width:76ch}
   </section>
 
   <section class="card">
-    <div class="ch"><h2 data-i18n="h_tech"></h2><span class="when" id="techwhen"></span></div>
-    <p class="lede" data-i18n="l_tech"></p>
-    <div class="tw"><table id="t-tech"></table></div>
-    <p class="note" id="technote"></p>
+    <div class="ch"><h2 data-i18n="h_ta"></h2><span class="when">TradingView</span></div>
+    <p class="lede" data-i18n="l_ta"></p>
+    <div id="tawrap"></div>
+    <p class="note" data-i18n="n_ta"></p>
   </section>
 
   <section class="card">
@@ -214,19 +218,14 @@ footer p{margin:0 0 var(--s7);max-width:76ch}
 <script>
 const I18N={
 en:{title:"KUB Flow Desk",
- src:"Bitkub public API v3 every 5 min · kubscan v2 (41 wallets) every 5 min · KUB Chain RPC (5 DEXes) every 15 min · price chart by TradingView",
- k_price:"Price",k_vol:"24 h volume",k_sell:"Sell 10k KUB",k_nf:"Left the exchange",k_taker:"Buyers crossing",
- k_spread:"spread",k_lv:"levels",k_trades:"trades",
+ src:"Bitkub public API v3 every 5 min · kubscan v2 (41 wallets) every 5 min · KUB Chain RPC (5 DEXes) every 15 min · chart and technicals by TradingView",
+ k_last:"Last traded price",k_vol:"24 h volume",k_sell:"Sell 10k KUB",k_nf:"Left the exchange",k_taker:"Buyers crossing",
+ k_spread:"spread",k_lv:"levels",k_trades:"trades",k_bid:"bid",k_ask:"ask",k_ticker:"Bitkub ticker",
  h_chart:"KUB / THB",
- n_tv:"Chart by TradingView on Bitkub's own KUBTHB feed — it carries years of history and its own drawing tools, which our collection cannot match. Everything below this chart is measured from our own tape.",
- h_tech:"Indicator readings",
- l_tech:"Computed from our own collected bars, not from the chart above, so these numbers reconcile with the slippage, sweep and taker panels further down. Each row shows where the value sits against its conventional threshold and how many bars it had.",
- n_tech:"No aggregated buy / sell verdict, on purpose. Reporting that RSI reads 72 and sits above the conventional 70 line is a measurement; collapsing a dozen indicators into one instruction to trade is a recommendation, and this page reports data only.",
- tf_bars:"{bars} bars collected at {tf}",
- th_ind:"Indicator",th_val:"Value",th_pos:"Position",th_bars:"Bars",
- p_over:"above {n}",p_under:"below {n}",p_between:"between {a} and {b}",p_na:"not enough bars",
- p_above_sig:"above signal",p_below_sig:"below signal",p_px_above:"price above",p_px_below:"price below",
- p_in_band:"inside bands",p_above_band:"above upper band",p_below_band:"below lower band",p_value:"reading",
+ n_tv:"Chart by TradingView on Bitkub's own KUBTHB feed — it carries years of history and its own drawing tools, which our collection cannot match. Everything below the technicals panel is measured from our own tape.",
+ h_ta:"Technical rating",
+ l_ta:"TradingView's own technicals for BITKUB:KUBTHB, embedded as their widget. The indicator values and the rating are computed by TradingView off Bitkub's feed, with years of history behind them — our own tape only starts on 19 Sep, so it cannot produce a meaningful RSI or MACD yet.",
+ n_ta:"This panel is TradingView's reading, published under their name. Everything below it is measured from the order book and the tape we collect ourselves, which is what TradingView cannot see.",
  h_cost:"What it actually costs to trade",w_now:"order book, now",
  l_cost:"Bitkub shows one last price. This walks the live book level by level and answers the question a size actually has: if I send this order right now, what average price do I get?",
  lg_sell:"Sell into bids",lg_buy:"Buy into asks",
@@ -246,9 +245,9 @@ en:{title:"KUB Flow Desk",
  l_treas:"Balances, not transfers. The stake vault is a contract: its KUB moves as internal transactions the transaction list never shows, so the balance is the only honest way to watch it.",
  h_health:"Is this data trustworthy yet",w_log:"collector log",
  l_health:"Every round writes a row whether it succeeds or fails, so gaps stay visible instead of hidden.",
- f1:"Everything below the chart reports measured numbers and nothing else: no forecast, no target, no read on where price goes next.",
+ f1:"The technical rating above is TradingView's, not ours. Every panel below it reports numbers measured from the book and the tape, with no forecast attached.",
  f2:"Depth is captured 60 levels deep; sizes beyond that cannot be priced from it. Windows longer than what has been collected are labelled, never back-filled.",
- f3:"Data report only. Not investment advice.",
+ f3:"Not investment advice.",
  th_dex:"DEX",th_out:"KUSDT out",th_px:"Per KUB",th_vs:"vs best",th_size:"Size",
  th_wallet:"Wallet",th_group:"Group",th_bal:"Balance, KUB",th_share:"Share",
  th_job:"Collection job",th_runs:"Rounds, 24 h",th_fail:"Failed",th_state:"State",
@@ -258,19 +257,14 @@ en:{title:"KUB Flow Desk",
  snap:"Showing the built-in snapshot — the live feed is unavailable.",
  apierr:"Live feed error: ",loading:"Loading…"},
 th:{title:"KUB Flow Desk",
- src:"Bitkub public API v3 ทุก 5 นาที · kubscan v2 (41 กระเป๋า) ทุก 5 นาที · KUB Chain RPC (5 DEX) ทุก 15 นาที · กราฟราคาโดย TradingView",
- k_price:"ราคา",k_vol:"วอลุ่ม 24 ชม.",k_sell:"ขาย 10k KUB",k_nf:"ไหลออกจากตลาด",k_taker:"ฝั่งซื้อไล่ราคา",
- k_spread:"สเปรด",k_lv:"ระดับบุ๊ก",k_trades:"รายการ",
+ src:"Bitkub public API v3 ทุก 5 นาที · kubscan v2 (41 กระเป๋า) ทุก 5 นาที · KUB Chain RPC (5 DEX) ทุก 15 นาที · กราฟและ technicals โดย TradingView",
+ k_last:"ราคาซื้อขายล่าสุด",k_vol:"วอลุ่ม 24 ชม.",k_sell:"ขาย 10k KUB",k_nf:"ไหลออกจากตลาด",k_taker:"ฝั่งซื้อไล่ราคา",
+ k_spread:"สเปรด",k_lv:"ระดับบุ๊ก",k_trades:"รายการ",k_bid:"bid",k_ask:"ask",k_ticker:"ticker ของ Bitkub",
  h_chart:"KUB / THB",
- n_tv:"กราฟจาก TradingView ใช้ฟีด KUBTHB ของ Bitkub เอง — มีประวัติย้อนหลังเป็นปีและเครื่องมือวาดครบ ซึ่งข้อมูลที่เราเก็บสู้ไม่ได้ ส่วนทุกอย่างใต้กราฟนี้วัดจาก tape ที่เราเก็บเอง",
- h_tech:"ค่าอินดิเคเตอร์",
- l_tech:"คำนวณจากแท่งที่เราเก็บเอง ไม่ใช่จากกราฟด้านบน ตัวเลขจึงตรงกับแผง slippage, sweep และ taker ด้านล่าง แต่ละแถวบอกว่าค่าอยู่ตรงไหนเทียบเส้นมาตรฐาน และใช้กี่แท่ง",
- n_tech:"ไม่มีป้ายสรุปว่าซื้อหรือขาย และตั้งใจไม่ใส่ การบอกว่า RSI อ่านได้ 72 และอยู่เหนือเส้น 70 คือการรายงานค่า แต่การยุบอินดิเคเตอร์สิบกว่าตัวให้เหลือคำสั่งเดียวว่าให้เทรด คือคำแนะนำ หน้านี้รายงานข้อมูลอย่างเดียว",
- tf_bars:"เก็บได้ {bars} แท่งที่ {tf}",
- th_ind:"อินดิเคเตอร์",th_val:"ค่า",th_pos:"ตำแหน่ง",th_bars:"แท่ง",
- p_over:"เหนือ {n}",p_under:"ใต้ {n}",p_between:"อยู่ระหว่าง {a} ถึง {b}",p_na:"แท่งไม่พอ",
- p_above_sig:"เหนือเส้น signal",p_below_sig:"ใต้เส้น signal",p_px_above:"ราคาอยู่เหนือ",p_px_below:"ราคาอยู่ใต้",
- p_in_band:"อยู่ในกรอบ",p_above_band:"เหนือกรอบบน",p_below_band:"ใต้กรอบล่าง",p_value:"ค่าที่อ่านได้",
+ n_tv:"กราฟจาก TradingView ใช้ฟีด KUBTHB ของ Bitkub เอง — มีประวัติย้อนหลังเป็นปีและเครื่องมือวาดครบ ซึ่งข้อมูลที่เราเก็บสู้ไม่ได้ ส่วนทุกอย่างใต้แผง technicals วัดจาก tape ที่เราเก็บเอง",
+ h_ta:"Technical rating",
+ l_ta:"ค่า technicals ของ TradingView สำหรับ BITKUB:KUBTHB ฝังมาเป็น widget ของเขาเอง ค่าอินดิเคเตอร์และเรตติ้งทั้งหมด TradingView คำนวณจากฟีดของ Bitkub โดยมีประวัติย้อนหลังเป็นปีรองรับ — ส่วน tape ของเราเพิ่งเริ่มเก็บ 19 ก.ย. จึงยังคำนวณ RSI หรือ MACD ให้มีความหมายไม่ได้",
+ n_ta:"แผงนี้เป็นค่าที่ TradingView อ่านและเผยแพร่ในชื่อของเขา ส่วนทุกอย่างใต้แผงนี้วัดจากออเดอร์บุ๊กและ tape ที่เราเก็บเอง ซึ่งเป็นสิ่งที่ TradingView มองไม่เห็น",
  h_cost:"ต้นทุนจริงของการเทรด",w_now:"ออเดอร์บุ๊ก ณ ตอนนี้",
  l_cost:"Bitkub โชว์ราคาเดียว หน้านี้เดินบุ๊กทีละระดับแล้วตอบคำถามที่ไซซ์จริงมี — ถ้าส่งออเดอร์ตอนนี้ จะได้ราคาเฉลี่ยเท่าไหร่",
  lg_sell:"ขายชนฝั่ง bid",lg_buy:"ซื้อชนฝั่ง ask",
@@ -290,9 +284,9 @@ th:{title:"KUB Flow Desk",
  l_treas:"ดูที่ยอดคงเหลือ ไม่ใช่ตัว transfer — stake vault เป็น contract เงินวิ่งเป็น internal transaction ที่รายการ tx ไม่แสดง ยอดคงเหลือจึงเป็นทางเดียวที่เชื่อได้",
  h_health:"ข้อมูลนี้เชื่อได้แค่ไหน",w_log:"log การเก็บข้อมูล",
  l_health:"ทุกรอบเขียน log ไว้ทั้งที่สำเร็จและล้มเหลว ช่องว่างจึงมองเห็น ไม่ถูกซ่อน",
- f1:"ทุกอย่างใต้กราฟรายงานตัวเลขที่วัดได้เท่านั้น ไม่มีการพยากรณ์ ไม่มีราคาเป้าหมาย และไม่บอกทิศทางราคา",
+ f1:"Technical rating ด้านบนเป็นของ TradingView ไม่ใช่ของหน้านี้ ส่วนทุกแผงที่อยู่ใต้มันรายงานตัวเลขที่วัดจากบุ๊กและ tape โดยไม่มีการพยากรณ์",
  f2:"บุ๊กเก็บ 60 ระดับ ไซซ์ที่ใหญ่กว่านั้นคำนวณต้นทุนไม่ได้ · window ที่ยาวกว่าข้อมูลที่เก็บมาจริงจะถูกระบุไว้ ไม่เติมตัวเลขเอง",
- f3:"รายงานข้อมูลเท่านั้น ไม่ใช่คำแนะนำลงทุน",
+ f3:"ไม่ใช่คำแนะนำลงทุน",
  th_dex:"DEX",th_out:"ได้ KUSDT",th_px:"ต่อ 1 KUB",th_vs:"เทียบที่ดีที่สุด",th_size:"ไซซ์",
  th_wallet:"กระเป๋า",th_group:"กลุ่ม",th_bal:"ยอดคงเหลือ KUB",th_share:"สัดส่วน",
  th_job:"งานเก็บข้อมูล",th_runs:"รอบ 24 ชม.",th_fail:"ล้มเหลว",th_state:"สถานะ",
@@ -302,19 +296,14 @@ th:{title:"KUB Flow Desk",
  snap:"กำลังแสดงข้อมูลสำรองที่ฝังมากับหน้า — ต่อข้อมูลสดไม่ได้",
  apierr:"ต่อข้อมูลสดไม่ได้: ",loading:"กำลังโหลด…"},
 zh:{title:"KUB 流动性看板",
- src:"Bitkub 公开 API v3 每 5 分钟 · kubscan v2（41 个钱包）每 5 分钟 · KUB 链 RPC（5 个 DEX）每 15 分钟 · 价格图表由 TradingView 提供",
- k_price:"价格",k_vol:"24 小时成交量",k_sell:"卖出 1 万 KUB",k_nf:"流出交易所",k_taker:"买方主动成交",
- k_spread:"价差",k_lv:"档位",k_trades:"笔",
+ src:"Bitkub 公开 API v3 每 5 分钟 · kubscan v2（41 个钱包）每 5 分钟 · KUB 链 RPC（5 个 DEX）每 15 分钟 · 图表与技术指标由 TradingView 提供",
+ k_last:"最新成交价",k_vol:"24 小时成交量",k_sell:"卖出 1 万 KUB",k_nf:"流出交易所",k_taker:"买方主动成交",
+ k_spread:"价差",k_lv:"档位",k_trades:"笔",k_bid:"买一",k_ask:"卖一",k_ticker:"Bitkub 行情接口",
  h_chart:"KUB / 泰铢",
- n_tv:"图表由 TradingView 提供，使用 Bitkub 自有的 KUBTHB 数据源 —— 它拥有数年历史与完整绘图工具，这是我们的采集无法比拟的。此图以下的所有内容均来自我们自己采集的成交记录。",
- h_tech:"指标读数",
- l_tech:"基于我们自己采集的K线计算，而非上方图表，因此这些数字与下方的滑点、扫单与主动成交面板互相对得上。每行标明该值相对常规阈值的位置，以及参与计算的K线数量。",
- n_tech:"刻意不提供买卖综合评级。指出 RSI 为 72、位于常规的 70 线之上，是在陈述测量结果；把十几个指标汇总成一个交易指令，则属于投资建议。本页只报告数据。",
- tf_bars:"在 {tf} 周期已采集 {bars} 根K线",
- th_ind:"指标",th_val:"数值",th_pos:"位置",th_bars:"K线数",
- p_over:"高于 {n}",p_under:"低于 {n}",p_between:"介于 {a} 与 {b} 之间",p_na:"K线不足",
- p_above_sig:"位于信号线上方",p_below_sig:"位于信号线下方",p_px_above:"价格在其上方",p_px_below:"价格在其下方",
- p_in_band:"位于通道内",p_above_band:"高于上轨",p_below_band:"低于下轨",p_value:"读数",
+ n_tv:"图表由 TradingView 提供，使用 Bitkub 自有的 KUBTHB 数据源 —— 它拥有数年历史与完整绘图工具，这是我们的采集无法比拟的。技术指标面板以下的所有内容均来自我们自己采集的成交记录。",
+ h_ta:"技术评级",
+ l_ta:"TradingView 针对 BITKUB:KUBTHB 的技术指标，以其自有挂件嵌入。指标数值与评级均由 TradingView 基于 Bitkub 数据源计算，背后有数年历史；而我们自己的成交记录自 9 月 19 日才开始采集，尚不足以算出有意义的 RSI 或 MACD。",
+ n_ta:"本面板是 TradingView 的读数，署其名发布。其下方的所有内容均来自我们自行采集的订单簿与成交记录 —— 那正是 TradingView 看不到的部分。",
  h_cost:"交易的真实成本",w_now:"当前订单簿",
  l_cost:"Bitkub 只显示一个最新价。本页逐档扫描订单簿，回答真正重要的问题：现在下这个数量的单，成交均价是多少？",
  lg_sell:"卖向买盘",lg_buy:"买向卖盘",
@@ -334,9 +323,9 @@ zh:{title:"KUB 流动性看板",
  l_treas:"看余额，而不是转账。质押金库是合约，其 KUB 以内部交易流动，交易列表根本不显示，因此余额是唯一可靠的观察方式。",
  h_health:"这些数据可信吗",w_log:"采集日志",
  l_health:"每一轮采集无论成功与否都会留下记录，所以缺口是可见的，而不是被掩盖。",
- f1:"图表以下的内容只报告实测数据：没有预测，没有目标价，也不判断价格走向。",
+ f1:"上方的技术评级属于 TradingView，不代表本页观点。其下方的每一个面板都只报告从订单簿与成交记录中实测的数字，不附带任何预测。",
  f2:"订单簿采集 60 档，超出该深度的数量无法定价 · 超出实际采集时长的时间窗会被标注，绝不臆填。",
- f3:"仅供数据参考，非投资建议。",
+ f3:"非投资建议。",
  th_dex:"DEX",th_out:"获得 KUSDT",th_px:"每 KUB",th_vs:"对比最优",th_size:"数量",
  th_wallet:"钱包",th_group:"分组",th_bal:"余额（KUB）",th_share:"占比",
  th_job:"采集任务",th_runs:"24 小时轮次",th_fail:"失败",th_state:"状态",
@@ -346,11 +335,12 @@ zh:{title:"KUB 流动性看板",
  snap:"正在显示内置快照 —— 无法连接实时数据。",
  apierr:"实时数据错误：",loading:"加载中…"}};
 
-const SNAP={generated_at:"2026-09-20T09:00:00Z",
- now:{price_thb:20.24,spread_bps:44.57,vol_24h_kub:233115.95,bid_share_1pct:65.05,taker_buy_pct_24h:51.46,netflow_out_24h_kub:31222.31},
- taker:[{win:"24h",taker_buy_pct:51.46,fills:706}],
- netflow:[{win:"24h",net_out_kub:31222.31,into_exchange_kub:10926.42,out_of_exchange_kub:42148.73,tx_count:40}],
- slipNow:[{side:"SELL",size_kub:500,slippage_pct:.4041,vwap:20.1134,levels_used:3},{side:"SELL",size_kub:1000,slippage_pct:.4125,vwap:20.1117,levels_used:3},{side:"SELL",size_kub:5000,slippage_pct:.4812,vwap:20.0978,levels_used:8},{side:"SELL",size_kub:10000,slippage_pct:.6553,vwap:20.0627,levels_used:11},{side:"SELL",size_kub:30000,slippage_pct:.8902,vwap:20.0152,levels_used:20},{side:"BUY",size_kub:500,slippage_pct:.2228,vwap:20.24,levels_used:1},{side:"BUY",size_kub:1000,slippage_pct:.2267,vwap:20.2408,levels_used:2},{side:"BUY",size_kub:5000,slippage_pct:.2913,vwap:20.2538,levels_used:3},{side:"BUY",size_kub:10000,slippage_pct:.4867,vwap:20.2933,levels_used:10},{side:"BUY",size_kub:30000,slippage_pct:.8376,vwap:20.3642,levels_used:11}],
+const SNAP={generated_at:"2026-09-20T10:05:00Z",
+ now:{price_thb:20.12,best_bid:20.13,best_ask:20.23,spread_bps:49.55,vol_24h_kub:206313.32,vol_24h_thb:4205673.72,
+   high_24h:20.5,low_24h:20.1,change_pct_24h:-.3,bid_share_1pct:83.12,taker_buy_pct_24h:45.49,netflow_out_24h_kub:30072.42},
+ taker:[{win:"24h",taker_buy_pct:45.49,fills:686}],
+ netflow:[{win:"24h",net_out_kub:30072.42,into_exchange_kub:10963.86,out_of_exchange_kub:41036.28,tx_count:45}],
+ slipNow:[{side:"SELL",size_kub:500,slippage_pct:.2875,vwap:20.121987,levels_used:2},{side:"SELL",size_kub:1000,slippage_pct:.2924,vwap:20.120994,levels_used:2},{side:"SELL",size_kub:5000,slippage_pct:.419,vwap:20.095443,levels_used:8},{side:"SELL",size_kub:10000,slippage_pct:.5898,vwap:20.060969,levels_used:12},{side:"SELL",size_kub:30000,slippage_pct:.7873,vwap:20.021128,levels_used:13},{side:"BUY",size_kub:500,slippage_pct:.2843,vwap:20.237362,levels_used:2},{side:"BUY",size_kub:1000,slippage_pct:.3156,vwap:20.243681,levels_used:2},{side:"BUY",size_kub:5000,slippage_pct:.3734,vwap:20.255351,levels_used:3},{side:"BUY",size_kub:10000,slippage_pct:.5707,vwap:20.295167,levels_used:12},{side:"BUY",size_kub:30000,slippage_pct:.9018,vwap:20.361991,levels_used:14}],
  hourly:[],sweeps:[],
  dex:[{size_kub:100,dex:"ponder",usdt_out:61.149293,px_usdt:.611493,vs_best_pct:0,quoted:true,is_best:true},
       {size_kub:100,dex:"udonswap",usdt_out:60.808689,px_usdt:.608087,vs_best_pct:-.56,quoted:true,is_best:false},
@@ -358,17 +348,14 @@ const SNAP={generated_at:"2026-09-20T09:00:00Z",
       {size_kub:100,dex:"diamon",usdt_out:10.519824,px_usdt:.105198,vs_best_pct:-82.8,quoted:true,is_best:false},
       {size_kub:100,dex:"kublerx",usdt_out:null,px_usdt:null,vs_best_pct:null,quoted:false,is_best:false}],
  health:[{job:"cex",runs:288,failed:0},{job:"chain:cex_hot",runs:288,failed:0},{job:"dex_quotes",runs:96,failed:0},{job:"watch_balance",runs:288,failed:0}],
- treasury:[{label:"StakeManagerVault",cat:"stake",kub:10924864},{label:"Bitkub Exchange (Cold Wallet) #1",cat:"cex_cold",kub:2288828},{label:"Sustainable Blockchain Development Fund (Cold-4)",cat:"fund",kub:2000001}],
- candles:{tf:"15m",bars:0,candles:[]}};
+ treasury:[{label:"StakeManagerVault",cat:"stake",kub:10924864},{label:"Bitkub Exchange (Cold Wallet) #1",cat:"cex_cold",kub:2288828},{label:"Sustainable Blockchain Development Fund (Cold-4)",cat:"fund",kub:2000001}]};
 
-const COLLECT_START=Date.parse("2026-09-19T08:10:00Z");
-const TFS=[["5m",300,"5"],["15m",900,"15"],["1h",3600,"60"],["4h",14400,"240"],["1d",86400,"D"]];
-const MIN_BARS=35;
-let L="en",D=SNAP,LIVE=false,TF="15m",CANDLES=[],CBARS=0;
+// [our tf, TradingView chart interval, TradingView technicals interval]
+const TFS=[["5m","5","5m"],["15m","15","15m"],["1h","60","1h"],["4h","240","4h"],["1d","D","1D"]];
+let L="en",D=SNAP,LIVE=false,TF="15m";
 
 const $=s=>document.querySelector(s),NS="http://www.w3.org/2000/svg";
 const T=k=>(I18N[L]&&I18N[L][k])||I18N.en[k]||k;
-const tpl=(k,o)=>T(k).replace(/\{(\w+)\}/g,(_,p)=>o[p]??"");
 const fmt=(n,d=0)=>n==null||isNaN(n)?"—":Number(n).toLocaleString("en-US",{minimumFractionDigits:d,maximumFractionDigits:d});
 const el=(t,a={},p)=>{const e=document.createElementNS(NS,t);for(const k in a)e.setAttribute(k,a[k]);if(p)p.appendChild(e);return e};
 const mk=(h,w,ht)=>{const n=$(h);if(!n)return null;n.innerHTML="";const s=el("svg",{viewBox:`0 0 ${w} ${ht}`,role:"img"});n.appendChild(s);return s};
@@ -379,45 +366,41 @@ function showTip(ev,html){tip.innerHTML=html;tip.style.opacity=1;const r=tip.get
   if(y+r.height>innerHeight-8)y=innerHeight-r.height-8;if(y<8)y=8;tip.style.left=x+"px";tip.style.top=y+"px"}
 const hideTip=()=>tip.style.opacity=0;
 function hov(n,h){n.addEventListener("pointerenter",e=>showTip(e,h));n.addEventListener("pointermove",e=>showTip(e,h));n.addEventListener("pointerleave",hideTip)}
-
-const SMA=(a,n)=>a.length<n?null:a.slice(-n).reduce((s,v)=>s+v,0)/n;
-function EMAs(a,n){if(a.length<n)return[];const k=2/(n+1);let e=a.slice(0,n).reduce((s,v)=>s+v,0)/n;const o=[e];
-  for(let i=n;i<a.length;i++){e=a[i]*k+e*(1-k);o.push(e)}return o}
-const EMA=(a,n)=>{const s=EMAs(a,n);return s.length?s[s.length-1]:null};
-function RSI(c,n=14){if(c.length<n+1)return null;let g=0,l=0;
-  for(let i=1;i<=n;i++){const d=c[i]-c[i-1];d>=0?g+=d:l-=d}g/=n;l/=n;
-  for(let i=n+1;i<c.length;i++){const d=c[i]-c[i-1];g=(g*(n-1)+(d>0?d:0))/n;l=(l*(n-1)+(d<0?-d:0))/n}
-  return l===0?100:100-100/(1+g/l)}
-function MACD(c){if(c.length<35)return null;const ef=EMAs(c,12),es=EMAs(c,26),off=ef.length-es.length;
-  const line=es.map((v,i)=>ef[i+off]-v);if(line.length<9)return null;
-  const sg=EMAs(line,9),L1=line[line.length-1],S1=sg[sg.length-1];return{line:L1,signal:S1,hist:L1-S1}}
-function STOCH(h,l,c,n=14,d=3){if(c.length<n+d)return null;const ks=[];
-  for(let i=n-1;i<c.length;i++){const hh=Math.max(...h.slice(i-n+1,i+1)),ll=Math.min(...l.slice(i-n+1,i+1));
-    ks.push(hh===ll?50:(c[i]-ll)/(hh-ll)*100)}return{k:ks[ks.length-1],d:SMA(ks,d)}}
-function CCI(h,l,c,n=20){if(c.length<n)return null;const tp=c.map((v,i)=>(h[i]+l[i]+v)/3);
-  const m=SMA(tp,n),w=tp.slice(-n),md=w.reduce((s,v)=>s+Math.abs(v-m),0)/n;
-  return md===0?0:(tp[tp.length-1]-m)/(.015*md)}
-function WILLR(h,l,c,n=14){if(c.length<n)return null;const hh=Math.max(...h.slice(-n)),ll=Math.min(...l.slice(-n));
-  return hh===ll?-50:(hh-c[c.length-1])/(hh-ll)*-100}
-function ATR(h,l,c,n=14){if(c.length<n+1)return null;const tr=[];
-  for(let i=1;i<c.length;i++)tr.push(Math.max(h[i]-l[i],Math.abs(h[i]-c[i-1]),Math.abs(l[i]-c[i-1])));
-  let a=tr.slice(0,n).reduce((s,v)=>s+v,0)/n;for(let i=n;i<tr.length;i++)a=(a*(n-1)+tr[i])/n;return a}
-function BB(c,n=20,k=2){if(c.length<n)return null;const m=SMA(c,n),w=c.slice(-n);
-  const sd=Math.sqrt(w.reduce((s,v)=>s+(v-m)*(v-m),0)/n);return{mid:m,up:m+k*sd,low:m-k*sd}}
+const tvLocale=()=>L==="th"?"th":L==="zh"?"zh_CN":"en";
 
 function mountTV(){
-  const tvi=(TFS.find(t=>t[0]===TF)||[])[2]||"15";
+  const tvi=(TFS.find(t=>t[0]===TF)||[])[1]||"15";
   const wrap=$("#tvwrap");
   if(!window.TradingView){wrap.innerHTML=`<div style="padding:40px;text-align:center;color:var(--text-inverse)">${T("loading")}</div>`;return}
   wrap.innerHTML='<div id="tv-chart" style="height:100%"></div>';
   new TradingView.widget({
     container_id:"tv-chart",symbol:"BITKUB:KUBTHB",interval:tvi,
     timezone:"Asia/Bangkok",theme:"dark",style:"1",
-    locale:L==="th"?"th":L==="zh"?"zh_CN":"en",
+    locale:tvLocale(),
     autosize:true,hide_side_toolbar:false,allow_symbol_change:false,
     withdateranges:true,details:false,
     backgroundColor:"#000000",gridColor:"#2e2e2e"
   });
+}
+
+// TradingView's technicals widget. Its config travels as the text content of
+// the script tag, so the element has to be built rather than written as HTML —
+// innerHTML never executes an injected script.
+function mountTA(){
+  const wrap=$("#tawrap");if(!wrap)return;
+  const ti=(TFS.find(t=>t[0]===TF)||[])[2]||"15m";
+  wrap.innerHTML='<div class="tradingview-widget-container"><div class="tradingview-widget-container__widget"></div></div>';
+  const box=wrap.querySelector(".tradingview-widget-container");
+  const s=document.createElement("script");
+  s.type="text/javascript";
+  s.src="https://s3.tradingview.com/external-embedding/embed-widget-technical-analysis.js";
+  s.async=true;
+  s.text=JSON.stringify({
+    symbol:"BITKUB:KUBTHB",interval:ti,width:"100%",height:420,
+    showIntervalTabs:true,displayMode:"single",isTransparent:true,
+    locale:tvLocale(),colorTheme:"dark"
+  });
+  box.appendChild(s);
 }
 
 function paintStatic(){
@@ -430,57 +413,39 @@ function paintStatic(){
   else if(!LIVE){b.hidden=false;b.textContent=T("snap")}
   else b.hidden=true;
   $("#stamp").textContent=bkk(LIVE?D.generated_at:SNAP.generated_at)+" UTC+7";
-  $("#techwhen").textContent=TF;
-  $("#technote").textContent=T("n_tech");
 }
 function tfButtons(){
   const seg=$("#tfseg");seg.innerHTML="";
-  const elapsed=(Date.now()-COLLECT_START)/1000;
-  TFS.forEach(([tf,secs])=>{
+  TFS.forEach(([tf])=>{
     const b=document.createElement("button");
     b.type="button";b.textContent=tf;b.dataset.tf=tf;
     b.setAttribute("aria-pressed",String(tf===TF));
-    if(elapsed/secs<MIN_BARS)b.title=tpl("tf_bars",{bars:Math.floor(elapsed/secs),tf});
     b.addEventListener("click",()=>setTF(tf));
     seg.appendChild(b)});
 }
 function kpis(){
-  const n=D.now||{},px=+n.price_thb,sp=+n.spread_bps/100,vol=+n.vol_24h_kub,nf=+n.netflow_out_24h_kub,tk=+n.taker_buy_pct_24h;
+  const n=D.now||{};
+  const px=+n.price_thb,bid=+n.best_bid,ask=+n.best_ask,sp=+n.spread_bps/100;
+  const volK=+n.vol_24h_kub;
+  // Bitkub reports quote volume itself; base volume x last price is not the
+  // same number and was what made this card disagree with their site.
+  const volT=n.vol_24h_thb!=null?+n.vol_24h_thb:(isNaN(volK)||isNaN(px)?NaN:volK*px);
+  const chg=n.change_pct_24h==null?null:+n.change_pct_24h;
+  const nf=+n.netflow_out_24h_kub,tk=+n.taker_buy_pct_24h;
   const s10=(D.slipNow||[]).find(r=>r.side==="SELL"&&+r.size_kub===10000);
   const t24=(D.taker||[]).find(t=>t.win==="24h")||{};
   const nf24=(D.netflow||[]).find(t=>t.win==="24h")||{};
   const k=(t,v,s)=>`<div class="kpi"><dt>${t}</dt><dd>${v}</dd><div class="sub">${s}</div></div>`;
+  const chgTxt=chg==null||isNaN(chg)?"":
+    ` · <b style="color:${chg>=0?"var(--up)":"var(--down)"}">${chg>=0?"+":""}${chg.toFixed(2)}%</b> 24h`;
   $("#kpis").innerHTML=
-   k(T("k_price"),"฿"+(isNaN(px)?"—":px.toFixed(2)),(isNaN(sp)?"—":sp.toFixed(2))+"% "+T("k_spread"))
-  +k(T("k_vol"),fmt(vol)+" KUB","฿"+fmt(vol*px))
+   k(T("k_last"),"฿"+(isNaN(px)?"—":px.toFixed(2)),
+     (isNaN(bid)?"":`${T("k_bid")} <b>฿${bid.toFixed(2)}</b> / ${T("k_ask")} <b>฿${ask.toFixed(2)}</b> · `)
+     +(isNaN(sp)?"—":sp.toFixed(2))+"% "+T("k_spread"))
+  +k(T("k_vol"),fmt(volK)+" KUB","฿"+fmt(volT)+" · "+T("k_ticker")+chgTxt)
   +k(T("k_sell"),s10?"−"+(+s10.slippage_pct).toFixed(2)+"%":"—",s10?("฿"+(+s10.vwap).toFixed(2)+" · "+s10.levels_used+" "+T("k_lv")):"")
   +k(T("k_nf"),fmt(nf)+" KUB",fmt(nf24.out_of_exchange_kub)+" / "+fmt(nf24.into_exchange_kub))
   +k(T("k_taker"),(isNaN(tk)?"—":tk.toFixed(1))+"%","24 h · "+fmt(t24.fills)+" "+T("k_trades"));
-}
-function tech(){
-  const c=CANDLES.map(r=>r[4]),h=CANDLES.map(r=>r[2]),l=CANDLES.map(r=>r[3]),N=c.length,px=c[N-1];
-  const chip=(cl,t)=>`<span class="chip ${cl}">${t}</span>`;
-  const na=`<td class="n">—</td><td>${chip("na",T("p_na"))}</td>`;
-  const R=[];
-  const rsi=RSI(c);R.push(["RSI (14)",rsi==null?null:rsi.toFixed(1),rsi==null?null:
-    rsi>70?["up",tpl("p_over",{n:70})]:rsi<30?["down",tpl("p_under",{n:30})]:["mid",tpl("p_between",{a:30,b:70})],15]);
-  const m=MACD(c);R.push(["MACD (12,26,9)",m==null?null:m.line.toFixed(4),m==null?null:
-    (m.hist>=0?["up",T("p_above_sig")]:["down",T("p_below_sig")]),35]);
-  const st=STOCH(h,l,c);R.push(["Stochastic %K (14,3)",st==null?null:st.k.toFixed(1),st==null?null:
-    st.k>80?["up",tpl("p_over",{n:80})]:st.k<20?["down",tpl("p_under",{n:20})]:["mid",tpl("p_between",{a:20,b:80})],17]);
-  const cci=CCI(h,l,c);R.push(["CCI (20)",cci==null?null:cci.toFixed(1),cci==null?null:
-    cci>100?["up",tpl("p_over",{n:100})]:cci<-100?["down",tpl("p_under",{n:-100})]:["mid",tpl("p_between",{a:-100,b:100})],20]);
-  const wr=WILLR(h,l,c);R.push(["Williams %R (14)",wr==null?null:wr.toFixed(1),wr==null?null:
-    wr>-20?["up",tpl("p_over",{n:-20})]:wr<-80?["down",tpl("p_under",{n:-80})]:["mid",tpl("p_between",{a:-80,b:-20})],14]);
-  const atr=ATR(h,l,c);R.push(["ATR (14)",atr==null?null:"฿"+atr.toFixed(4),atr==null?null:["mid",T("p_value")],15]);
-  const bb=BB(c);R.push(["Bollinger (20, 2σ)",bb==null?null:"฿"+bb.up.toFixed(2)+" / ฿"+bb.low.toFixed(2),bb==null?null:
-    px>bb.up?["up",T("p_above_band")]:px<bb.low?["down",T("p_below_band")]:["mid",T("p_in_band")],20]);
-  [["SMA",SMA],["EMA",EMA]].forEach(([nm,fn])=>[10,20,50].forEach(n=>{const v=fn(c,n);
-    R.push([`${nm} (${n})`,v==null?null:"฿"+v.toFixed(3),v==null?null:(px>v?["up",T("p_px_above")]:["down",T("p_px_below")]),n])}));
-  let html=`<thead><tr><th>${T("th_ind")}</th><th class="n">${T("th_val")}</th><th>${T("th_pos")}</th><th class="n">${T("th_bars")}</th></tr></thead><tbody>`;
-  R.forEach(([nm,val,pos,need])=>{html+=`<tr><td>${nm}</td>`+(val==null?na:`<td class="n">${val}</td><td>${chip(pos[0],pos[1])}</td>`)
-    +`<td class="n" style="color:var(--text-inverse)">${N} / ${need}</td></tr>`});
-  $("#t-tech").innerHTML=html+"</tbody>";
 }
 function hourly(){if(!LIVE)return[];
   return (D.hourly||[]).map(r=>[bkk(r.hour),r.px_close==null?null:+r.px_close,r.trade_kub==null?null:+r.trade_kub,
@@ -600,18 +565,14 @@ function health(){
   $("#t-health").innerHTML=h+"</tbody>";
 }
 
-function render(){paintStatic();tfButtons();kpis();tech();cSlip();tDex();cSlipT();cTaker();cSweep();treasury();health()}
+function render(){paintStatic();tfButtons();kpis();cSlip();tDex();cSlipT();cTaker();cSweep();treasury();health()}
 function setTF(tf){
   TF=tf;try{localStorage.setItem("kfd-tf",tf)}catch(e){}
   document.querySelectorAll("#tfseg button").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.tf===tf)));
-  mountTV();
-  if(!LIVE){render();return}
-  fetch(`/api/candles?tf=${tf}&limit=300`).then(r=>r.json())
-    .then(j=>{CANDLES=(j.candles||[]).map(c=>[c[0],+c[1],+c[2],+c[3],+c[4],+c[5],c[6]]);CBARS=j.bars||0;render()})
-    .catch(()=>render());
+  mountTV();mountTA();
 }
 document.querySelectorAll(".seg button[data-lang]").forEach(b=>
-  b.addEventListener("click",()=>{L=b.dataset.lang;try{localStorage.setItem("kfd-lang",L)}catch(e){}render();mountTV()}));
+  b.addEventListener("click",()=>{L=b.dataset.lang;try{localStorage.setItem("kfd-lang",L)}catch(e){}render();mountTV();mountTA()}));
 try{
   const sv=localStorage.getItem("kfd-lang");
   if(sv&&I18N[sv])L=sv;
@@ -620,13 +581,11 @@ try{
   const st=localStorage.getItem("kfd-tf");if(st&&TFS.some(t=>t[0]===st))TF=st;
 }catch(e){}
 
-render();mountTV();
+render();mountTV();mountTA();
 fetch("/api/data").then(r=>r.json()).then(j=>{
   if(!j)return;
-  if(j.now){D=j;LIVE=true;
-    if(j.candles&&j.candles.candles){CANDLES=j.candles.candles.map(c=>[c[0],+c[1],+c[2],+c[3],+c[4],+c[5],c[6]]);CBARS=j.candles.bars}
-    if(TF!==(j.candles&&j.candles.tf))setTF(TF);else render();
-  }else if(j.error){D=SNAP;LIVE=false;D.errors=[j.error];render();
+  if(j.now){D=j;LIVE=true;render()}
+  else if(j.error){D=SNAP;LIVE=false;D.errors=[j.error];render();
     $("#banner").hidden=false;$("#banner").textContent=T("apierr")+j.error}
 }).catch(()=>{});
 </script>
