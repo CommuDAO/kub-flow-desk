@@ -11,23 +11,52 @@ export function missingKey(res) {
   return true
 }
 
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms))
+
+/**
+ * Worth trying again rather than reporting.
+ *
+ * PGRST303 ("JWT issued at future") is the interesting one: a secret key is
+ * exchanged for a short-lived token per request, so a fraction of a second of
+ * clock skew between the issuing node and the database makes PostgREST treat a
+ * valid token as not yet valid. It lands on a different query each time and
+ * clears on its own, so a retry is the correct response, not a banner.
+ */
+function retriable(status, body) {
+  if (status >= 500 || status === 429) return true
+  if (status === 401 && /PGRST303|issued at future/i.test(body)) return true
+  return false
+}
+
 export function client() {
   const key = process.env.SUPABASE_SERVICE_KEY
   const headers = { apikey: key, Authorization: `Bearer ${key}` }
 
   async function call(url, init) {
-    const r = await fetch(url, init)
-    const text = await r.text()
-    if (!r.ok) {
-      const e = new Error(text.slice(0, 300))
-      e.status = r.status
-      throw e
+    let last
+    for (let attempt = 0; attempt < 3; attempt++) {
+      if (attempt) await sleep(attempt * 400)
+      let r, text
+      try {
+        r = await fetch(url, init)
+        text = await r.text()
+      } catch (e) {
+        last = e
+        continue // network blip: same treatment
+      }
+      if (!r.ok) {
+        last = new Error(text.slice(0, 300))
+        last.status = r.status
+        if (retriable(r.status, text)) continue
+        throw last
+      }
+      try {
+        return JSON.parse(text)
+      } catch {
+        throw new Error(`non-JSON response: ${text.slice(0, 200)}`)
+      }
     }
-    try {
-      return JSON.parse(text)
-    } catch {
-      throw new Error(`non-JSON response: ${text.slice(0, 200)}`)
-    }
+    throw last
   }
 
   return {
