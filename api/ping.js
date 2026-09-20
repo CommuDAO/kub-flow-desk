@@ -3,6 +3,12 @@ import { URL_BASE } from './_supabase.js'
 /**
  * Diagnostic endpoint. Answers "is the key present, is it the right one, and
  * which query breaks" without exposing the key.
+ *
+ * ?ref=<project ref> additionally tries the same key against another Supabase
+ * project. A new-style sb_secret_ key carries no readable project claim, so
+ * "Invalid API key" cannot tell a revoked key apart from a key pasted from the
+ * wrong project — this probe can. The ref comes in as a query param so no
+ * unrelated project ref has to live in the repo.
  */
 export default async function handler(req, res) {
   const key = process.env.SUPABASE_SERVICE_KEY || ''
@@ -37,9 +43,9 @@ export default async function handler(req, res) {
     }
 
     const headers = { apikey: key, Authorization: `Bearer ${key}` }
-    const probe = async (label, path, init) => {
+    const probe = async (label, path, init, base) => {
       try {
-        const r = await fetch(`${URL_BASE}/rest/v1/${path}`, { headers, ...(init || {}) })
+        const r = await fetch(`${base || URL_BASE}/rest/v1/${path}`, { headers, ...(init || {}) })
         const body = await r.text()
         out.probes[label] = r.ok ? `ok (${body.length} bytes)` : `${r.status}: ${body.slice(0, 160)}`
       } catch (e) {
@@ -55,6 +61,13 @@ export default async function handler(req, res) {
       headers: { apikey: key, Authorization: `Bearer ${key}`, 'Content-Type': 'application/json' },
       body: JSON.stringify({ p_tf: '15m', p_limit: 5 }),
     })
+
+    const alt = String(req.query?.ref || '').replace(/[^a-z0-9]/g, '')
+    if (alt && alt !== out.project_ref) {
+      // 200 or 404 here means the key authenticates against THAT project, i.e.
+      // it was copied from the wrong one. Another 401 means it is simply dead.
+      await probe(`other project ${alt}`, 'kub_hourly?select=hour&limit=1', null, `https://${alt}.supabase.co`)
+    }
   }
 
   res.status(200).json(out)
