@@ -5,99 +5,109 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>KUB Flow Desk</title>
 <meta name="description" content="KUB market microstructure, execution cost, five-DEX quotes and treasury balances.">
-<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anuphan:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<meta name="color-scheme" content="dark">
 <style>
+/* TradingView design tokens — deliberately single-theme dark, to match the
+   embedded chart. Every colour is painted explicitly; nothing inherits. */
 :root{
-  --bg:#f8f8f6; --card:#ffffff; --card-2:#f8f8f6;
-  --ink:#1b1c1b; --ink-2:#464746; --ink-3:#6b6b6a;
-  --line:#f1f2ef; --line-2:#e6e7e3;
-  --accent:#00b359; --accent-ink:#00994d;
-  --up:#00994d; --down:#d03b3b; --info:#2a78d6; --warn:#b26a00;
-  --r-xs:6px; --r-sm:8px; --r-md:16px; --r-lg:24px;
-  --sh1:rgba(27,28,27,.08) 0 2px 5px 0; --sh2:rgba(27,28,27,.08) 0 4px 5px 0;
-  --fast:150ms;
-  --sans:"GraphikTH","Anuphan","Noto Sans SC",system-ui,-apple-system,"Segoe UI",sans-serif;
-  --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
-}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
-  --bg:#0e0f0e; --card:#191b19; --card-2:#202220;
-  --ink:#f6f6f4; --ink-2:#c4c5c1; --ink-3:#8f918d;
-  --line:#262826; --line-2:#303230;
-  --accent:#00c964; --accent-ink:#17c46e;
-  --up:#17c46e; --down:#e06464; --info:#3987e5; --warn:#d99a1f;
-  --sh1:rgba(0,0,0,.4) 0 2px 5px 0; --sh2:rgba(0,0,0,.45) 0 4px 5px 0;
-}}
-:root[data-theme="dark"]{
-  --bg:#0e0f0e; --card:#191b19; --card-2:#202220;
-  --ink:#f6f6f4; --ink-2:#c4c5c1; --ink-3:#8f918d;
-  --line:#262826; --line-2:#303230;
-  --accent:#00c964; --accent-ink:#17c46e;
-  --up:#17c46e; --down:#e06464; --info:#3987e5; --warn:#d99a1f;
-  --sh1:rgba(0,0,0,.4) 0 2px 5px 0; --sh2:rgba(0,0,0,.45) 0 4px 5px 0;
+  color-scheme:dark;
+  --surface-base:#000000;
+  --surface-raised:#1f1f1f;
+  --surface-muted:#2e2e2e;
+  --text-primary:#dbdbdb;
+  --text-secondary:#9e9eff;
+  --text-tertiary:#ffffff;
+  --text-inverse:#575757;
+  --up:#26a69a; --down:#ef5350; --accent:#2962ff;
+  --s1:1px; --s2:2px; --s3:4px; --s4:5px; --s5:6px; --s6:7px; --s7:8px; --s8:11px;
+  --r-xs:4px; --r-sm:6px; --r-md:8px; --r-lg:12px; --r-xl:16px; --r-2xl:24px;
+  --sh1:rgba(0,0,0,.4) 0 2px 4px 0;
+  --dur:300ms;
+  --sans:-apple-system,BlinkMacSystemFont,"Trebuchet MS",Roboto,Ubuntu,sans-serif;
+  --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
 }
 *{box-sizing:border-box}
-html,body{margin:0}
-body{background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:14px;line-height:22px;
+html,body{margin:0;background:var(--surface-base)}
+body{color:var(--text-primary);font-family:var(--sans);font-size:14px;line-height:18px;font-weight:400;
   -webkit-font-smoothing:antialiased;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
-.wrap{max-width:1120px;margin:0 auto;padding-block:20px 56px;padding-left:16px;padding-right:16px}
-:focus-visible{outline:2px solid var(--accent-ink);outline-offset:2px;border-radius:var(--r-xs)}
-.mast{display:flex;flex-wrap:wrap;align-items:center;gap:8px 16px;padding:12px 0 16px}
-.brand{display:flex;align-items:center;gap:10px}
-.dot{width:22px;height:22px;border-radius:var(--r-xs);background:var(--accent);flex:none}
-.mast h1{margin:0;font-size:20px;line-height:26px;font-weight:600;letter-spacing:-.01em}
-.mast .pair{font-family:var(--mono);font-size:12px;color:var(--ink-3);padding:2px 8px;border:1px solid var(--line-2);border-radius:999px}
-.tools{margin-left:auto;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
-.seg{display:flex;background:var(--card);border:1px solid var(--line-2);border-radius:var(--r-sm);padding:2px;gap:2px;box-shadow:var(--sh1)}
-.seg button{font:500 12px/18px var(--sans);padding:5px 10px;background:transparent;color:var(--ink-2);border:0;border-radius:var(--r-xs);cursor:pointer;transition:background var(--fast),color var(--fast)}
-.seg button:hover:not(:disabled){background:var(--card-2)}
-.seg button[aria-pressed="true"]{background:var(--accent);color:#fff}
-.seg button:disabled{color:var(--ink-3);opacity:.45;cursor:not-allowed}
-.stamp{font-family:var(--mono);font-size:12px;color:var(--ink-3)}
-.srcline{font-size:12px;color:var(--ink-3);padding-bottom:16px}
-.banner{background:var(--card);border:1px solid var(--line-2);border-left:3px solid var(--warn);
-  border-radius:var(--r-sm);padding:10px 14px;font-size:13px;color:var(--ink-2);margin-bottom:16px;box-shadow:var(--sh1)}
-.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(168px,1fr));gap:12px;margin-bottom:20px}
-.kpi{background:var(--card);border:1px solid var(--line);border-radius:var(--r-md);padding:14px 16px;box-shadow:var(--sh1)}
-.kpi dt{margin:0;font-size:12px;color:var(--ink-3);font-weight:500}
-.kpi dd{margin:6px 0 0;font-family:var(--mono);font-size:20px;line-height:26px;font-weight:600;letter-spacing:-.01em}
-.kpi .sub{font-size:12px;color:var(--ink-3);margin-top:3px}
-.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r-md);padding:18px 18px 14px;margin-bottom:16px;box-shadow:var(--sh1)}
-.ch{display:flex;flex-wrap:wrap;align-items:center;gap:8px 14px;margin-bottom:6px}
-.ch h2{margin:0;font-size:16px;line-height:24px;font-weight:600}
-.ch .when{font-size:12px;color:var(--ink-3);margin-left:auto}
-.lede{margin:0 0 14px;font-size:13px;line-height:21px;color:var(--ink-2);max-width:66ch}
-.legend{display:flex;flex-wrap:wrap;gap:6px 16px;margin:0 0 10px;padding:0;list-style:none;font-size:12px;color:var(--ink-2)}
-.legend li{display:flex;align-items:center;gap:7px}
-.sw{width:20px;height:3px;border-radius:2px;flex:none}
-.sw.dot{width:10px;height:10px;border-radius:50%}
-#tvwrap{height:min(62vh,520px);min-height:340px;border-radius:var(--r-sm);overflow:hidden;background:var(--card-2)}
+.wrap{max-width:1180px;margin:0 auto;padding-block:16px 48px;padding-left:16px;padding-right:16px}
+:focus-visible{outline:2px solid var(--text-secondary);outline-offset:2px;border-radius:var(--r-xs)}
+
+.mast{display:flex;flex-wrap:wrap;align-items:center;gap:var(--s7) var(--s8);padding:var(--s8) 0}
+.brand{display:flex;align-items:center;gap:var(--s7)}
+.dot{width:20px;height:20px;border-radius:var(--r-sm);background:var(--up);flex:none}
+.mast h1{margin:0;font-size:20px;line-height:26px;font-weight:600;color:var(--text-tertiary);letter-spacing:-.01em}
+.mast .pair{font-family:var(--mono);font-size:12px;color:var(--text-inverse);
+  padding:var(--s2) var(--s7);border:1px solid var(--surface-muted);border-radius:var(--r-2xl)}
+.tools{margin-left:auto;display:flex;align-items:center;gap:var(--s7);flex-wrap:wrap}
+.seg{display:flex;background:var(--surface-raised);border:1px solid var(--surface-muted);
+  border-radius:var(--r-md);padding:var(--s2);gap:var(--s2)}
+.seg button{font:500 12px/16px var(--sans);padding:var(--s4) var(--s8);background:transparent;
+  color:var(--text-inverse);border:0;border-radius:var(--r-sm);cursor:pointer;
+  transition:background var(--dur),color var(--dur)}
+.seg button:hover{background:var(--surface-muted);color:var(--text-primary)}
+.seg button[aria-pressed="true"]{background:var(--surface-muted);color:var(--text-tertiary)}
+.stamp{font-family:var(--mono);font-size:12px;color:var(--text-inverse)}
+.srcline{font-size:12px;line-height:18px;color:var(--text-inverse);padding-bottom:var(--s8)}
+.banner{background:var(--surface-raised);border:1px solid var(--surface-muted);border-left:3px solid var(--down);
+  border-radius:var(--r-md);padding:var(--s7) var(--s8);font-size:13px;color:var(--text-primary);margin-bottom:var(--s8)}
+
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:var(--s7);margin-bottom:var(--s8)}
+.kpi{background:var(--surface-raised);border:1px solid var(--surface-muted);border-radius:var(--r-md);
+  padding:var(--s8) var(--s8) 10px;box-shadow:var(--sh1)}
+.kpi dt{margin:0;font-size:12px;line-height:16px;color:var(--text-inverse);font-weight:400}
+.kpi dd{margin:var(--s5) 0 0;font-family:var(--mono);font-size:20px;line-height:24px;font-weight:600;
+  color:var(--text-tertiary);letter-spacing:-.01em}
+.kpi .sub{font-size:12px;line-height:16px;color:var(--text-inverse);margin-top:var(--s3)}
+
+.card{background:var(--surface-raised);border:1px solid var(--surface-muted);border-radius:var(--r-lg);
+  padding:var(--s8) var(--s8) 10px;margin-bottom:var(--s8);box-shadow:var(--sh1)}
+.ch{display:flex;flex-wrap:wrap;align-items:center;gap:var(--s5) var(--s8);margin-bottom:var(--s5)}
+.ch h2{margin:0;font-size:16px;line-height:22px;font-weight:600;color:var(--text-tertiary)}
+.ch .when{font-size:12px;color:var(--text-inverse);margin-left:auto}
+.lede{margin:0 0 var(--s8);font-size:13px;line-height:19px;color:var(--text-primary);max-width:68ch}
+.legend{display:flex;flex-wrap:wrap;gap:var(--s4) var(--s8);margin:0 0 10px;padding:0;list-style:none;
+  font-size:12px;color:var(--text-primary)}
+.legend li{display:flex;align-items:center;gap:var(--s5)}
+.sw{width:18px;height:3px;border-radius:var(--s2);flex:none}
+.sw.dot{width:9px;height:9px;border-radius:50%}
+
+#tvwrap{height:min(64vh,540px);min-height:340px;border-radius:var(--r-md);overflow:hidden;background:var(--surface-base)}
 #tv-chart{height:100%;width:100%}
 svg{display:block;width:100%;height:auto;overflow:visible}
-.gl{stroke:var(--line-2);stroke-width:1}
-.ax{stroke:var(--line-2);stroke-width:1}
-.tick{font-family:var(--mono);font-size:10.5px;fill:var(--ink-3)}
+.gl{stroke:var(--surface-muted);stroke-width:1}
+.ax{stroke:var(--text-inverse);stroke-width:1}
+.tick{font-family:var(--mono);font-size:10.5px;fill:var(--text-inverse)}
 .dlab{font-family:var(--mono);font-size:11px;font-weight:600}
 .hit{fill:transparent;cursor:crosshair}
+
 table{width:100%;border-collapse:collapse;font-size:13px}
 .tw{overflow-x:auto}
-th{text-align:left;font-size:12px;font-weight:500;color:var(--ink-3);padding:0 12px 8px 0;border-bottom:1px solid var(--line-2);white-space:nowrap}
-td{padding:9px 12px 9px 0;border-bottom:1px solid var(--line);vertical-align:baseline}
+th{text-align:left;font-size:12px;font-weight:400;color:var(--text-inverse);
+  padding:0 var(--s8) var(--s7) 0;border-bottom:1px solid var(--surface-muted);white-space:nowrap}
+td{padding:var(--s7) var(--s8) var(--s7) 0;border-bottom:1px solid var(--surface-muted);
+  vertical-align:baseline;color:var(--text-primary)}
 td.n,th.n{text-align:right;font-family:var(--mono);font-variant-numeric:tabular-nums;padding-right:0}
 tr:last-child td{border-bottom:0}
-tr.noquote td{color:var(--ink-3)}
-.chip{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:500;padding:2px 9px;border-radius:999px;border:1px solid var(--line-2);white-space:nowrap;color:var(--ink-2)}
-.chip.up{color:var(--up)}.chip.down{color:var(--down)}.chip.mid{color:var(--ink-3)}.chip.na{color:var(--ink-3);opacity:.7}
-.best{background:var(--accent);color:#fff;font-size:11px;font-weight:600;padding:1px 7px;border-radius:var(--r-xs)}
-.tag{font-family:var(--mono);font-size:11px;padding:1px 7px;border-radius:var(--r-xs);background:var(--card-2);color:var(--ink-2);border:1px solid var(--line)}
-.note{font-size:12.5px;line-height:20px;color:var(--ink-2);margin:12px 0 0;padding-top:12px;border-top:1px solid var(--line)}
-.note b{font-weight:600;color:var(--ink)}
-#tip{position:fixed;z-index:30;pointer-events:none;opacity:0;transition:opacity var(--fast);
-  background:var(--card);border:1px solid var(--line-2);border-radius:var(--r-sm);padding:9px 11px;
-  font-family:var(--mono);font-size:11.5px;line-height:17px;color:var(--ink);box-shadow:var(--sh2);max-width:250px}
-#tip .k{color:var(--ink-3)}
-footer{margin-top:24px;padding-top:16px;border-top:1px solid var(--line-2);font-size:12.5px;line-height:20px;color:var(--ink-2)}
-footer p{margin:0 0 8px;max-width:74ch}
+tr.noquote td{color:var(--text-inverse)}
+.chip{display:inline-flex;align-items:center;gap:var(--s3);font-size:12px;line-height:16px;
+  padding:var(--s2) var(--s7);border-radius:var(--r-2xl);border:1px solid var(--surface-muted);color:var(--text-primary)}
+.chip.up{color:var(--up)}.chip.down{color:var(--down)}.chip.mid{color:var(--text-inverse)}
+.chip.na{color:var(--text-inverse)}
+.best{background:var(--up);color:#00110f;font-size:11px;font-weight:600;padding:var(--s1) var(--s5);border-radius:var(--r-xs)}
+.tag{font-family:var(--mono);font-size:11px;padding:var(--s1) var(--s5);border-radius:var(--r-xs);
+  background:var(--surface-muted);color:var(--text-primary)}
+.note{font-size:12.5px;line-height:18px;color:var(--text-inverse);margin:var(--s8) 0 0;
+  padding-top:var(--s8);border-top:1px solid var(--surface-muted)}
+.note b{font-weight:600;color:var(--text-primary)}
+#tip{position:fixed;z-index:30;pointer-events:none;opacity:0;transition:opacity 150ms;
+  background:var(--surface-muted);border:1px solid var(--text-inverse);border-radius:var(--r-sm);
+  padding:var(--s7) var(--s8);font-family:var(--mono);font-size:11.5px;line-height:16px;
+  color:var(--text-tertiary);box-shadow:var(--sh1);max-width:250px}
+#tip .k{color:var(--text-inverse)}
+footer{margin-top:var(--s8);padding-top:var(--s8);border-top:1px solid var(--surface-muted);
+  font-size:12.5px;line-height:18px;color:var(--text-inverse)}
+footer p{margin:0 0 var(--s7);max-width:76ch}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 </head>
@@ -105,12 +115,12 @@ footer p{margin:0 0 8px;max-width:74ch}
 <div class="wrap">
   <header class="mast">
     <div class="brand"><span class="dot" aria-hidden="true"></span><h1 data-i18n="title">KUB Flow Desk</h1></div>
-    <span class="pair">KUB_THB · Bitkub</span>
+    <span class="pair">KUB_THB · BITKUB</span>
     <div class="tools">
       <div class="seg" role="group" aria-label="Language">
-        <button type="button" id="lang-th" data-lang="th">ไทย</button>
-        <button type="button" id="lang-en" data-lang="en">EN</button>
-        <button type="button" id="lang-zh" data-lang="zh">中文</button>
+        <button type="button" data-lang="th">ไทย</button>
+        <button type="button" data-lang="en">EN</button>
+        <button type="button" data-lang="zh">中文</button>
       </div>
       <span class="stamp" id="stamp"></span>
     </div>
@@ -140,7 +150,7 @@ footer p{margin:0 0 8px;max-width:74ch}
     <p class="lede" data-i18n="l_cost"></p>
     <ul class="legend">
       <li><span class="sw" style="background:var(--down)"></span><span data-i18n="lg_sell"></span></li>
-      <li><span class="sw" style="background:var(--info)"></span><span data-i18n="lg_buy"></span></li>
+      <li><span class="sw" style="background:var(--up)"></span><span data-i18n="lg_buy"></span></li>
     </ul>
     <div id="c-slip"></div>
     <p class="note" id="slipnote"></p>
@@ -158,7 +168,7 @@ footer p{margin:0 0 8px;max-width:74ch}
     <p class="lede" data-i18n="l_slipt"></p>
     <ul class="legend">
       <li><span class="sw" style="background:var(--down)"></span><span data-i18n="lg_sell10"></span></li>
-      <li><span class="sw" style="background:var(--info)"></span><span data-i18n="lg_buy10"></span></li>
+      <li><span class="sw" style="background:var(--up)"></span><span data-i18n="lg_buy10"></span></li>
     </ul>
     <div id="c-slipt"></div>
   </section>
@@ -167,7 +177,7 @@ footer p{margin:0 0 8px;max-width:74ch}
     <div class="ch"><h2 data-i18n="h_taker"></h2><span class="when" data-i18n="w_exec"></span></div>
     <p class="lede" data-i18n="l_taker"></p>
     <ul class="legend">
-      <li><span class="sw dot" style="background:var(--info)"></span><span data-i18n="lg_bcross"></span></li>
+      <li><span class="sw dot" style="background:var(--up)"></span><span data-i18n="lg_bcross"></span></li>
       <li><span class="sw dot" style="background:var(--down)"></span><span data-i18n="lg_scross"></span></li>
     </ul>
     <div id="c-taker"></div>
@@ -183,7 +193,7 @@ footer p{margin:0 0 8px;max-width:74ch}
     <div class="ch"><h2 data-i18n="h_treas"></h2><span class="when" data-i18n="w_treas"></span></div>
     <p class="lede" data-i18n="l_treas"></p>
     <div id="c-treas"></div>
-    <div class="tw" style="margin-top:14px"><table id="t-treas"></table></div>
+    <div class="tw" style="margin-top:12px"><table id="t-treas"></table></div>
   </section>
 
   <section class="card">
@@ -195,7 +205,7 @@ footer p{margin:0 0 8px;max-width:74ch}
   <footer>
     <p data-i18n="f1"></p>
     <p data-i18n="f2"></p>
-    <p style="color:var(--ink-3);margin-top:10px" data-i18n="f3"></p>
+    <p style="margin-top:10px" data-i18n="f3"></p>
   </footer>
 </div>
 <div id="tip" role="status" aria-live="polite"></div>
@@ -208,7 +218,7 @@ en:{title:"KUB Flow Desk",
  k_price:"Price",k_vol:"24 h volume",k_sell:"Sell 10k KUB",k_nf:"Left the exchange",k_taker:"Buyers crossing",
  k_spread:"spread",k_lv:"levels",k_trades:"trades",
  h_chart:"KUB / THB",
- n_tv:"Chart by TradingView, on Bitkub's own KUBTHB feed — it carries years of history and its own drawing tools, which our 25 hours of collection cannot match. Everything below this chart is measured from our own tape.",
+ n_tv:"Chart by TradingView on Bitkub's own KUBTHB feed — it carries years of history and its own drawing tools, which our collection cannot match. Everything below this chart is measured from our own tape.",
  h_tech:"Indicator readings",
  l_tech:"Computed from our own collected bars, not from the chart above, so these numbers reconcile with the slippage, sweep and taker panels further down. Each row shows where the value sits against its conventional threshold and how many bars it had.",
  n_tech:"No aggregated buy / sell verdict, on purpose. Reporting that RSI reads 72 and sits above the conventional 70 line is a measurement; collapsing a dozen indicators into one instruction to trade is a recommendation, and this page reports data only.",
@@ -252,7 +262,7 @@ th:{title:"KUB Flow Desk",
  k_price:"ราคา",k_vol:"วอลุ่ม 24 ชม.",k_sell:"ขาย 10k KUB",k_nf:"ไหลออกจากตลาด",k_taker:"ฝั่งซื้อไล่ราคา",
  k_spread:"สเปรด",k_lv:"ระดับบุ๊ก",k_trades:"รายการ",
  h_chart:"KUB / THB",
- n_tv:"กราฟจาก TradingView ใช้ฟีด KUBTHB ของ Bitkub เอง — มีประวัติย้อนหลังเป็นปีและเครื่องมือวาดครบ ซึ่งข้อมูล 25 ชั่วโมงของเราสู้ไม่ได้ ส่วนทุกอย่างใต้กราฟนี้วัดจาก tape ที่เราเก็บเอง",
+ n_tv:"กราฟจาก TradingView ใช้ฟีด KUBTHB ของ Bitkub เอง — มีประวัติย้อนหลังเป็นปีและเครื่องมือวาดครบ ซึ่งข้อมูลที่เราเก็บสู้ไม่ได้ ส่วนทุกอย่างใต้กราฟนี้วัดจาก tape ที่เราเก็บเอง",
  h_tech:"ค่าอินดิเคเตอร์",
  l_tech:"คำนวณจากแท่งที่เราเก็บเอง ไม่ใช่จากกราฟด้านบน ตัวเลขจึงตรงกับแผง slippage, sweep และ taker ด้านล่าง แต่ละแถวบอกว่าค่าอยู่ตรงไหนเทียบเส้นมาตรฐาน และใช้กี่แท่ง",
  n_tech:"ไม่มีป้ายสรุปว่าซื้อหรือขาย และตั้งใจไม่ใส่ การบอกว่า RSI อ่านได้ 72 และอยู่เหนือเส้น 70 คือการรายงานค่า แต่การยุบอินดิเคเตอร์สิบกว่าตัวให้เหลือคำสั่งเดียวว่าให้เทรด คือคำแนะนำ หน้านี้รายงานข้อมูลอย่างเดียว",
@@ -296,7 +306,7 @@ zh:{title:"KUB 流动性看板",
  k_price:"价格",k_vol:"24 小时成交量",k_sell:"卖出 1 万 KUB",k_nf:"流出交易所",k_taker:"买方主动成交",
  k_spread:"价差",k_lv:"档位",k_trades:"笔",
  h_chart:"KUB / 泰铢",
- n_tv:"图表由 TradingView 提供，使用 Bitkub 自有的 KUBTHB 数据源 —— 它拥有数年历史与完整绘图工具，这是我们 25 小时的采集无法比拟的。此图以下的所有内容均来自我们自己采集的成交记录。",
+ n_tv:"图表由 TradingView 提供，使用 Bitkub 自有的 KUBTHB 数据源 —— 它拥有数年历史与完整绘图工具，这是我们的采集无法比拟的。此图以下的所有内容均来自我们自己采集的成交记录。",
  h_tech:"指标读数",
  l_tech:"基于我们自己采集的K线计算，而非上方图表，因此这些数字与下方的滑点、扫单与主动成交面板互相对得上。每行标明该值相对常规阈值的位置，以及参与计算的K线数量。",
  n_tech:"刻意不提供买卖综合评级。指出 RSI 为 72、位于常规的 70 线之上，是在陈述测量结果；把十几个指标汇总成一个交易指令，则属于投资建议。本页只报告数据。",
@@ -354,7 +364,7 @@ const SNAP={generated_at:"2026-09-20T09:00:00Z",
 const COLLECT_START=Date.parse("2026-09-19T08:10:00Z");
 const TFS=[["5m",300,"5"],["15m",900,"15"],["1h",3600,"60"],["4h",14400,"240"],["1d",86400,"D"]];
 const MIN_BARS=35;
-let L="en",D=SNAP,LIVE=false,TF="15m",CANDLES=[],CBARS=0,TV=null;
+let L="en",D=SNAP,LIVE=false,TF="15m",CANDLES=[],CBARS=0;
 
 const $=s=>document.querySelector(s),NS="http://www.w3.org/2000/svg";
 const T=k=>(I18N[L]&&I18N[L][k])||I18N.en[k]||k;
@@ -369,10 +379,7 @@ function showTip(ev,html){tip.innerHTML=html;tip.style.opacity=1;const r=tip.get
   if(y+r.height>innerHeight-8)y=innerHeight-r.height-8;if(y<8)y=8;tip.style.left=x+"px";tip.style.top=y+"px"}
 const hideTip=()=>tip.style.opacity=0;
 function hov(n,h){n.addEventListener("pointerenter",e=>showTip(e,h));n.addEventListener("pointermove",e=>showTip(e,h));n.addEventListener("pointerleave",hideTip)}
-const isDark=()=>document.documentElement.dataset.theme==="dark"||
-  (document.documentElement.dataset.theme!=="light"&&matchMedia("(prefers-color-scheme: dark)").matches);
 
-/* indicators */
 const SMA=(a,n)=>a.length<n?null:a.slice(-n).reduce((s,v)=>s+v,0)/n;
 function EMAs(a,n){if(a.length<n)return[];const k=2/(n+1);let e=a.slice(0,n).reduce((s,v)=>s+v,0)/n;const o=[e];
   for(let i=n;i<a.length;i++){e=a[i]*k+e*(1-k);o.push(e)}return o}
@@ -398,19 +405,18 @@ function ATR(h,l,c,n=14){if(c.length<n+1)return null;const tr=[];
 function BB(c,n=20,k=2){if(c.length<n)return null;const m=SMA(c,n),w=c.slice(-n);
   const sd=Math.sqrt(w.reduce((s,v)=>s+(v-m)*(v-m),0)/n);return{mid:m,up:m+k*sd,low:m-k*sd}}
 
-/* TradingView */
 function mountTV(){
   const tvi=(TFS.find(t=>t[0]===TF)||[])[2]||"15";
-  if(!window.TradingView){$("#tvwrap").innerHTML=`<div style="padding:40px;text-align:center;color:var(--ink-3)">${T("loading")}</div>`;return}
-  $("#tvwrap").innerHTML='<div id="tv-chart" style="height:100%"></div>';
-  TV=new TradingView.widget({
+  const wrap=$("#tvwrap");
+  if(!window.TradingView){wrap.innerHTML=`<div style="padding:40px;text-align:center;color:var(--text-inverse)">${T("loading")}</div>`;return}
+  wrap.innerHTML='<div id="tv-chart" style="height:100%"></div>';
+  new TradingView.widget({
     container_id:"tv-chart",symbol:"BITKUB:KUBTHB",interval:tvi,
-    timezone:"Asia/Bangkok",theme:isDark()?"dark":"light",style:"1",
+    timezone:"Asia/Bangkok",theme:"dark",style:"1",
     locale:L==="th"?"th":L==="zh"?"zh_CN":"en",
     autosize:true,hide_side_toolbar:false,allow_symbol_change:false,
     withdateranges:true,details:false,
-    backgroundColor:isDark()?"#191b19":"#ffffff",
-    gridColor:isDark()?"#262826":"#f1f2ef"
+    backgroundColor:"#000000",gridColor:"#2e2e2e"
   });
 }
 
@@ -473,7 +479,7 @@ function tech(){
     R.push([`${nm} (${n})`,v==null?null:"฿"+v.toFixed(3),v==null?null:(px>v?["up",T("p_px_above")]:["down",T("p_px_below")]),n])}));
   let html=`<thead><tr><th>${T("th_ind")}</th><th class="n">${T("th_val")}</th><th>${T("th_pos")}</th><th class="n">${T("th_bars")}</th></tr></thead><tbody>`;
   R.forEach(([nm,val,pos,need])=>{html+=`<tr><td>${nm}</td>`+(val==null?na:`<td class="n">${val}</td><td>${chip(pos[0],pos[1])}</td>`)
-    +`<td class="n" style="color:var(--ink-3)">${N} / ${need}</td></tr>`});
+    +`<td class="n" style="color:var(--text-inverse)">${N} / ${need}</td></tr>`});
   $("#t-tech").innerHTML=html+"</tbody>";
 }
 function hourly(){if(!LIVE)return[];
@@ -490,11 +496,11 @@ function cSlip(){
   el("line",{class:"ax",x1:Lx,x2:W-R,y1:H-B,y2:H-B},s);
   sizes.forEach((sz,i)=>el("text",{class:"tick",x:x(i),y:H-B+18,"text-anchor":"middle"},s).textContent=sz>=1000?sz/1000+"k":sz);
   el("text",{class:"tick",x:(Lx+W-R)/2,y:H-B+34,"text-anchor":"middle"},s).textContent="KUB";
-  [["SELL","var(--down)",T("lg_sell")],["BUY","var(--info)",T("lg_buy")]].forEach(([side,col,nm])=>{
+  [["SELL","var(--down)",T("lg_sell")],["BUY","var(--up)",T("lg_buy")]].forEach(([side,col,nm])=>{
     const rs=sizes.map(sz=>all.find(r=>r.side===side&&r.size===sz)).filter(Boolean);if(!rs.length)return;
     const pts=rs.map(r=>[x(sizes.indexOf(r.size)),y(r.slip)]);
     el("path",{d:"M"+pts.map(p=>p.join(" ")).join(" L "),fill:"none",stroke:col,"stroke-width":2,"stroke-linejoin":"round"},s);
-    rs.forEach((r,i)=>{el("circle",{cx:pts[i][0],cy:pts[i][1],r:5,fill:col,stroke:"var(--card)","stroke-width":2},s);
+    rs.forEach((r,i)=>{el("circle",{cx:pts[i][0],cy:pts[i][1],r:5,fill:col,stroke:"var(--surface-raised)","stroke-width":2},s);
       hov(el("circle",{cx:pts[i][0],cy:pts[i][1],r:15,class:"hit"},s),
         `<b>${nm} ${fmt(r.size)} KUB</b><br><span class="k">cost</span> ${r.slip.toFixed(2)}%<br><span class="k">avg</span> ฿${r.vwap.toFixed(4)}<br><span class="k">levels</span> ${r.lv}`)});
     const p=pts[pts.length-1];
@@ -511,7 +517,7 @@ function cSlipT(){
   [0,hi/2,hi].forEach(g=>{el("line",{class:"gl",x1:Lx,x2:W-R,y1:y(g),y2:y(g)},s);
     el("text",{class:"tick",x:Lx-8,y:y(g)+3.5,"text-anchor":"end"},s).textContent=g.toFixed(2)+"%"});
   el("line",{class:"ax",x1:Lx,x2:W-R,y1:H-B,y2:H-B},s);
-  [["a","var(--down)"],["b","var(--info)"]].forEach(([k,col])=>{let d="",open=false;
+  [["a","var(--down)"],["b","var(--up)"]].forEach(([k,col])=>{let d="",open=false;
     rs.forEach(r=>{if(r[k]==null){open=false;return}d+=(open?" L ":" M ")+x(r.i)+" "+y(r[k]);open=true});
     if(d)el("path",{d:d.trim(),fill:"none",stroke:col,"stroke-width":2,"stroke-linejoin":"round"},s)});
   rs.forEach(r=>{if(r.a==null&&r.b==null)return;
@@ -530,7 +536,7 @@ function cTaker(){
   rs.forEach(r=>{const X=Lx+r.i*(W-Lx-R)/rs.length+1.5;
     if(r.v!=null){const up=r.v>=50;
       el("rect",{x:X,y:up?y(r.v):y(50),width:Math.max(1,bw),height:Math.max(1.5,Math.abs(y(r.v)-y(50))),rx:2,
-        fill:up?"var(--info)":"var(--down)"},s)}
+        fill:up?"var(--up)":"var(--down)"},s)}
     hov(el("rect",{x:X-1.5,y:Tp,width:bw+3,height:H-B-Tp,class:"hit"},s),`<b>${r.t}</b><br>${r.v==null?"—":r.v.toFixed(1)+"%"}`)});
   el("text",{class:"tick",x:Lx,y:H-B+16},s).textContent=rs[0].t;
   el("text",{class:"tick",x:W-R,y:H-B+16,"text-anchor":"end"},s).textContent=rs[rs.length-1].t;
@@ -545,11 +551,11 @@ function cSweep(){
     el("text",{class:"tick",x:Lx-9,y:y(g)+3.5,"text-anchor":"end"},s).textContent=g>=1000?g/1000+"k":g});
   el("line",{class:"ax",x1:Lx,x2:W-R,y1:H-B,y2:H-B},s);
   let big=0,bi=0;sw.forEach((r,i)=>{if(r[2]>big){big=r[2];bi=i}});
-  sw.forEach((r,i)=>{const col=r[1]==="BUY"?"var(--info)":"var(--down)";
-    el("circle",{cx:x(i),cy:y(r[2]),r:5.5,fill:col,stroke:"var(--card)","stroke-width":2},s);
+  sw.forEach((r,i)=>{const col=r[1]==="BUY"?"var(--up)":"var(--down)";
+    el("circle",{cx:x(i),cy:y(r[2]),r:5.5,fill:col,stroke:"var(--surface-raised)","stroke-width":2},s);
     hov(el("circle",{cx:x(i),cy:y(r[2]),r:14,class:"hit"},s),
       `<b>${r[1]} ${fmt(r[2])} KUB</b><br><span class="k">at</span> ${r[0]}<br><span class="k">levels</span> ${r[3]}`)});
-  el("text",{class:"dlab",x:Math.min(x(bi)+12,W-R-4),y:y(big)+4,fill:sw[bi][1]==="BUY"?"var(--info)":"var(--down)"},s)
+  el("text",{class:"dlab",x:Math.min(x(bi)+12,W-R-4),y:y(big)+4,fill:sw[bi][1]==="BUY"?"var(--up)":"var(--down)"},s)
     .textContent=fmt(big)+" KUB";
 }
 function tDex(){
@@ -560,22 +566,22 @@ function tDex(){
     h+=`<tr class="${q?"":"noquote"}"><td>${i===0?fmt(sz)+" KUB":""}</td>
       <td>${r.dex}${r.is_best?' <span class="best">BEST</span>':""}${r.fee?` <span class="tag">${r.fee}</span>`:""}</td>`
       +(q?`<td class="n">${fmt(r.usdt_out,4)}</td><td class="n">${fmt(r.px_usdt,6)}</td>
-           <td class="n" style="color:${+r.vs_best_pct<-1?"var(--down)":"var(--ink-2)"}">${(+r.vs_best_pct).toFixed(2)}%</td>`
+           <td class="n" style="color:${+r.vs_best_pct<-1?"var(--down)":"var(--text-primary)"}">${(+r.vs_best_pct).toFixed(2)}%</td>`
          :`<td class="n" colspan="3" style="text-align:right">${T("no_quote")}</td>`)
       +`</tr>`})});
   $("#t-dex").innerHTML=h+"</tbody>";
 }
 function treasury(){
-  const cats=[["stake",T("g_stake"),"var(--accent)"],["fund",T("g_fund"),"var(--info)"],["cex_cold",T("g_cold"),"var(--ink-3)"]];
+  const cats=[["stake",T("g_stake"),"var(--up)"],["fund",T("g_fund"),"var(--accent)"],["cex_cold",T("g_cold"),"var(--text-inverse)"]];
   const tot={stake:0,fund:0,cex_cold:0},cnt={stake:0,fund:0,cex_cold:0};
   (D.treasury||[]).forEach(t=>{if(tot[t.cat]==null)return;tot[t.cat]+=t.kub;cnt[t.cat]++});
   const grand=tot.stake+tot.fund+tot.cex_cold;if(!grand)return;
   const W=880,H=96,Tp=24,s=mk("#c-treas",W,H);let X=0;
   cats.forEach(([k,nm,col])=>{const w=tot[k]/grand*(W-4);
-    el("rect",{x:X,y:Tp,width:Math.max(0,w-3),height:38,rx:6,fill:col},s);
+    el("rect",{x:X,y:Tp,width:Math.max(0,w-3),height:38,rx:4,fill:col},s);
     hov(el("rect",{x:X,y:Tp-6,width:Math.max(0,w-3),height:50,class:"hit"},s),
       `<b>${nm}</b><br>${fmt(tot[k])} KUB · ${cnt[k]} · ${(tot[k]/grand*100).toFixed(1)}%`);
-    if(w>170){el("text",{class:"dlab",x:X+11,y:Tp+23,fill:"#fff"},s).textContent=(tot[k]/1e6).toFixed(1)+"M";
+    if(w>170){el("text",{class:"dlab",x:X+11,y:Tp+23,fill:"#000000"},s).textContent=(tot[k]/1e6).toFixed(1)+"M";
       el("text",{class:"tick",x:X,y:Tp-9},s).textContent=nm}
     X+=w});
   el("text",{class:"tick",x:0,y:Tp+54},s).textContent=fmt(grand)+" "+T("t_watched");
@@ -589,7 +595,7 @@ function health(){
   let h=`<thead><tr><th>${T("th_job")}</th><th class="n">${T("th_runs")}</th><th class="n">${T("th_fail")}</th><th>${T("th_state")}</th></tr></thead><tbody>`;
   (D.health||[]).forEach(r=>{const e=exp[r.job],partial=e&&r.runs<e*.9;
     const cls=r.failed?"down":partial?"mid":"up",txt=r.failed?`${r.failed} ${T("st_fail")}`:partial?T("st_ramp"):T("st_ok");
-    h+=`<tr><td><span class="tag">${r.job}</span></td><td class="n">${r.runs}${e?` <span style="color:var(--ink-3)">/ ${e}</span>`:""}</td>
+    h+=`<tr><td><span class="tag">${r.job}</span></td><td class="n">${r.runs}${e?` <span style="color:var(--text-inverse)">/ ${e}</span>`:""}</td>
       <td class="n">${r.failed}</td><td><span class="chip ${cls}">${txt}</span></td></tr>`});
   $("#t-health").innerHTML=h+"</tbody>";
 }
@@ -613,7 +619,6 @@ try{
   else if((navigator.language||"").startsWith("zh"))L="zh";
   const st=localStorage.getItem("kfd-tf");if(st&&TFS.some(t=>t[0]===st))TF=st;
 }catch(e){}
-matchMedia("(prefers-color-scheme: dark)").addEventListener("change",mountTV);
 
 render();mountTV();
 fetch("/api/data").then(r=>r.json()).then(j=>{
