@@ -62,7 +62,6 @@ body{color:var(--text-primary);font-family:var(--sans);font-size:14px;line-heigh
 .ch{display:flex;flex-wrap:wrap;align-items:center;gap:var(--s5) var(--s8);margin-bottom:var(--s5)}
 .ch h2{margin:0;font-size:16px;line-height:22px;font-weight:600;color:var(--text-strong)}
 .ch .when{font-size:12px;color:var(--text-muted);margin-left:auto}
-.lede{margin:0 0 var(--s8);font-size:13px;line-height:19px;color:var(--text-primary);max-width:70ch}
 .legend{display:flex;flex-wrap:wrap;gap:var(--s4) var(--s8);margin:0 0 12px;padding:0;list-style:none;
   font-size:12px;color:var(--text-primary)}
 .legend li{display:flex;align-items:center;gap:var(--s5)}
@@ -98,6 +97,18 @@ tr.other td:first-child{color:var(--text-muted)}
   background:#1e222d;color:var(--text-primary)}
 .note{font-size:12.5px;line-height:18px;color:var(--text-muted);margin:var(--s8) 0 0}
 .note b{font-weight:600;color:var(--text-primary)}
+.i{width:17px;height:17px;border-radius:50%;border:1px solid var(--text-muted);background:transparent;
+  color:var(--text-muted);font:600 10px/1 var(--sans);cursor:pointer;padding:0;flex:none;
+  display:inline-flex;align-items:center;justify-content:center;
+  transition:color var(--dur),border-color var(--dur)}
+.i::before{content:"i"}
+.i:hover,.i[aria-expanded="true"]{color:var(--text-strong);border-color:var(--text-strong)}
+#pop{position:fixed;z-index:40;display:none;max-width:min(400px,calc(100vw - 32px));
+  background:#1e222d;border:1px solid var(--line);border-radius:var(--r-md);padding:12px 14px;
+  font-size:13px;line-height:20px;color:var(--text-primary);box-shadow:rgba(0,0,0,.6) 0 6px 18px 0}
+#pop[data-open="true"]{display:block}
+#pop p{margin:0}
+#pop p+p{margin-top:10px;color:var(--text-muted)}
 #tip{position:fixed;z-index:30;pointer-events:none;opacity:0;transition:opacity 150ms;
   background:#1e222d;border:1px solid var(--line);border-radius:var(--r-sm);
   padding:var(--s7) var(--s8);font-family:var(--mono);font-size:11.5px;line-height:16px;
@@ -129,23 +140,19 @@ footer p{margin:0 0 var(--s7);max-width:76ch}
 
   <section class="card">
     <div class="ch">
-      <h2 data-i18n="h_chart"></h2>
+      <h2 data-i18n="h_chart"></h2><button class="i" type="button" aria-expanded="false" data-info="n_tv"></button>
       <div class="seg" id="tfseg" role="group" aria-label="Timeframe"></div>
     </div>
     <div id="tvwrap"><div id="tv-chart"></div></div>
-    <p class="note" data-i18n="n_tv"></p>
   </section>
 
   <section class="card">
-    <div class="ch"><h2 data-i18n="h_tech"></h2><span class="when" id="techwhen"></span></div>
-    <p class="lede" data-i18n="l_tech"></p>
+    <div class="ch"><h2 data-i18n="h_tech"></h2><button class="i" type="button" aria-expanded="false" data-info="l_tech n_tech"></button><span class="when" id="techwhen"></span></div>
     <div class="tw"><table id="t-tech"></table></div>
-    <p class="note" id="technote"></p>
   </section>
 
   <section class="card">
-    <div class="ch"><h2 data-i18n="h_cost"></h2><span class="when" data-i18n="w_now"></span></div>
-    <p class="lede" data-i18n="l_cost"></p>
+    <div class="ch"><h2 data-i18n="h_cost"></h2><button class="i" type="button" aria-expanded="false" data-info="l_cost"></button><span class="when" data-i18n="w_now"></span></div>
     <ul class="legend">
       <li><span class="sw" style="background:var(--down)"></span><span data-i18n="lg_sell"></span></li>
       <li><span class="sw" style="background:var(--up)"></span><span data-i18n="lg_buy"></span></li>
@@ -155,15 +162,12 @@ footer p{margin:0 0 var(--s7);max-width:76ch}
   </section>
 
   <section class="card">
-    <div class="ch"><h2 data-i18n="h_dex"></h2><span class="when">KKUB → KUSDT</span></div>
-    <p class="lede" data-i18n="l_dex"></p>
+    <div class="ch"><h2 data-i18n="h_dex"></h2><button class="i" type="button" aria-expanded="false" data-info="l_dex n_dex"></button><span class="when">KKUB → KUSDT</span></div>
     <div class="tw"><table id="t-dex"></table></div>
-    <p class="note" data-i18n="n_dex"></p>
   </section>
 
   <section class="card">
-    <div class="ch"><h2 data-i18n="h_slipt"></h2><span class="when" data-i18n="w_hourly"></span></div>
-    <p class="lede" data-i18n="l_slipt"></p>
+    <div class="ch"><h2 data-i18n="h_slipt"></h2><button class="i" type="button" aria-expanded="false" data-info="l_slipt"></button><span class="when" data-i18n="w_hourly"></span></div>
     <ul class="legend">
       <li><span class="sw" style="background:var(--down)"></span><span data-i18n="lg_sell10"></span></li>
       <li><span class="sw" style="background:var(--up)"></span><span data-i18n="lg_buy10"></span></li>
@@ -172,8 +176,7 @@ footer p{margin:0 0 var(--s7);max-width:76ch}
   </section>
 
   <section class="card">
-    <div class="ch"><h2 data-i18n="h_taker"></h2><span class="when" data-i18n="w_exec"></span></div>
-    <p class="lede" data-i18n="l_taker"></p>
+    <div class="ch"><h2 data-i18n="h_taker"></h2><button class="i" type="button" aria-expanded="false" data-info="l_taker"></button><span class="when" data-i18n="w_exec"></span></div>
     <ul class="legend">
       <li><span class="sw dot" style="background:var(--up)"></span><span data-i18n="lg_bcross"></span></li>
       <li><span class="sw dot" style="background:var(--down)"></span><span data-i18n="lg_scross"></span></li>
@@ -182,23 +185,19 @@ footer p{margin:0 0 var(--s7);max-width:76ch}
   </section>
 
   <section class="card">
-    <div class="ch"><h2 data-i18n="h_sweep"></h2><span class="when" data-i18n="w_sweep"></span></div>
-    <p class="lede" data-i18n="l_sweep"></p>
+    <div class="ch"><h2 data-i18n="h_sweep"></h2><button class="i" type="button" aria-expanded="false" data-info="l_sweep"></button><span class="when" data-i18n="w_sweep"></span></div>
     <div id="c-sweep"></div>
   </section>
 
   <section class="card">
-    <div class="ch"><h2 data-i18n="h_treas"></h2><span class="when" id="treaswhen"></span></div>
-    <p class="lede" data-i18n="l_treas"></p>
+    <div class="ch"><h2 data-i18n="h_treas"></h2><button class="i" type="button" aria-expanded="false" data-info="l_treas n_treas"></button><span class="when" id="treaswhen"></span></div>
     <ul class="legend" id="treaslegend"></ul>
     <div id="c-treas"></div>
     <div class="tw" style="margin-top:14px"><table id="t-treas"></table></div>
-    <p class="note" data-i18n="n_treas"></p>
   </section>
 
   <section class="card">
-    <div class="ch"><h2 data-i18n="h_health"></h2><span class="when" data-i18n="w_log"></span></div>
-    <p class="lede" data-i18n="l_health"></p>
+    <div class="ch"><h2 data-i18n="h_health"></h2><button class="i" type="button" aria-expanded="false" data-info="l_health"></button><span class="when" data-i18n="w_log"></span></div>
     <div class="tw"><table id="t-health"></table></div>
   </section>
 
@@ -208,152 +207,153 @@ footer p{margin:0 0 var(--s7);max-width:76ch}
     <p style="margin-top:10px" data-i18n="f3"></p>
   </footer>
 </div>
+<div id="pop" role="note"></div>
 <div id="tip" role="status" aria-live="polite"></div>
 
 <script src="https://s3.tradingview.com/tv.js"></script>
 <script>
 const I18N={
-en:{title:"KUB Flow Desk",
+en:{info:"More information",title:"KUB Flow Desk",
  src:"Bitkub public API v3 every 5 min · kubscan v2 (41 wallets) every 5 min · KUB Chain RPC (5 DEXes) every 15 min · price chart by TradingView",
  k_offer:"Lowest offer",k_vol:"24 h volume",k_sell:"Sell 10k KUB",k_nf:"Left the exchange",k_taker:"Buyers crossing",
  k_spread:"spread",k_lv:"levels",k_trades:"trades",k_bid:"bid",k_last:"last",k_ticker:"Bitkub ticker",
  h_chart:"KUB / THB",
- n_tv:"Chart by TradingView on Bitkub's own KUBTHB feed — it carries years of history and its own drawing tools, which our collection cannot match. Everything below it is measured from our own tape.",
+ n_tv:"The chart is provided by TradingView from Bitkub's own KUBTHB feed, which carries years of history and a complete set of drawing tools, beyond what the data KUB Flow collects can offer. Every panel below the chart is measured by KUB Flow from its own trade record.",
  h_tech:"Indicator readings",
- l_tech:"Computed here from the bars we collect, not read off the chart above, so these numbers reconcile with the slippage, sweep and taker panels further down. Each row shows where the value sits against its conventional threshold and how many bars it had.",
- n_tech:"Values and positions only — no single buy or sell score. RSI reading 72 and sitting above the conventional 70 line is a measurement; collapsing a dozen indicators into one number is a different kind of claim, and this table does not make it.",
+ l_tech:"These values are calculated by KUB Flow from the bars it collects, and are not read from the chart above, so they reconcile with the execution-cost, sweep and taker panels below. Each row states where the value sits against its conventional threshold, and how many bars were used.",
+ n_tech:"Values and positions only; no combined buy or sell score. Stating that RSI reads 72 and sits above the conventional 70 threshold is a measurement. Reducing a dozen indicators to a single figure is a claim of a different kind, and this table does not make it.",
  tf_bars:"{bars} bars collected at {tf}",
  th_ind:"Indicator",th_val:"Value",th_pos:"Position",th_bars:"Bars",
  p_over:"above {n}",p_under:"below {n}",p_between:"between {a} and {b}",p_na:"not enough bars",
  p_above_sig:"above signal",p_below_sig:"below signal",p_px_above:"price above",p_px_below:"price below",
  p_in_band:"inside bands",p_above_band:"above upper band",p_below_band:"below lower band",p_value:"reading",
- h_cost:"What it actually costs to trade",w_now:"order book, now",
- l_cost:"Bitkub shows one last price. This walks the live book level by level and answers the question a size actually has: if I send this order right now, what average price do I get?",
- lg_sell:"Sell into bids",lg_buy:"Buy into asks",
+ h_cost:"Actual cost of trading",w_now:"order book, current",
+ l_cost:"Bitkub publishes a single last price. KUB Flow walks the live order book level by level to answer the question an actual order size raises: at what average price would this order fill right now?",
+ lg_sell:"Sell into the bid side",lg_buy:"Buy into the ask side",
  h_dex:"On-chain price across five DEXes",
- l_dex:"Direct eth_call to each router and quoter, no third-party API. Shows which venue returns the most for a given size.",
- n_dex:"Each venue is quoted as a single pool. Junoswap can split one trade across several pools, which this does not yet model, so its row is a floor rather than the best it can do. Kublerx returns nothing because it has no KKUB/KUSDT pool — all four fee tiers revert, so the blank is a finding, not a gap.",
+ l_dex:"An eth_call is issued directly to each venue's router and quoter, without any third-party API, to compare which venue returns the most for the same size.",
+ n_dex:"Each venue is quoted as a single pool. Junoswap can split one order across several pools, which KUB Flow does not yet model, so its figure is a floor rather than the best price available. Kublerx returns no quote because it holds no KKUB/KUSDT pool; all four fee tiers revert. That blank is a result, not missing data.",
  no_quote:"no pool",
- h_slipt:"How the cost has moved",w_hourly:"hourly",
- l_slipt:"Cost of a 10,000 KUB order, hour by hour. A rising line means the book thinned and the same order now costs more.",
+ h_slipt:"Movement in execution cost",w_hourly:"hourly",
+ l_slipt:"The cost of a 10,000 KUB order, hour by hour. A rising line indicates a thinner order book, in which the same order costs more.",
  lg_sell10:"Sell 10k",lg_buy10:"Buy 10k",
- h_taker:"Who paid the spread",w_exec:"executed trades",
- l_taker:"Every bar is one hour of completed trades, split by which side crossed. Above the line, buyers were in a hurry; below it, sellers were.",
+ h_taker:"Which side crossed the spread",w_exec:"executed trades",
+ l_taker:"Each bar represents one hour of completed trades, divided by the side that crossed the spread. Above the centre line, buyers were the aggressors; below it, sellers were.",
  lg_bcross:"Buyers crossing",lg_scross:"Sellers crossing",
- h_sweep:"Orders that ate through the book",w_sweep:"30 h · 3+ price levels",
- l_sweep:"A single order clearing three or more price levels at once. Size is on a log scale so small ones stay visible beside the big one.",
- h_treas:"Where the supply sits",
- l_treas:"The whole coin supply, not just the wallets we watch. Balances, not transfers: the stake vault is a contract whose KUB moves as internal transactions the transaction list never shows, so the balance is the only honest way to watch it.",
- n_treas:"The burn address is left out. kubscan credits it with more KUB than exists — an accounting artefact of how gas is booked, not a holder. Anything not identified sits in the last segment; it is not claimed to be locked.",
+ h_sweep:"Orders clearing multiple price levels",w_sweep:"30 h · 3+ price levels",
+ l_sweep:"A single order clearing three or more price levels at once. The vertical axis is logarithmic, so that smaller orders remain visible alongside larger ones.",
+ h_treas:"Distribution of the coin supply",
+ l_treas:"Measured against the whole coin supply, not only the wallets under observation, and from balances rather than transfers: the stake vault is a contract whose KUB moves as internal transactions that never appear in the transaction list, so the balance is the only reliable measure.",
+ n_treas:"The burn address is excluded. kubscan credits it with more KUB than exists, which follows from how gas is accounted for rather than from any actual holder. Whatever cannot be attributed appears in the final segment, and is not represented as locked.",
  g_stake:"Stake vault",g_fund:"Ecosystem & development funds",g_cold:"Bitkub cold wallets",
- g_kkub:"Wrapped as KKUB",g_other:"Other large holders",g_rest:"Everyone else",
- t_supply:"{watched} of {total} KUB in the watched wallets ({pct}%)",
- h_health:"Is this data trustworthy yet",w_log:"collector log",
- l_health:"Every round writes a row whether it succeeds or fails, so gaps stay visible instead of hidden.",
- f1:"Numbers on this page are measured from the order book, the tape and the chain. Where a number is someone else's, the panel says so.",
- f2:"Depth is captured 60 levels deep; sizes beyond that cannot be priced from it. Windows longer than what has been collected are labelled, never back-filled.",
+ g_kkub:"Wrapped as KKUB",g_other:"Other large holders",g_rest:"Other holders",
+ t_supply:"{watched} of {total} KUB held in the wallets under observation ({pct}%)",
+ h_health:"Collection integrity",w_log:"collector log",
+ l_health:"Every collection round is recorded, whether it succeeds or fails, so gaps remain visible rather than hidden.",
+ f1:"The figures on this page are measured by KUB Flow from the order book, the trade record and the chain. Where a figure originates elsewhere, the panel states so.",
+ f2:"The order book is captured 60 levels deep; sizes beyond that depth cannot be priced from it. Windows longer than the data actually collected are labelled as such, and are never back-filled.",
  f3:"Not investment advice.",
  th_dex:"DEX",th_out:"KUSDT out",th_px:"Per KUB",th_vs:"vs best",th_size:"Size",
  th_wallet:"Wallet",th_group:"Group",th_bal:"Balance, KUB",th_share:"Share",
  th_job:"Collection job",th_runs:"Rounds, 24 h",th_fail:"Failed",th_state:"State",
  st_ok:"healthy",st_ramp:"ramping up",st_fail:"failed",
  unlabelled:"unlabelled address",
- snap:"Showing the built-in snapshot — the live feed is unavailable.",
- apierr:"Live feed error: ",loading:"Loading…"},
-th:{title:"KUB Flow Desk",
+ snap:"Showing the built-in snapshot, as the live feed is unavailable.",
+ apierr:"Unable to load live data: ",loading:"Loading…"},
+th:{info:"รายละเอียด",title:"KUB Flow Desk",
  src:"Bitkub public API v3 ทุก 5 นาที · kubscan v2 (41 กระเป๋า) ทุก 5 นาที · KUB Chain RPC (5 DEX) ทุก 15 นาที · กราฟราคาโดย TradingView",
- k_offer:"ราคาเสนอขายต่ำสุด",k_vol:"วอลุ่ม 24 ชม.",k_sell:"ขาย 10k KUB",k_nf:"ไหลออกจากตลาด",k_taker:"ฝั่งซื้อไล่ราคา",
- k_spread:"สเปรด",k_lv:"ระดับบุ๊ก",k_trades:"รายการ",k_bid:"bid",k_last:"ล่าสุด",k_ticker:"ticker ของ Bitkub",
+ k_offer:"ราคาเสนอขายต่ำสุด",k_vol:"วอลุ่ม 24 ชม.",k_sell:"ขาย 10k KUB",k_nf:"ไหลออกจากศูนย์ซื้อขาย",k_taker:"ฝั่งซื้อข้ามสเปรด",
+ k_spread:"สเปรด",k_lv:"ระดับราคา",k_trades:"รายการ",k_bid:"bid",k_last:"ล่าสุด",k_ticker:"ticker ของ Bitkub",
  h_chart:"KUB / THB",
- n_tv:"กราฟจาก TradingView ใช้ฟีด KUBTHB ของ Bitkub เอง — มีประวัติย้อนหลังเป็นปีและเครื่องมือวาดครบ ซึ่งข้อมูลที่เราเก็บสู้ไม่ได้ ส่วนทุกอย่างใต้กราฟวัดจาก tape ที่เราเก็บเอง",
+ n_tv:"กราฟนี้จัดทำโดย TradingView จากฟีด KUBTHB ของ Bitkub ซึ่งมีข้อมูลย้อนหลังหลายปีและมีเครื่องมือวิเคราะห์ครบถ้วน เกินกว่าชุดข้อมูลที่ KUB Flow จัดเก็บเองจะให้ได้ ส่วนทุกแผงที่อยู่ใต้กราฟ KUB Flow วัดจากข้อมูลการซื้อขายที่จัดเก็บเอง",
  h_tech:"ค่าอินดิเคเตอร์",
- l_tech:"คำนวณที่นี่จากแท่งที่เราเก็บเอง ไม่ได้อ่านมาจากกราฟด้านบน ตัวเลขจึงตรงกับแผง slippage, sweep และ taker ด้านล่าง แต่ละแถวบอกว่าค่าอยู่ตรงไหนเทียบเส้นมาตรฐาน และใช้กี่แท่ง",
- n_tech:"รายงานค่ากับตำแหน่งเท่านั้น ไม่มีคะแนนรวมว่าซื้อหรือขาย การบอกว่า RSI อ่านได้ 72 และอยู่เหนือเส้น 70 คือการรายงานค่า ส่วนการยุบอินดิเคเตอร์สิบกว่าตัวให้เหลือตัวเลขเดียวเป็นการอ้างอีกแบบ ซึ่งตารางนี้ไม่ทำ",
- tf_bars:"เก็บได้ {bars} แท่งที่ {tf}",
- th_ind:"อินดิเคเตอร์",th_val:"ค่า",th_pos:"ตำแหน่ง",th_bars:"แท่ง",
- p_over:"เหนือ {n}",p_under:"ใต้ {n}",p_between:"อยู่ระหว่าง {a} ถึง {b}",p_na:"แท่งไม่พอ",
+ l_tech:"ค่าทั้งหมด KUB Flow คำนวณจากแท่งราคาที่จัดเก็บเอง มิได้อ่านค่าจากกราฟด้านบน ตัวเลขจึงสอดคล้องกับแผงต้นทุนการซื้อขาย แผงคำสั่งขนาดใหญ่ และแผงฝั่งที่ข้ามสเปรดด้านล่าง แต่ละรายการแสดงตำแหน่งของค่าเทียบกับเกณฑ์มาตรฐาน พร้อมจำนวนแท่งราคาที่ใช้คำนวณ",
+ n_tech:"รายงานเฉพาะค่าและตำแหน่ง ไม่มีคะแนนรวมสรุปว่าควรซื้อหรือขาย การระบุว่า RSI มีค่า 72 และอยู่เหนือเกณฑ์ 70 คือการรายงานผลการวัด ส่วนการสรุปอินดิเคเตอร์หลายรายการให้เหลือค่าเดียวเป็นการอ้างอีกลักษณะหนึ่ง ซึ่งตารางนี้มิได้จัดทำ",
+ tf_bars:"จัดเก็บได้ {bars} แท่งราคาที่ {tf}",
+ th_ind:"อินดิเคเตอร์",th_val:"ค่า",th_pos:"ตำแหน่ง",th_bars:"แท่งราคา",
+ p_over:"เหนือ {n}",p_under:"ใต้ {n}",p_between:"อยู่ระหว่าง {a} ถึง {b}",p_na:"แท่งราคาไม่เพียงพอ",
  p_above_sig:"เหนือเส้น signal",p_below_sig:"ใต้เส้น signal",p_px_above:"ราคาอยู่เหนือ",p_px_below:"ราคาอยู่ใต้",
  p_in_band:"อยู่ในกรอบ",p_above_band:"เหนือกรอบบน",p_below_band:"ใต้กรอบล่าง",p_value:"ค่าที่อ่านได้",
- h_cost:"ต้นทุนจริงของการเทรด",w_now:"ออเดอร์บุ๊ก ณ ตอนนี้",
- l_cost:"Bitkub โชว์ราคาเดียว หน้านี้เดินบุ๊กทีละระดับแล้วตอบคำถามที่ไซซ์จริงมี — ถ้าส่งออเดอร์ตอนนี้ จะได้ราคาเฉลี่ยเท่าไหร่",
- lg_sell:"ขายชนฝั่ง bid",lg_buy:"ซื้อชนฝั่ง ask",
+ h_cost:"ต้นทุนที่แท้จริงของการซื้อขาย",w_now:"สมุดคำสั่ง ณ ปัจจุบัน",
+ l_cost:"Bitkub เผยแพร่ราคาล่าสุดเพียงค่าเดียว KUB Flow ไล่อ่านสมุดคำสั่งซื้อขายทีละระดับราคา เพื่อตอบคำถามที่เกิดขึ้นจริงเมื่อส่งคำสั่งขนาดหนึ่ง ๆ ว่าจะได้ราคาเฉลี่ยเท่าใด",
+ lg_sell:"ขายเข้าฝั่งเสนอซื้อ",lg_buy:"ซื้อเข้าฝั่งเสนอขาย",
  h_dex:"ราคาบนเชน เทียบ 5 DEX",
- l_dex:"ยิง eth_call ตรงไปที่ router และ quoter ของแต่ละ DEX ไม่ผ่าน API ใคร เทียบว่าไซซ์เท่านี้ที่ไหนได้ของมากที่สุด",
- n_dex:"แต่ละที่ quote แบบ pool เดียว · Junoswap แตกออเดอร์ไปหลาย pool ได้ ซึ่งตรงนี้ยังไม่ได้จำลอง แถวของ Junoswap จึงเป็นค่าต่ำสุด ไม่ใช่ราคาที่ดีที่สุดที่ทำได้จริง · Kublerx ไม่มี quote เพราะไม่มี pool KKUB/KUSDT ตรวจครบทั้ง 4 fee tier แล้ว revert ทุกตัว ช่องว่างนี้จึงเป็นข้อค้นพบ ไม่ใช่ข้อมูลขาด",
+ l_dex:"เรียก eth_call ไปยัง router และ quoter ของแต่ละ DEX โดยตรง ไม่ผ่าน API ของผู้ให้บริการรายใด เพื่อเปรียบเทียบว่าปริมาณเท่ากันนี้ แหล่งใดให้ผลตอบแทนสูงสุด",
+ n_dex:"แต่ละแหล่งคิดราคาแบบ pool เดียว Junoswap สามารถแบ่งคำสั่งไปยังหลาย pool ได้ ซึ่ง KUB Flow ยังมิได้จำลองส่วนนี้ ค่าที่แสดงจึงเป็นค่าต่ำสุด มิใช่ราคาที่ดีที่สุดที่ทำได้จริง ส่วน Kublerx ไม่มีค่าเสนอราคา เนื่องจากไม่มี pool KKUB/KUSDT ตรวจสอบครบทั้งสี่ระดับค่าธรรมเนียมแล้วพบว่า revert ทุกกรณี ช่องว่างนี้จึงเป็นผลการตรวจสอบ มิใช่ข้อมูลขาดหาย",
  no_quote:"ไม่มี pool",
- h_slipt:"ต้นทุนเปลี่ยนไปยังไง",w_hourly:"รายชั่วโมง",
- l_slipt:"ต้นทุนของออเดอร์ 10,000 KUB ในแต่ละชั่วโมง ถ้าเส้นขึ้น แปลว่าบุ๊กบางลง ออเดอร์เดิมแพงขึ้น",
+ h_slipt:"การเปลี่ยนแปลงของต้นทุน",w_hourly:"รายชั่วโมง",
+ l_slipt:"ต้นทุนของคำสั่งขนาด 10,000 KUB ในแต่ละชั่วโมง เส้นที่สูงขึ้นหมายถึงสมุดคำสั่งบางลง และคำสั่งขนาดเดิมมีต้นทุนสูงขึ้น",
  lg_sell10:"ขาย 10k",lg_buy10:"ซื้อ 10k",
- h_taker:"ใครเป็นคนจ่าย spread",w_exec:"รายการที่แมตช์แล้ว",
- l_taker:"แต่ละแท่งคือหนึ่งชั่วโมงของรายการที่ปิดแล้ว แยกตามฝั่งที่ข้าม spread เหนือเส้นคือฝั่งซื้อรีบกว่า ใต้เส้นคือฝั่งขาย",
- lg_bcross:"ฝั่งซื้อไล่",lg_scross:"ฝั่งขายไล่",
- h_sweep:"ออเดอร์ที่กวาดบุ๊ก",w_sweep:"30 ชม. · ตั้งแต่ 3 ระดับขึ้นไป",
- l_sweep:"ออเดอร์เดียวที่กินราคาตั้งแต่ 3 ระดับขึ้นไปในทีเดียว แกนตั้งเป็น log เพื่อให้ก้อนเล็กยังเห็นได้ข้างก้อนใหญ่",
- h_treas:"เหรียญทั้งหมดอยู่ที่ไหน",
- l_treas:"ดูจากซัพพลายทั้งเชน ไม่ใช่แค่กระเป๋าที่เราเฝ้า · ดูที่ยอดคงเหลือ ไม่ใช่ตัว transfer เพราะ stake vault เป็น contract เงินวิ่งเป็น internal transaction ที่รายการ tx ไม่แสดง ยอดคงเหลือจึงเป็นทางเดียวที่เชื่อได้",
- n_treas:"ไม่นับ burn address เพราะ kubscan ให้ยอดมากกว่าซัพพลายทั้งหมด เป็นผลจากวิธีลงบัญชี gas ไม่ใช่ผู้ถือจริง · ส่วนที่ระบุไม่ได้อยู่ในแท่งสุดท้าย และไม่ได้แปลว่าถูกล็อก",
+ h_taker:"ฝั่งที่เป็นผู้ข้ามสเปรด",w_exec:"รายการที่จับคู่แล้ว",
+ l_taker:"แต่ละแท่งคือรายการซื้อขายที่จับคู่สำเร็จภายในหนึ่งชั่วโมง แยกตามฝั่งที่ข้ามสเปรด เหนือเส้นกลางหมายถึงฝั่งซื้อเป็นผู้เร่ง ใต้เส้นกลางหมายถึงฝั่งขาย",
+ lg_bcross:"ฝั่งซื้อข้ามสเปรด",lg_scross:"ฝั่งขายข้ามสเปรด",
+ h_sweep:"คำสั่งที่กินหลายระดับราคา",w_sweep:"30 ชม. · ตั้งแต่ 3 ระดับราคาขึ้นไป",
+ l_sweep:"คำสั่งเดียวที่กินระดับราคาตั้งแต่สามระดับขึ้นไปในครั้งเดียว แกนตั้งใช้มาตราลอการิทึม เพื่อให้รายการขนาดเล็กยังคงมองเห็นได้เมื่ออยู่ข้างรายการขนาดใหญ่",
+ h_treas:"การกระจายตัวของเหรียญทั้งหมด",
+ l_treas:"พิจารณาจากปริมาณเหรียญทั้งเครือข่าย มิใช่เฉพาะกระเป๋าที่ติดตาม และใช้ยอดคงเหลือแทนรายการโอน เนื่องจาก stake vault เป็นสัญญาอัจฉริยะที่เหรียญเคลื่อนไหวในรูป internal transaction ซึ่งไม่ปรากฏในรายการธุรกรรม ยอดคงเหลือจึงเป็นวิธีเดียวที่เชื่อถือได้",
+ n_treas:"ไม่นับรวม burn address เนื่องจาก kubscan บันทึกยอดไว้สูงกว่าปริมาณเหรียญทั้งหมด อันเป็นผลจากวิธีบันทึกค่าธรรมเนียม มิใช่ผู้ถือครองจริง ส่วนที่ระบุแหล่งไม่ได้จะรวมอยู่ในแถบสุดท้าย และมิได้หมายความว่าถูกล็อกไว้",
  g_stake:"Stake vault",g_fund:"กองทุน",g_cold:"Cold wallet ของ Bitkub",
- g_kkub:"ห่อเป็น KKUB",g_other:"ผู้ถือรายใหญ่อื่น",g_rest:"กระจายอยู่ที่อื่น",
- t_supply:"กระเป๋าที่เฝ้าถือ {watched} จาก {total} KUB ({pct}%)",
- h_health:"ข้อมูลนี้เชื่อได้แค่ไหน",w_log:"log การเก็บข้อมูล",
- l_health:"ทุกรอบเขียน log ไว้ทั้งที่สำเร็จและล้มเหลว ช่องว่างจึงมองเห็น ไม่ถูกซ่อน",
- f1:"ตัวเลขบนหน้านี้วัดจากออเดอร์บุ๊ก tape และเชน ถ้าตัวเลขไหนเป็นของคนอื่น แผงนั้นจะระบุไว้",
- f2:"บุ๊กเก็บ 60 ระดับ ไซซ์ที่ใหญ่กว่านั้นคำนวณต้นทุนไม่ได้ · window ที่ยาวกว่าข้อมูลที่เก็บมาจริงจะถูกระบุไว้ ไม่เติมตัวเลขเอง",
- f3:"ไม่ใช่คำแนะนำลงทุน",
+ g_kkub:"ห่อเป็น KKUB",g_other:"ผู้ถือรายใหญ่อื่น",g_rest:"ผู้ถือครองรายอื่น",
+ t_supply:"กระเป๋าที่ติดตามถือครอง {watched} จาก {total} KUB ({pct}%)",
+ h_health:"ความครบถ้วนของการจัดเก็บข้อมูล",w_log:"บันทึกการจัดเก็บ",
+ l_health:"ทุกรอบการจัดเก็บจะบันทึกผลไว้ ทั้งกรณีสำเร็จและล้มเหลว ช่วงข้อมูลที่ขาดหายจึงปรากฏให้เห็น ไม่ถูกปกปิด",
+ f1:"ตัวเลขบนหน้านี้ KUB Flow วัดจากสมุดคำสั่งซื้อขาย รายการซื้อขาย และข้อมูลบนเครือข่าย หากตัวเลขใดมาจากแหล่งอื่น จะระบุไว้ในแผงนั้น",
+ f2:"สมุดคำสั่งจัดเก็บลึก 60 ระดับราคา ปริมาณที่เกินกว่านั้นไม่สามารถคำนวณต้นทุนได้ ช่วงเวลาที่ยาวกว่าข้อมูลที่จัดเก็บจริงจะระบุกำกับไว้ และไม่มีการเติมตัวเลขย้อนหลัง",
+ f3:"ไม่ใช่คำแนะนำการลงทุน",
  th_dex:"DEX",th_out:"ได้ KUSDT",th_px:"ต่อ 1 KUB",th_vs:"เทียบที่ดีที่สุด",th_size:"ไซซ์",
  th_wallet:"กระเป๋า",th_group:"กลุ่ม",th_bal:"ยอดคงเหลือ KUB",th_share:"สัดส่วน",
- th_job:"งานเก็บข้อมูล",th_runs:"รอบ 24 ชม.",th_fail:"ล้มเหลว",th_state:"สถานะ",
- st_ok:"ปกติ",st_ramp:"เพิ่งเริ่ม",st_fail:"ล้มเหลว",
+ th_job:"งานจัดเก็บ",th_runs:"รอบ 24 ชม.",th_fail:"ล้มเหลว",th_state:"สถานะ",
+ st_ok:"ปกติ",st_ramp:"อยู่ระหว่างเริ่มต้น",st_fail:"ล้มเหลว",
  unlabelled:"ไม่มีป้ายชื่อ",
- snap:"กำลังแสดงข้อมูลสำรองที่ฝังมากับหน้า — ต่อข้อมูลสดไม่ได้",
- apierr:"ต่อข้อมูลสดไม่ได้: ",loading:"กำลังโหลด…"},
-zh:{title:"KUB 流动性看板",
+ snap:"กำลังแสดงข้อมูลสำรองที่ฝังมากับหน้าเว็บ เนื่องจากไม่สามารถเชื่อมต่อข้อมูลสดได้",
+ apierr:"ไม่สามารถเชื่อมต่อข้อมูลสดได้: ",loading:"กำลังโหลด…"},
+zh:{info:"说明",title:"KUB 流动性看板",
  src:"Bitkub 公开 API v3 每 5 分钟 · kubscan v2（41 个钱包）每 5 分钟 · KUB 链 RPC（5 个 DEX）每 15 分钟 · 价格图表由 TradingView 提供",
  k_offer:"最低卖价",k_vol:"24 小时成交量",k_sell:"卖出 1 万 KUB",k_nf:"流出交易所",k_taker:"买方主动成交",
  k_spread:"价差",k_lv:"档位",k_trades:"笔",k_bid:"买一",k_last:"最新",k_ticker:"Bitkub 行情接口",
  h_chart:"KUB / 泰铢",
- n_tv:"图表由 TradingView 提供，使用 Bitkub 自有的 KUBTHB 数据源 —— 它拥有数年历史与完整绘图工具，这是我们的采集无法比拟的。其下方的所有内容均来自我们自己采集的成交记录。",
+ n_tv:"图表由 TradingView 提供，采用 Bitkub 自有的 KUBTHB 数据源，具备数年历史数据与完整绘图工具，超出 KUB Flow 自行采集的数据所能提供的范围。图表以下各面板均由 KUB Flow 基于自采成交记录测算。",
  h_tech:"指标读数",
- l_tech:"由本页基于自采K线计算，而非读取上方图表，因此这些数字与下方的滑点、扫单与主动成交面板互相对得上。每行标明该值相对常规阈值的位置，以及参与计算的K线数量。",
- n_tech:"只报告数值与位置，不给出买卖综合评分。指出 RSI 为 72、位于常规的 70 线之上，是在陈述测量结果；把十几个指标压缩成一个数字则是另一种性质的断言，本表不做。",
+ l_tech:"各项数值由 KUB Flow 基于自采K线计算，并非读取上方图表，因此可与下方的执行成本、扫单与主动成交面板相互印证。每一行标明该值相对常规阈值的位置，以及参与计算的K线数量。",
+ n_tech:"仅报告数值与位置，不提供买卖综合评分。指出 RSI 为 72 且高于常规的 70 阈值属于测量结果；将十余项指标归并为单一数字则属于另一种性质的判断，本表不予提供。",
  tf_bars:"在 {tf} 周期已采集 {bars} 根K线",
  th_ind:"指标",th_val:"数值",th_pos:"位置",th_bars:"K线数",
  p_over:"高于 {n}",p_under:"低于 {n}",p_between:"介于 {a} 与 {b} 之间",p_na:"K线不足",
  p_above_sig:"位于信号线上方",p_below_sig:"位于信号线下方",p_px_above:"价格在其上方",p_px_below:"价格在其下方",
  p_in_band:"位于通道内",p_above_band:"高于上轨",p_below_band:"低于下轨",p_value:"读数",
- h_cost:"交易的真实成本",w_now:"当前订单簿",
- l_cost:"Bitkub 只显示一个最新价。本页逐档扫描订单簿，回答真正重要的问题：现在下这个数量的单，成交均价是多少？",
+ h_cost:"交易的实际成本",w_now:"当前订单簿",
+ l_cost:"Bitkub 仅公布单一最新价。KUB Flow 逐档遍历实时订单簿，以回答实际下单规模所引出的问题：此刻提交该笔订单，成交均价为多少。",
  lg_sell:"卖向买盘",lg_buy:"买向卖盘",
  h_dex:"链上价格：5 个 DEX 对比",
- l_dex:"直接对各 DEX 的 router 与 quoter 发起 eth_call，不经任何第三方 API，比较同一数量在哪家换得最多。",
- n_dex:"每个场所均按单一流动性池报价。Junoswap 可将一笔交易拆分到多个池，本页尚未模拟，因此其数值是下限而非其最优报价。Kublerx 没有报价，因为它没有 KKUB/KUSDT 池 —— 四个费率档全部 revert，所以这个空白是结论，不是数据缺失。",
+ l_dex:"直接向各场所的 router 与 quoter 发起 eth_call，不经任何第三方 API，以比较同等数量下何处回报最高。",
+ n_dex:"各场所均按单一流动性池计价。Junoswap 可将一笔订单拆分至多个池，KUB Flow 尚未对此建模，故其数值为下限，而非实际可得的最优价格。Kublerx 无报价，因其不存在 KKUB/KUSDT 池，四个费率档均 revert。该空白为核查结果，而非数据缺失。",
  no_quote:"无流动性池",
- h_slipt:"成本如何变化",w_hourly:"每小时",
- l_slipt:"每小时 10,000 KUB 订单的成本。曲线上升意味着订单簿变薄，同样的单子变贵了。",
+ h_slipt:"执行成本的变化",w_hourly:"每小时",
+ l_slipt:"10,000 KUB 订单逐小时的成本。曲线上行表示订单簿变薄，同等订单的成本随之上升。",
  lg_sell10:"卖出 1 万",lg_buy10:"买入 1 万",
- h_taker:"谁付了价差",w_exec:"已成交",
- l_taker:"每根柱子代表一小时的已成交订单，按主动跨价的一方划分。线上方是买方更急，下方是卖方。",
+ h_taker:"主动跨越价差的一方",w_exec:"已成交",
+ l_taker:"每根柱体代表一小时内已成交的订单，按主动跨越价差的一方划分。位于中线之上表示买方为主动方，之下则为卖方。",
  lg_bcross:"买方主动",lg_scross:"卖方主动",
- h_sweep:"扫穿订单簿的大单",w_sweep:"30 小时 · 3 档以上",
- l_sweep:"一次吃掉三档及以上价格的单笔订单。纵轴为对数刻度，小单在大单旁边依然可见。",
- h_treas:"全部供应量在哪里",
- l_treas:"以全链供应量为分母，而不只是我们监控的钱包。看余额而非转账：质押金库是合约，其 KUB 以内部交易流动，交易列表根本不显示，因此余额是唯一可靠的观察方式。",
- n_treas:"不计入销毁地址 —— kubscan 记在其名下的 KUB 超过实际总量，那是 gas 记账方式造成的，并非真实持有者。无法识别的部分归入最后一段，并不表示它被锁定。",
+ h_sweep:"吃掉多档价格的订单",w_sweep:"30 小时 · 3 档以上",
+ l_sweep:"单笔订单一次吃掉三档及以上价格。纵轴采用对数刻度，使小额订单在大额订单旁仍可辨识。",
+ h_treas:"代币供应量的分布",
+ l_treas:"以全网代币供应量为基准，而非仅限受监控钱包，并以余额而非转账计量：质押金库为智能合约，其 KUB 以内部交易形式流动，不会出现在交易列表中，因此余额是唯一可靠的观测方式。",
+ n_treas:"不计入销毁地址。kubscan 记于其名下的 KUB 超过实际总量，此系 gas 记账方式所致，并非真实持有。无法归属的部分列入最后一段，且不表示其处于锁定状态。",
  g_stake:"质押金库",g_fund:"生态与发展基金",g_cold:"Bitkub 冷钱包",
- g_kkub:"包装为 KKUB",g_other:"其他大户",g_rest:"其余持有者",
+ g_kkub:"包装为 KKUB",g_other:"其他大户",g_rest:"其他持有者",
  t_supply:"监控钱包持有 {watched} / 共 {total} KUB（{pct}%）",
- h_health:"这些数据可信吗",w_log:"采集日志",
- l_health:"每一轮采集无论成功与否都会留下记录，所以缺口是可见的，而不是被掩盖。",
- f1:"本页的数字均实测自订单簿、成交记录与链上数据。若某个数字来自他方，相应面板会注明。",
- f2:"订单簿采集 60 档，超出该深度的数量无法定价 · 超出实际采集时长的时间窗会被标注，绝不臆填。",
+ h_health:"采集完整性",w_log:"采集日志",
+ l_health:"每一轮采集无论成功与否均有记录，故数据缺口始终可见，不被掩盖。",
+ f1:"本页数字由 KUB Flow 基于订单簿、成交记录与链上数据测算。若某项数字来自其他来源，相应面板将予以注明。",
+ f2:"订单簿采集深度为 60 档，超出该深度的数量无法据此定价。超出实际采集时长的时间窗将予以标注，且不进行回填。",
  f3:"非投资建议。",
  th_dex:"DEX",th_out:"获得 KUSDT",th_px:"每 KUB",th_vs:"对比最优",th_size:"数量",
  th_wallet:"钱包",th_group:"分组",th_bal:"余额（KUB）",th_share:"占比",
  th_job:"采集任务",th_runs:"24 小时轮次",th_fail:"失败",th_state:"状态",
  st_ok:"正常",st_ramp:"刚启动",st_fail:"失败",
  unlabelled:"未标注地址",
- snap:"正在显示内置快照 —— 无法连接实时数据。",
- apierr:"实时数据错误：",loading:"加载中…"}};
+ snap:"正在显示内置快照，因无法连接实时数据。",
+ apierr:"无法加载实时数据：",loading:"加载中…"}};
 
 const SNAP={generated_at:"2026-09-20T10:05:00Z",
  now:{price_thb:20.12,best_bid:20.13,best_ask:20.23,spread_bps:49.55,vol_24h_kub:206313.32,vol_24h_thb:4205673.72,
@@ -435,6 +435,37 @@ function mountTV(){
   });
 }
 
+// Panel commentary sits behind the info button instead of running as body
+// copy under every heading.
+const pop=$("#pop");
+let popBtn=null;
+function closePop(){if(popBtn){popBtn.setAttribute("aria-expanded","false");popBtn=null}pop.dataset.open="false"}
+// Scrolling repositions the panel rather than dismissing it: clicking the
+// button can itself scroll it into view, which was closing the panel again on
+// the same gesture.
+function placePop(){
+  if(!popBtn)return;
+  const r=popBtn.getBoundingClientRect(),pr=pop.getBoundingClientRect();
+  let x=r.left,y=r.bottom+8;
+  if(x+pr.width>innerWidth-16)x=Math.max(16,innerWidth-16-pr.width);
+  if(y+pr.height>innerHeight-16)y=Math.max(16,r.top-8-pr.height);
+  pop.style.left=x+"px";pop.style.top=y+"px";
+}
+function openPop(btn){
+  pop.innerHTML=(btn.dataset.info||"").split(/\s+/).filter(Boolean)
+    .map(k=>{const d=document.createElement("p");d.textContent=T(k);return d.outerHTML}).join("");
+  pop.dataset.open="true";btn.setAttribute("aria-expanded","true");popBtn=btn;
+  placePop();
+}
+document.addEventListener("click",e=>{
+  const t=e.target,b=t&&t.closest?t.closest(".i"):null;
+  if(b){e.stopPropagation();if(popBtn===b)closePop();else openPop(b);return}
+  if(!t||!t.closest||!t.closest("#pop"))closePop();
+});
+document.addEventListener("keydown",e=>{if(e.key==="Escape")closePop()});
+addEventListener("resize",placePop);
+addEventListener("scroll",placePop,true);
+
 function paintStatic(){
   document.documentElement.lang=L==="zh"?"zh":L;
   document.title=T("title");
@@ -446,7 +477,8 @@ function paintStatic(){
   else b.hidden=true;
   $("#stamp").textContent=bkk(LIVE?D.generated_at:SNAP.generated_at)+" UTC+7";
   $("#techwhen").textContent=TF;
-  $("#technote").textContent=T("n_tech");
+  document.querySelectorAll(".i").forEach(b=>b.setAttribute("aria-label",T("info")));
+  closePop();
 }
 function tfButtons(){
   const seg=$("#tfseg");seg.innerHTML="";
