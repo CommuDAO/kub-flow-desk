@@ -113,6 +113,9 @@ export default async function handler(req, res) {
         net: Number(r.net_out_kub),
         in_tx: Number(r.in_tx),
         out_tx: Number(r.out_tx),
+        // How far the history walk has reached, per day. A day it has not
+        // reached is uncollected, not a day without flow.
+        covered: r.covered === true,
       })),
       collecting_since: iso(exFlow.length ? exFlow[0].collecting_since : null),
     },
