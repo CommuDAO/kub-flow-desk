@@ -1,45 +1,69 @@
-# Indicators: where they come from
+# Indicators and quotes: what is computed, and what is not
 
-## TradingView's widget, not our own maths
+## Indicators — computed here
 
-The technicals panel is TradingView's `embed-widget-technical-analysis` on
-`BITKUB:KUBTHB`. RSI, MACD, Stochastic, CCI, Williams %R, ATR, Bollinger, the
-moving averages and the aggregated **Strong Buy / Buy / Neutral / Sell /
-Strong Sell** gauge are all computed by TradingView from Bitkub's own feed and
-rendered by their script. The page passes three things: the symbol, the
-interval (from the timeframe selector) and the locale.
+All values come from `kub_candles` for the selected timeframe and are calculated
+in the browser from the same bars the rest of the page uses, so an indicator
+reading reconciles with the slippage, sweep and taker panels rather than with a
+third-party feed.
 
-### Why the widget rather than the page
+| Indicator | Period | Reported as |
+| --- | --- | --- |
+| RSI | 14 (Wilder) | value, and whether it sits above 70 or below 30 |
+| MACD | 12 / 26 / 9 | line, and which side of the signal |
+| Stochastic | %K 14, %D 3 | value, and whether above 80 or below 20 |
+| CCI | 20 | value, and whether beyond ±100 |
+| Williams %R | 14 | value, and whether above −20 or below −80 |
+| ATR | 14 | value, in THB |
+| Bollinger | 20, 2σ | upper, lower, and where price sits |
+| SMA / EMA | 10, 20, 50 | value, and whether price is above or below |
 
-Two reasons, and only one of them is about effort.
+Each row shows **how many bars were available**. An indicator whose period
+exceeds the bars collected reads "not enough bars" and is never estimated.
+Collection began 2026-09-19, so the long periods and the 4h / 1d timeframes stay
+unavailable for a while yet. That is the honest state, not a bug.
 
-1. **History.** Collection began 2026-09-19. A 14-period RSI on daily bars needs
-   roughly a month before it means anything, and a 50-period EMA considerably
-   longer. Our own table spent most of its rows saying "not enough bars" and
-   would have kept doing so for weeks. TradingView has years.
-2. **Scraping `tradingview.com/symbols/KUBTHB/technicals/` is not an option.**
-   The numbers there are rendered client-side from their private feed, and
-   lifting them into our own table would strip the attribution off values that
-   are theirs. The widget is the supported way to show them, it names them, and
-   it refreshes itself.
+There is no single buy / sell score. Reporting that RSI reads 72 and sits above
+the conventional 70 line is a measurement; compressing a dozen indicators into
+one number is a different kind of claim, and this table does not make it.
 
-### What the widget brings with it
+A TradingView technicals widget was tried here briefly and removed. Its values
+have years of history behind them, but it carries their aggregated gauge, and
+the page reads better with numbers it can account for itself.
 
-The aggregated gauge is a trading recommendation, not a measurement. It stays
-labelled as TradingView's rating, under their name, in its own panel. The page
-does not compute one, restate one, or act as though the gauge is its own
-reading — and the footer no longer claims the page reports data only, because
-with this panel on it that would not be true. `Not investment advice` stays.
+## The DEX table quotes single pools
 
-## What is still measured here
+Each venue is priced with one direct `eth_call`: `getAmountsOut` for the V2
+forks, `quoteExactInputSingle` on QuoterV2 for the V3 ones, which tries all four
+fee tiers and keeps the best. No third-party API is involved.
 
-Everything below the technicals panel, and it is the part TradingView cannot
-see: the live order book walked level by level for real execution cost, the
-same cost tracked hour over hour, sweeps that cleared three or more levels,
-which side crossed the spread, five-DEX on-chain quotes by direct `eth_call`,
-41 treasury balances, and the collector's own health log.
+**Junoswap's row is a floor, not its best price.** Junoswap on Bitkub Chain is a
+standard Uniswap V3 deployment:
 
-## The Telegram alert is unchanged
+| | |
+| --- | --- |
+| Factory | `0x090C6E5fF29251B1eF9EC31605Bdd13351eA316C` |
+| QuoterV2 | `0xCB0c6E78519f6B4c1b9623e602E831dEf0f5ff7f` |
+| SwapRouter02 | `0x3F7582E36843FF79F173c7DC19f517832496f2D8` |
 
-`kub_alert_text()` still reports measured numbers only. No rating, no forecast.
-The widget lives on the web page; it is not in the message.
+(from `junoswap-labs/v3-deploy`, `state/bkc-state.json`)
+
+There is **no aggregator contract** in that set. Route selection and splitting a
+trade across several pools happen off-chain in their router code, and the result
+is executed through SwapRouter02. So no single `eth_call` returns the number
+their UI shows.
+
+QuoterV2 does expose `quoteExactInput(bytes path, uint256 amountIn)`, which
+prices a multi-hop path, so the quoting primitive exists. What does not exist
+on-chain is the part that decides *which* pools and *what fraction* to each —
+reproducing that means reproducing their routing algorithm, and a home-grown
+approximation of it would disagree with their UI and be worse than admitting the
+gap. The route set should come from the SDK instead.
+
+Kublerx returns nothing because it has no KKUB/KUSDT pool at all — all four fee
+tiers revert. That blank is a finding, not a missing measurement.
+
+## The Telegram alert
+
+`kub_alert_text()` reports measured numbers only — no rating, no forecast. It is
+unaffected by anything on this page.
