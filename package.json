@@ -1,0 +1,8 @@
+{
+  "name": "kub-flow-desk",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=20"
+  }
+}
