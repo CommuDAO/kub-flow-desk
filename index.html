@@ -227,7 +227,8 @@ footer p{margin:0 0 var(--s7);max-width:76ch}
   <section class="card">
     <div class="ch">
       <h2 data-i18n="h_ex"></h2><button class="i" type="button" aria-expanded="false" data-info="l_ex n_ex"></button>
-      <div class="right"><span class="fresh" data-fresh="exchange"></span></div>
+      <div class="right"><div class="seg" id="exseg" role="group" aria-label="Range"></div>
+        <span class="fresh" data-fresh="exchange"></span></div>
     </div>
     <dl class="kpis" id="exkpis"></dl>
     <ul class="legend">
@@ -287,7 +288,7 @@ footer p{margin:0 0 var(--s7);max-width:76ch}
 <script src="https://s3.tradingview.com/tv.js"></script>
 <script>
 const I18N={
-en:{ex_cold:"cold",ex_hot:"hot",title:"KUB Flow Desk",info:"More information",why_title:"What this tells you",
+en:{ex_days:"{n} days shown",ex_cold:"cold",ex_hot:"hot",title:"KUB Flow Desk",info:"More information",why_title:"What this tells you",
  fresh_at:"read {t}",fresh_none:"no data yet",
  src:"Bitkub public API v3 every 5 min · kubscan v2 (41 wallets) every 5 min · KUB Chain RPC (5 DEXes) every 15 min · chain activity from kubscan hourly · price chart by TradingView",
  k_offer:"Lowest offer",k_vol:"24 h volume",k_sell:"Sell 10k KUB",k_nf:"Left the exchange",k_taker:"Buyers crossing",
@@ -321,10 +322,10 @@ en:{ex_cold:"cold",ex_hot:"hot",title:"KUB Flow Desk",info:"More information",wh
  no_quote:"no pool",
  th_dex:"DEX",th_out:"USD out",th_px:"Per KUB",th_vs:"vs best",th_tok:"Quoted in",
  h_ex:"KUB held at Bitkub Exchange",
- l_ex:"Only the exchange's own wallets are counted here — its cold wallets and its active hot wallet — read every five minutes. Ecosystem funds, the stake vault and the company reserve are not the exchange's and are left to the supply panel. Transfers in and out are read from the chain, by day, in Bangkok time.",
+ l_ex:"Only the exchange's own wallets are counted here — its cold wallets and its active hot wallet — read every five minutes. Ecosystem funds, the stake vault and the company reserve are not the exchange's and are left to the supply panel. Transfers in and out are read from the chain, by day, in Bangkok time, and the history is walked backwards a page at a time from kubscan.",
  n_ex:"Days before collection began are marked as uncollected rather than drawn as zero flow. The exchange moves KUB between its own wallets too; only transfers crossing the boundary are counted.",
  w_ex:"Whether coins are moving onto the exchange or away from it. Sustained flow onto an exchange puts sellable supply within reach of the order book; flow away from it takes supply out of immediate circulation. Neither predicts price, but both change what the book can absorb.",
- ex_in:"Onto the exchange",ex_out:"Off the exchange",ex_net:"Net out, 7 days",
+ ex_in:"Onto the exchange",ex_out:"Off the exchange",ex_net:"Net out, period",
  ex_bal:"Held by the exchange",ex_nodata:"not collected",
  h_chain:"Chain activity",
  l_chain:"Daily totals from kubscan. Transaction counts come from its chart endpoint, which reaches back about a month; fees are fetched one day at a time and go back as far as the backfill has walked. Both are read from kubscan, so both match what kubscan reports for the same day.",
@@ -351,7 +352,7 @@ en:{ex_cold:"cold",ex_hot:"hot",title:"KUB Flow Desk",info:"More information",wh
  f3:"Not investment advice.",
  snap:"Showing the built-in snapshot, as the live feed is unavailable.",
  apierr:"Unable to load live data: ",loading:"Loading…"},
-th:{ex_cold:"cold",ex_hot:"hot",title:"KUB Flow Desk",info:"รายละเอียด",why_title:"ข้อมูลนี้บอกอะไร",
+th:{ex_days:"แสดง {n} วัน",ex_cold:"cold",ex_hot:"hot",title:"KUB Flow Desk",info:"รายละเอียด",why_title:"ข้อมูลนี้บอกอะไร",
  fresh_at:"ข้อมูล ณ {t}",fresh_none:"ยังไม่มีข้อมูล",
  src:"Bitkub public API v3 ทุก 5 นาที · kubscan v2 (41 กระเป๋า) ทุก 5 นาที · KUB Chain RPC (5 DEX) ทุก 15 นาที · กิจกรรมบนเชนจาก kubscan รายชั่วโมง · กราฟราคาโดย TradingView",
  k_offer:"ราคาเสนอขายต่ำสุด",k_vol:"วอลุ่ม 24 ชม.",k_sell:"ขาย 10k KUB",k_nf:"ไหลออกจากศูนย์ซื้อขาย",k_taker:"ฝั่งซื้อข้ามสเปรด",
@@ -385,10 +386,10 @@ th:{ex_cold:"cold",ex_hot:"hot",title:"KUB Flow Desk",info:"รายละเ�
  no_quote:"ไม่มี pool",
  th_dex:"DEX",th_out:"ได้ USD",th_px:"ต่อ 1 KUB",th_vs:"เทียบที่ดีที่สุด",th_tok:"คิดราคากับ",
  h_ex:"KUB ที่อยู่บน Bitkub Exchange",
- l_ex:"นับเฉพาะกระเป๋าของศูนย์ซื้อขายเท่านั้น คือกระเป๋าเย็นทั้งหมดและกระเป๋าร้อนที่ใช้งานอยู่ อ่านค่าทุกห้านาที ส่วนกองทุนระบบนิเวศ stake vault และ KUB Company Reserve ไม่ใช่ของศูนย์ซื้อขาย จึงไปอยู่ในแผงการกระจายตัวของเหรียญแทน ขณะที่รายการโอนเข้าออกอ่านจากเชนโดยตรง แยกรายวันตามเวลาไทย",
+ l_ex:"นับเฉพาะกระเป๋าของศูนย์ซื้อขายเท่านั้น คือกระเป๋าเย็นทั้งหมดและกระเป๋าร้อนที่ใช้งานอยู่ อ่านค่าทุกห้านาที ส่วนกองทุนระบบนิเวศ stake vault และ KUB Company Reserve ไม่ใช่ของศูนย์ซื้อขาย จึงไปอยู่ในแผงการกระจายตัวของเหรียญแทน ขณะที่รายการโอนเข้าออกอ่านจากเชนโดยตรง แยกรายวันตามเวลาไทย และประวัติย้อนหลังไล่ดึงจาก kubscan ทีละหน้า",
  n_ex:"วันก่อนเริ่มจัดเก็บจะระบุว่ายังไม่ได้จัดเก็บ แทนการวาดเป็นศูนย์ และศูนย์ซื้อขายมีการโอนระหว่างกระเป๋าของตนเองด้วย ตรงนี้นับเฉพาะรายการที่ข้ามขอบเขตเข้าออกเท่านั้น",
  w_ex:"เหรียญกำลังไหลเข้าหรือออกจากศูนย์ซื้อขาย การไหลเข้าต่อเนื่องหมายถึงอุปทานที่พร้อมขายเข้ามาอยู่ใกล้สมุดคำสั่งมากขึ้น ส่วนการไหลออกคือการนำอุปทานออกจากการหมุนเวียนทันที ทั้งสองอย่างไม่ได้ทำนายราคา แต่เปลี่ยนปริมาณที่สมุดคำสั่งรับไหว",
- ex_in:"ไหลเข้าศูนย์ซื้อขาย",ex_out:"ไหลออกจากศูนย์ซื้อขาย",ex_net:"ไหลออกสุทธิ 7 วัน",
+ ex_in:"ไหลเข้าศูนย์ซื้อขาย",ex_out:"ไหลออกจากศูนย์ซื้อขาย",ex_net:"ไหลออกสุทธิในช่วงที่เลือก",
  ex_bal:"ศูนย์ซื้อขายถือครอง",ex_nodata:"ยังไม่ได้จัดเก็บ",
  h_chain:"กิจกรรมบนเชน",
  l_chain:"ยอดรวมรายวันจาก kubscan จำนวนธุรกรรมมาจาก chart endpoint ซึ่งย้อนหลังได้ราวหนึ่งเดือน ส่วนค่าธรรมเนียมดึงทีละวันจึงย้อนหลังได้เท่าที่การเติมข้อมูลเดินไปถึง ทั้งสองค่าอ่านจาก kubscan โดยตรง จึงตรงกับที่ kubscan รายงานในวันเดียวกัน",
@@ -415,7 +416,7 @@ th:{ex_cold:"cold",ex_hot:"hot",title:"KUB Flow Desk",info:"รายละเ�
  f3:"ไม่ใช่คำแนะนำการลงทุน",
  snap:"กำลังแสดงข้อมูลสำรองที่ฝังมากับหน้าเว็บ เนื่องจากไม่สามารถเชื่อมต่อข้อมูลสดได้",
  apierr:"ไม่สามารถเชื่อมต่อข้อมูลสดได้: ",loading:"กำลังโหลด…"},
-zh:{ex_cold:"冷钱包",ex_hot:"热钱包",title:"KUB 流动性看板",info:"说明",why_title:"这一面板说明什么",
+zh:{ex_days:"显示 {n} 天",ex_cold:"冷钱包",ex_hot:"热钱包",title:"KUB 流动性看板",info:"说明",why_title:"这一面板说明什么",
  fresh_at:"数据截至 {t}",fresh_none:"暂无数据",
  src:"Bitkub 公开 API v3 每 5 分钟 · kubscan v2（41 个钱包）每 5 分钟 · KUB 链 RPC（5 个 DEX）每 15 分钟 · 链上活动每小时取自 kubscan · 价格图表由 TradingView 提供",
  k_offer:"最低卖价",k_vol:"24 小时成交量",k_sell:"卖出 1 万 KUB",k_nf:"流出交易所",k_taker:"买方主动成交",
@@ -449,10 +450,10 @@ zh:{ex_cold:"冷钱包",ex_hot:"热钱包",title:"KUB 流动性看板",info:"说
  no_quote:"无流动性池",
  th_dex:"DEX",th_out:"获得美元",th_px:"每 KUB",th_vs:"对比最优",th_tok:"计价代币",
  h_ex:"存放于 Bitkub Exchange 的 KUB",
- l_ex:"此处只统计交易所自有的钱包 —— 其全部冷钱包与在用的热钱包 —— 每五分钟读取一次。生态基金、质押金库与公司储备并不属于交易所，归入供应量分布面板。进出转账直接读自链上，按曼谷时间逐日统计。",
+ l_ex:"此处只统计交易所自有的钱包 —— 其全部冷钱包与在用的热钱包 —— 每五分钟读取一次。生态基金、质押金库与公司储备并不属于交易所，归入供应量分布面板。进出转账直接读自链上，按曼谷时间逐日统计，历史数据则自 kubscan 逐页向前回溯。",
  n_ex:"采集开始之前的日期标注为未采集，而不是画成零流量。交易所在自有钱包之间也会划转，此处只统计跨越进出边界的转账。",
  w_ex:"代币正在流入还是流出交易所。持续流入意味着可供抛售的供应更贴近订单簿；流出则把供应移出即时流通。两者都不预测价格，但都会改变订单簿所能承接的量。",
- ex_in:"流入交易所",ex_out:"流出交易所",ex_net:"7 日净流出",
+ ex_in:"流入交易所",ex_out:"流出交易所",ex_net:"所选区间净流出",
  ex_bal:"交易所持有量",ex_nodata:"未采集",
  h_chain:"链上活动",
  l_chain:"取自 kubscan 的每日合计。交易笔数来自其图表接口，可回溯约一个月；手续费按日逐条获取，回溯范围取决于补数进度。两者均直接读自 kubscan，因此与 kubscan 同一天的报告一致。",
@@ -498,9 +499,9 @@ const SNAP={generated_at:"2026-09-20T11:15:00Z",
  other:[{rank:3,address:"0x67ebd850304c70d983b2d1b93ea79c7cd6c3f6b5",label:"Wrapped KUB (KKUB)",cat:"wrapped",kub:10586039,kkub:true},
         {rank:40,address:"0xf9d09603690473910529a2c814563e61959b25d8",label:null,cat:"unidentified",kub:1666667,kkub:false}],
  exchange:{balance:50655847,wallets:28,cold:50538828,hot:117019,collecting_since:"2026-09-19T08:10:00Z",
-   flow:[{day:"2026-09-18",in:1320.15,out:8,net:-1312.16,in_tx:3,out_tx:2},
-         {day:"2026-09-19",in:9350.84,out:10208.12,net:857.28,in_tx:13,out_tx:35},
-         {day:"2026-09-20",in:10923.41,out:40856.13,net:29932.72,in_tx:15,out_tx:22}]},
+   flow:[{day:"2026-09-18",in:57037.29,out:79117.39,net:22080.10,in_tx:17,out_tx:39,covered:true},
+         {day:"2026-09-19",in:9350.84,out:10208.12,net:857.28,in_tx:13,out_tx:44,covered:true},
+         {day:"2026-09-20",in:10923.41,out:40962.32,net:30038.91,in_tx:15,out_tx:28,covered:true}]},
  chain:[{day:"2026-09-16",tx:42199,fees:197.6182,gas:7904729527},
         {day:"2026-09-17",tx:41040,fees:201.1397,gas:8045586711},
         {day:"2026-09-18",tx:37334,fees:181.3769,gas:7255075843},
@@ -513,7 +514,7 @@ const TFS=[["5m",300,"5"],["15m",900,"15"],["1h",3600,"60"],["4h",14400,"240"],[
 const SUBS=["cost","slipt","taker","sweep"];
 const RANGES=[["7d",7,"r_7d"],["1m",30,"r_1m"],["3m",90,"r_3m"],["1y",365,"r_1y"]];
 const MIN_BARS=35;
-let L="en",D=SNAP,LIVE=false,TF="15m",CANDLES=[],DEXSIZE=null,RANGE="1m";
+let L="en",D=SNAP,LIVE=false,TF="15m",CANDLES=[],DEXSIZE=null,RANGE="1m",EXRANGE="7d";
 let SUBON={cost:true,slipt:true,taker:true,sweep:true};
 
 const $=s=>document.querySelector(s),NS="http://www.w3.org/2000/svg";
@@ -646,6 +647,12 @@ function subButtons(){
 }
 function applySubs(){
   SUBS.forEach(s=>{const n=document.querySelector(`.sub-panel[data-sub="${s}"]`);if(n)n.hidden=!SUBON[s]});
+}
+function exRangeButtons(){
+  segButtons("#exseg",RANGES.map(([k,,lab])=>({k,label:T(lab)})),k=>k===EXRANGE,k=>{
+    EXRANGE=k;try{localStorage.setItem("kfd-exrange",k)}catch(e){}
+    exRangeButtons();exchange();
+  });
 }
 function rangeButtons(){
   segButtons("#chainseg",RANGES.map(([k,,lab])=>({k,label:T(lab)})),k=>k===RANGE,k=>{
@@ -798,9 +805,13 @@ function tDex(){
   $("#t-dex").innerHTML=h+"</tbody>";
 }
 function exchange(){
-  const ex=D.exchange||{},flow=ex.flow||[];
+  const ex=D.exchange||{},all=ex.flow||[];
+  const days=(RANGES.find(r=>r[0]===EXRANGE)||[])[1]||7;
+  const flow=all.slice(-days);
   const since=ex.collecting_since?Date.parse(ex.collecting_since):null;
-  const net7=flow.reduce((s,r)=>s+(+r.net||0),0);
+  // A day the history walk has not reached is uncollected, not a quiet day.
+  const uncovered=r=>r.covered===false||(r.covered==null&&since!=null&&Date.parse(r.day+"T23:59:59Z")<since);
+  const net7=flow.filter(r=>!uncovered(r)).reduce((s,r)=>s+(+r.net||0),0);
   const k=(t,v,s)=>`<div class="kpi"><dt>${t}</dt><dd>${v}</dd><div class="sub">${s}</div></div>`;
   // Only the exchange's own wallets: its cold wallets plus the live hot one.
   const exCold=(D.treasury||[]).filter(t=>t.cat==="cex_cold");
@@ -810,31 +821,40 @@ function exchange(){
   $("#exkpis").innerHTML=
      k(T("ex_bal"),fmt(bal)+" KUB",
        `${T("ex_cold")} <b>${fmt(sumK(exCold))}</b> (${exCold.length}) · ${T("ex_hot")} <b>${fmt(sumK(exHot))}</b> (${exHot.length})`)
-    +k(T("ex_net"),(net7>=0?"+":"")+fmt(net7)+" KUB",T("ex_out")+" / "+T("ex_in"));
+    +k(T("ex_net"),(net7>=0?"+":"")+fmt(net7)+" KUB",tpl("ex_days",{n:flow.filter(r=>!uncovered(r)).length}));
 
   const W=880,H=240,Lx=62,R=16,Tp=18,B=40,s=mk("#c-exflow",W,H);if(!s)return;
   if(!flow.length){el("text",{class:"tick",x:W/2,y:H/2,"text-anchor":"middle"},s).textContent=T("loading");return}
   const hi=Math.max(100,...flow.flatMap(r=>[+r.in||0,+r.out||0]));
   const mid=(H-B+Tp)/2,y=v=>mid-(v/hi)*(mid-Tp);
-  const slot=(W-Lx-R)/flow.length,bw=Math.min(26,slot/2-3);
+  const slot=(W-Lx-R)/flow.length;
+  // Two bars per day while they still fit; below that, one slot-wide pair.
+  const paired=slot>=8,bw=paired?Math.min(26,slot/2-2):Math.max(.8,slot*.42);
+  const sparse=flow.length>14;
   [hi,hi/2,0,-hi/2,-hi].forEach(g=>{el("line",{class:g===0?"ax":"gl",x1:Lx,x2:W-R,y1:y(g),y2:y(g)},s);
     el("text",{class:"tick",x:Lx-9,y:y(g)+3.5,"text-anchor":"end"},s).textContent=fmt(Math.abs(g))});
   flow.forEach((r,i)=>{
     const cx=Lx+slot*i+slot/2;
     const uncollected=since!=null&&Date.parse(r.day+"T23:59:59Z")<since;
     if(uncollected){
-      el("rect",{x:cx-slot/2+2,y:Tp,width:slot-4,height:H-B-Tp,rx:3,fill:"#14171f"},s);
-      el("text",{class:"tick",x:cx,y:mid+4,"text-anchor":"middle"},s).textContent=T("ex_nodata");
+      el("rect",{x:cx-slot/2,y:Tp,width:Math.max(.8,slot),height:H-B-Tp,fill:"#14171f"},s);
+      if(!sparse)el("text",{class:"tick",x:cx,y:mid+4,"text-anchor":"middle"},s).textContent=T("ex_nodata");
     }else{
       const i0=+r.in||0,o0=+r.out||0;
-      el("rect",{x:cx-bw-2,y:y(i0),width:bw,height:Math.max(1,mid-y(i0)),rx:2,fill:"var(--up)"},s);
-      el("rect",{x:cx+2,y:mid,width:bw,height:Math.max(1,mid-y(o0)),rx:2,fill:"var(--down)"},s);
+      const xi=paired?cx-bw-1:cx-bw/2,xo=paired?cx+1:cx-bw/2;
+      el("rect",{x:xi,y:y(i0),width:bw,height:Math.max(1,mid-y(i0)),rx:paired?2:0,fill:"var(--up)"},s);
+      el("rect",{x:xo,y:mid,width:bw,height:Math.max(1,mid-y(o0)),rx:paired?2:0,fill:"var(--down)",
+        "fill-opacity":paired?1:.85},s);
     }
-    hov(el("rect",{x:cx-slot/2,y:Tp,width:slot,height:H-B-Tp,class:"hit"},s),
+    hov(el("rect",{x:cx-slot/2,y:Tp,width:Math.max(3,slot),height:H-B-Tp,class:"hit"},s),
       uncollected?`<b>${dmy(r.day)}</b><br>${T("ex_nodata")}`
       :`<b>${dmy(r.day)}</b><br><span class="k">${T("ex_in")}</span> ${fmt(r.in)} (${r.in_tx})<br><span class="k">${T("ex_out")}</span> ${fmt(r.out)} (${r.out_tx})<br><span class="k">net</span> ${fmt(r.net)}`);
-    el("text",{class:"tick",x:cx,y:H-B+18,"text-anchor":"middle"},s).textContent=dmy(r.day);
+    if(!sparse)el("text",{class:"tick",x:cx,y:H-B+18,"text-anchor":"middle"},s).textContent=dmy(r.day);
   });
+  if(sparse){
+    el("text",{class:"tick",x:Lx,y:H-B+18},s).textContent=dmy(flow[0].day);
+    el("text",{class:"tick",x:W-R,y:H-B+18,"text-anchor":"end"},s).textContent=dmy(flow[flow.length-1].day);
+  }
 }
 // Two measured quantities divided by each other, rather than a fee total
 // scaled by a gas price nobody actually paid.
@@ -946,7 +966,7 @@ function health(){
 }
 
 function render(){
-  paintStatic();tfButtons();subButtons();applySubs();rangeButtons();
+  paintStatic();tfButtons();subButtons();applySubs();rangeButtons();exRangeButtons();
   kpis();tech();cSlip();cSlipT();cTaker();cSweep();
   dexSelect();tDex();exchange();cChain();treasury();health();
 }
@@ -976,6 +996,7 @@ try{
   else if((navigator.language||"").startsWith("zh"))L="zh";
   const st=localStorage.getItem("kfd-tf");if(st&&TFS.some(t=>t[0]===st))TF=st;
   const sr=localStorage.getItem("kfd-range");if(sr&&RANGES.some(r=>r[0]===sr))RANGE=sr;
+  const se=localStorage.getItem("kfd-exrange");if(se&&RANGES.some(r=>r[0]===se))EXRANGE=se;
   const ss=localStorage.getItem("kfd-subs");
   if(ss){const o=JSON.parse(ss);SUBS.forEach(k=>{if(typeof o[k]==="boolean")SUBON[k]=o[k]})}
   if(localStorage.getItem("kfd-health")==="1")$("#healthbody").hidden=false;
