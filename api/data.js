@@ -12,6 +12,10 @@ const maxOf = (rows, field) => {
 // A day, not an instant. Anchor it to Bangkok midnight so a bare date is not
 // read as UTC and shown seven hours out.
 const day = (d) => (d == null ? null : new Date(`${d}T00:00:00+07:00`).toISOString())
+// A naive Bangkok wall-clock timestamp with no offset of its own — like
+// kub_slippage_now.snapshot_at, kub_addr_anomaly.ts_bkk is local time already.
+// Read it as +07:00, not as UTC, or every row lands seven hours early.
+const bkkNaive = (v) => (v == null ? null : new Date(`${v.replace(' ', 'T')}+07:00`).toISOString())
 
 export default async function handler(req, res) {
   if (missingKey(res)) return
@@ -45,6 +49,9 @@ export default async function handler(req, res) {
     chain: () => db.get('kub_chain_activity?select=*&order=day.asc'),
     chainTypes: () => db.get('kub_chain_tx_types?select=*&order=day.asc'),
     dailyOhlc: () => db.get('kub_daily_ohlc?select=day,open,high,low,close&order=day.asc'),
+    // Transfers crossing the exchange boundary, scored against that
+    // address's own historical average — the last 30 that stood out.
+    anomaly: () => db.get('kub_addr_anomaly?select=*&order=ts_bkk.desc&limit=30'),
     candles: () => db.rpc('kub_candles', { p_tf: '15m', p_limit: 300 }),
   })
 
@@ -71,6 +78,15 @@ export default async function handler(req, res) {
   // A day with neither a transaction count nor a fee total is a day the
   // backfill has not reached, not a quiet day. Drop it rather than draw a zero.
   const chain = (out.chain || []).filter((r) => r.tx_count != null || r.fees_kub != null)
+
+  const anomalies = (out.anomaly || []).map((r) => ({
+    ts: bkkNaive(r.ts_bkk),
+    addr: r.addr,
+    label: r.label,
+    direction: r.direction,
+    value: Number(r.value_kub),
+    z: Number(r.z),
+  }))
 
   const generated = new Date().toISOString()
 
@@ -137,6 +153,8 @@ export default async function handler(req, res) {
       other: Number(r.other_n),
       n: Number(r.sampled_n),
     })),
+    // Sorted newest first already, by the query itself.
+    anomalies,
     // Bitkub's own daily price history, for indicator ranges longer than the
     // on-chain tape this site has collected itself.
     dailyOhlc: (out.dailyOhlc || []).map((r) => [r.day, +r.open, +r.high, +r.low, +r.close]),
@@ -153,6 +171,7 @@ export default async function handler(req, res) {
       supply: iso(sup && sup.as_of),
       exchange: iso(exBal && exBal.as_of),
       chain: day(chain.length ? chain[chain.length - 1].day : null),
+      anomaly: anomalies.length ? anomalies[0].ts : null,
     },
     candles: {
       tf: '15m',

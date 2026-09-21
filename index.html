@@ -276,6 +276,15 @@ footer p{margin:0 0 var(--s7);max-width:76ch}
 
   <section class="card">
     <div class="ch">
+      <h2 data-i18n="h_anomaly"></h2><button class="i" type="button" aria-expanded="false" data-info="l_anomaly"></button>
+      <div class="right"><span class="fresh" data-fresh="anomaly"></span></div>
+    </div>
+    <div class="tw"><table id="t-anomaly"></table></div>
+    <p class="why"><b data-i18n="why_title"></b><span data-i18n="w_anomaly"></span></p>
+  </section>
+
+  <section class="card">
+    <div class="ch">
       <h2 data-i18n="h_chain"></h2><button class="i" type="button" aria-expanded="false" data-info="l_chain n_chain"></button>
       <div class="right"><div class="seg" id="chainseg" role="group" aria-label="Range"></div>
         <span class="fresh" data-fresh="chain"></span></div>
@@ -299,6 +308,16 @@ footer p{margin:0 0 var(--s7);max-width:76ch}
     <div id="c-treas"></div>
     <div class="tw" style="margin-top:14px"><table id="t-treas"></table></div>
     <p class="why"><b data-i18n="why_title"></b><span data-i18n="w_treas"></span></p>
+  </section>
+
+  <section class="card">
+    <div class="ch">
+      <h2 data-i18n="h_digest"></h2><button class="i" type="button" aria-expanded="false" data-info="l_digest"></button>
+      <div class="right"><span class="fresh" data-fresh="exchange"></span></div>
+    </div>
+    <div class="tw"><table id="t-digest"></table></div>
+    <p class="note" data-i18n="digest_note"></p>
+    <p class="why"><b data-i18n="why_title"></b><span data-i18n="w_digest"></span></p>
   </section>
 
   <section class="card">
@@ -351,6 +370,8 @@ const SNAP={generated_at:"2026-09-20T11:15:00Z",
         {day:"2026-09-18",tx:37334,fees:181.3769,gas:7255075843},
         {day:"2026-09-19",tx:39079,fees:190.4081,gas:7616325322}],
  asOf:{},
+ anomalies:[{ts:"2026-09-20T02:40:39Z",addr:"0xbbb34997bc5de67085e459462c6edb21d8e3fa8d",label:null,direction:"exchange_in",value:2589.9995,z:5.81},
+   {ts:"2026-09-20T03:58:56Z",addr:"0x44a96c0fb29735369314140343aaef1399d23c76",label:null,direction:"exchange_out",value:250,z:3.88}],
  chainTypes:[{day:"2026-09-20",native:1,token:35,contract:21,other:0,n:57}],
  dailyOhlc:[["2026-09-18",20.5,20.6,20.3,20.44],["2026-09-19",20.44,20.6,20.3,20.49],["2026-09-20",20.49,20.5,20.0,20.08]],
  candles:{tf:"15m",bars:0,candles:[]}};
@@ -839,6 +860,91 @@ function chainMix(rs){
     <div class="mixbar">${bar}</div><ul class="mixlegend">${legend}</ul>
     <p class="note">${tpl("ch_sample_note",{n:fmt(tot.n)})}</p>`;
 }
+// Each row scores a transfer against that same address's own history, not
+// against the market — a large amount through a quiet address stands out
+// more than the same amount through one that moves KUB constantly. Rows
+// through the exchange's own hot wallet use the same in/out coloring as the
+// exchange-flow chart above, since that traffic is ordinary deposit and
+// withdrawal turnover rather than an external signal.
+function anomalyFeed(){
+  const tbl=$("#t-anomaly");if(!tbl)return;
+  const rows=D.anomalies||[];
+  if(!rows.length){tbl.innerHTML=`<tbody><tr><td>${T("anom_empty")}</td></tr></tbody>`;return}
+  let h=`<thead><tr><th>${T("th_time")}</th><th>${T("th_dir")}</th><th>${T("th_addr")}</th><th class="n">${T("th_kub")}</th><th class="n">${T("th_z")}</th></tr></thead><tbody>`;
+  rows.forEach(r=>{
+    const inbound=r.direction==="exchange_in";
+    const cls=inbound?"up":"down",arrow=inbound?"↓":"↑",lbl=inbound?T("dir_in"):T("dir_out");
+    h+=`<tr><td>${bkk(r.ts)}</td><td><span class="chip ${cls}">${arrow} ${lbl}</span></td>
+      <td>${r.label?r.label:`<span class="addr">${short(r.addr)}</span>`}</td>
+      <td class="n">${fmt(r.value)}</td><td class="n">${(+r.z).toFixed(2)}</td></tr>`;
+  });
+  tbl.innerHTML=h+"</tbody>";
+}
+// Two days in Sep 2025 recorded a one-time count taken when the exchange-
+// flow history backfill first ran, not a real transfer — orders of magnitude
+// above every other day in the whole series. Left out here so one month's
+// total is not dominated by a backfill artifact; the daily chart above still
+// shows them as recorded.
+const DIGEST_OUTLIER_DAYS=new Set(["2025-09-24","2025-09-30"]);
+const monthKey=d=>d.slice(0,7);
+const monthLabel=k=>{const[y,m]=k.split("-").map(Number);
+  try{return new Intl.DateTimeFormat(L,{month:"short",year:"2-digit",timeZone:"UTC"}).format(new Date(Date.UTC(y,m-1,1)))}
+  catch(e){return k}};
+// The same daily figures charted elsewhere on this page (exchange flow,
+// chain activity, Bitkub's own daily close), rolled up to calendar months so
+// the whole collected history reads in one table instead of one range at a
+// time.
+function monthlyDigest(){
+  const box=$("#t-digest");if(!box)return;
+  const flowAll=(D.exchange&&D.exchange.flow)||[];
+  const ohlc=D.dailyOhlc||[];
+  if(!ohlc.length){box.innerHTML="";return}
+
+  const months=new Map();
+  flowAll.forEach(r=>{
+    if(r.covered===false||DIGEST_OUTLIER_DAYS.has(r.day))return;
+    const k=monthKey(r.day),m=months.get(k)||{net:0,inTx:0,outTx:0};
+    m.net+=r.net||0;m.inTx+=r.in_tx||0;m.outTx+=r.out_tx||0;
+    months.set(k,m);
+  });
+
+  const priceMonth=new Map();
+  ohlc.forEach(r=>{
+    const k=monthKey(r[0]),p=priceMonth.get(k);
+    if(!p)priceMonth.set(k,{open:+r[1],close:+r[4]});else p.close=+r[4];
+  });
+
+  const feeMonth=new Map();
+  (D.chain||[]).forEach(r=>{
+    if(r.fees==null)return;
+    const k=monthKey(r.day),f=feeMonth.get(k)||{sum:0,n:0};
+    f.sum+=r.fees;f.n++;feeMonth.set(k,f);
+  });
+
+  const keys=[...priceMonth.keys()].sort();
+  const chip=(cls,t)=>`<span class="chip ${cls}">${t}</span>`;
+  let h=`<thead><tr><th>${T("th_month")}</th><th class="n">${T("th_price")}</th><th class="n">${T("th_chg")}</th><th>${T("th_flow")}</th><th class="n">${T("th_netkub")}</th><th class="n">${T("th_txio")}</th><th class="n">${T("th_feeday")}</th></tr></thead><tbody>`;
+  keys.forEach((k,i)=>{
+    const pr=priceMonth.get(k),fl=months.get(k),fe=feeMonth.get(k);
+    const partial=i===0||i===keys.length-1;
+    const label=monthLabel(k)+(partial?" *":"");
+    const chg=pr.open?(pr.close-pr.open)/pr.open*100:null;
+    const chgTxt=chg==null?"—":(chg>=0?"+":"")+chg.toFixed(2)+"%";
+    const chgColor=chg==null?"var(--text-muted)":chg>=0?"var(--up)":"var(--down)";
+    // net_out_kub < 0 means more moved onto the exchange than off it that
+    // month — colored the same as "onto the exchange" in the flow chart above.
+    const flowCls=!fl?"mid":fl.net<0?"up":"down";
+    const flowLbl=!fl?"—":fl.net<0?T("dir_in"):T("dir_out");
+    h+=`<tr><td>${label}</td>
+      <td class="n">฿${pr.open.toFixed(2)} → ฿${pr.close.toFixed(2)}</td>
+      <td class="n" style="color:${chgColor};font-weight:600">${chgTxt}</td>
+      <td>${fl?chip(flowCls,flowLbl):"—"}</td>
+      <td class="n">${fl?fmt(Math.abs(fl.net)):"—"}</td>
+      <td class="n">${fl?fmt(fl.inTx)+" / "+fmt(fl.outTx):"—"}</td>
+      <td class="n">${fe?fmt(fe.sum/fe.n,1)+" KUB":"—"}</td></tr>`;
+  });
+  box.innerHTML=h+"</tbody>";
+}
 function treasury(){
   const MAP={stake:"stake",fund:"fund",cex_cold:"cex",cex_hot:"cex",reserve:"reserve"};
   const tot={stake:0,fund:0,cex:0,reserve:0},cnt={stake:0,fund:0,cex:0,reserve:0};
@@ -945,7 +1051,7 @@ function health(){
 function render(){
   paintStatic();tfButtons();rangeButtons();exRangeButtons();techRangeButtons();
   kpis();tech();cSlip();cSlipT();cTaker();cSweep();
-  dexSelect();tDex();exchange();cChain();treasury();health();
+  dexSelect();tDex();exchange();anomalyFeed();cChain();treasury();monthlyDigest();health();
 }
 function setTF(tf){
   TF=tf;try{localStorage.setItem("kfd-tf",tf)}catch(e){}
