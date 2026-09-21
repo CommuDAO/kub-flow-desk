@@ -52,6 +52,9 @@ export default async function handler(req, res) {
     // Transfers crossing the exchange boundary, scored against that
     // address's own historical average — the last 30 that stood out.
     anomaly: () => db.get('kub_addr_anomaly?select=*&order=ts_bkk.desc&limit=30'),
+    // Individual executed order-book fills above the whale-size floor — real
+    // trades from kub_trade, not a derived or sampled figure.
+    trades: () => db.get('kub_trade?select=ts,rate,amount,side&amount=gte.5000&order=ts.desc&limit=30'),
     candles: () => db.rpc('kub_candles', { p_tf: '15m', p_limit: 300 }),
   })
 
@@ -86,6 +89,14 @@ export default async function handler(req, res) {
     direction: r.direction,
     value: Number(r.value_kub),
     z: Number(r.z),
+  }))
+
+  // kub_trade.ts is a real timestamptz already — no naive-local landmine here.
+  const whaleTrades = (out.trades || []).map((r) => ({
+    ts: iso(r.ts),
+    rate: Number(r.rate),
+    amount: Number(r.amount),
+    side: r.side,
   }))
 
   const generated = new Date().toISOString()
@@ -155,6 +166,9 @@ export default async function handler(req, res) {
     })),
     // Sorted newest first already, by the query itself.
     anomalies,
+    // Real fills from the order book, not a derived figure — sorted newest
+    // first already, by the query itself.
+    whaleTrades,
     // Bitkub's own daily price history, for indicator ranges longer than the
     // on-chain tape this site has collected itself.
     dailyOhlc: (out.dailyOhlc || []).map((r) => [r.day, +r.open, +r.high, +r.low, +r.close]),
@@ -172,6 +186,7 @@ export default async function handler(req, res) {
       exchange: iso(exBal && exBal.as_of),
       chain: day(chain.length ? chain[chain.length - 1].day : null),
       anomaly: anomalies.length ? anomalies[0].ts : null,
+      whale: whaleTrades.length ? whaleTrades[0].ts : null,
     },
     candles: {
       tf: '15m',

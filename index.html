@@ -285,6 +285,15 @@ footer p{margin:0 0 var(--s7);max-width:76ch}
 
   <section class="card">
     <div class="ch">
+      <h2 data-i18n="h_whale"></h2><button class="i" type="button" aria-expanded="false" data-info="l_whale"></button>
+      <div class="right"><span class="fresh" data-fresh="whale"></span></div>
+    </div>
+    <div class="tw"><table id="t-whale"></table></div>
+    <p class="why"><b data-i18n="why_title"></b><span data-i18n="w_whale"></span></p>
+  </section>
+
+  <section class="card">
+    <div class="ch">
       <h2 data-i18n="h_chain"></h2><button class="i" type="button" aria-expanded="false" data-info="l_chain n_chain"></button>
       <div class="right"><div class="seg" id="chainseg" role="group" aria-label="Range"></div>
         <span class="fresh" data-fresh="chain"></span></div>
@@ -354,8 +363,7 @@ const SNAP={generated_at:"2026-09-20T11:15:00Z",
  dex:[{size_kub:100,dex:"kublerx",fee:500,usdt_out:60.991793,px_usdt:.609918,vs_best_pct:0,quoted:true,is_best:true,quote_token:"USDT"},
       {size_kub:100,dex:"ponder",usdt_out:60.974903,px_usdt:.609749,vs_best_pct:-.03,quoted:true,is_best:false,quote_token:"KUSDT"},
       {size_kub:100,dex:"udonswap",usdt_out:60.808689,px_usdt:.608087,vs_best_pct:-.30,quoted:true,is_best:false,quote_token:"KUSDT"},
-      {size_kub:100,dex:"junoswap",fee:3000,usdt_out:60.795607,px_usdt:.607956,vs_best_pct:-.32,quoted:true,is_best:false,quote_token:"KUSDT"},
-      {size_kub:100,dex:"diamon",usdt_out:10.519824,px_usdt:.105198,vs_best_pct:-82.75,quoted:true,is_best:false,quote_token:"KUSDT"}],
+      {size_kub:100,dex:"junoswap",fee:3000,usdt_out:60.795607,px_usdt:.607956,vs_best_pct:-.32,quoted:true,is_best:false,quote_token:"KUSDT"}],
  health:[{job:"cex",runs:288,failed:0},{job:"chain:cex_hot",runs:288,failed:0},{job:"dex_quotes",runs:96,failed:0},{job:"watch_balance",runs:288,failed:0}],
  treasury:[{label:"StakeManagerVault",cat:"stake",kub:10925438},{label:"Bitkub Exchange (Cold Wallet) #1",cat:"cex_cold",kub:2288828},{label:"Bitkub Exchange (Hot Wallet) #2",cat:"cex_hot",kub:117019},{label:"Sustainable Blockchain Development Fund (Cold-4)",cat:"fund",kub:2000001}],
  supply:{total:109697579,watched:84464267,wallets:41,kkub:10586039},
@@ -372,6 +380,8 @@ const SNAP={generated_at:"2026-09-20T11:15:00Z",
  asOf:{},
  anomalies:[{ts:"2026-09-20T02:40:39Z",addr:"0xbbb34997bc5de67085e459462c6edb21d8e3fa8d",label:null,direction:"exchange_in",value:2589.9995,z:5.81},
    {ts:"2026-09-20T03:58:56Z",addr:"0x44a96c0fb29735369314140343aaef1399d23c76",label:null,direction:"exchange_out",value:250,z:3.88}],
+ whaleTrades:[{ts:"2026-09-20T06:43:27Z",rate:20.4,amount:16918.79,side:"BUY"},
+   {ts:"2026-09-19T17:41:28Z",rate:20.5,amount:34418.59,side:"BUY"}],
  chainTypes:[{day:"2026-09-20",native:1,token:35,contract:21,other:0,n:57}],
  dailyOhlc:[["2026-09-18",20.5,20.6,20.3,20.44],["2026-09-19",20.44,20.6,20.3,20.49],["2026-09-20",20.49,20.5,20.0,20.08]],
  candles:{tf:"15m",bars:0,candles:[]}};
@@ -381,7 +391,7 @@ const TFS=[["5m",300,"5"],["15m",900,"15"],["1h",3600,"60"],["4h",14400,"240"],[
 const TV_LOCALE={th:"th",zh:"zh_CN",ms:"ms_MY",vi:"vi_VN",id:"id_ID"};
 const RANGES=[["7d",7,"r_7d"],["1m",30,"r_1m"],["3m",90,"r_3m"],["1y",365,"r_1y"]];
 const MIN_BARS=35;
-let L="en",D=SNAP,LIVE=false,TF="15m",CANDLES=[],DEXSIZE=null,RANGE="1m",EXRANGE="7d",TECHRANGE="tf";
+let L="en",D=SNAP,LIVE=false,TF="15m",CANDLES=[],DEXSIZE=null,RANGE="1m",EXRANGE="7d";
 
 const $=s=>document.querySelector(s),NS="http://www.w3.org/2000/svg";
 const T=k=>(I18N[L]&&I18N[L][k])||I18N.en[k]||k;
@@ -504,20 +514,14 @@ function tfButtons(){
     title:elapsed/secs<MIN_BARS?tpl("tf_bars",{bars:Math.floor(elapsed/secs),tf}):null})),
     k=>k===TF,setTF);
 }
-// "tf" mode reads the same bars the chart uses; the four longer ranges switch
-// to Bitkub's own daily price history, which reaches back further than the
-// tape collected here does.
-function techLabel(){
-  if(TECHRANGE==="tf")return TF;
-  const r=RANGES.find(x=>x[0]===TECHRANGE);return r?T(r[2]):TECHRANGE;
-}
+// Indicators read the same timeframe the chart is set to — picking one here
+// picks it everywhere, the same control the chart's own timeframe row uses.
+function techLabel(){return TF}
 function techRangeButtons(){
-  const items=[{k:"tf",label:TF}].concat(RANGES.map(([k,,lab])=>({k,label:T(lab)})));
-  segButtons("#techrangeseg",items,k=>k===TECHRANGE,k=>{
-    TECHRANGE=k;try{localStorage.setItem("kfd-techrange",k)}catch(e){}
-    techRangeButtons();tech();
-    $("#techtf").textContent=techLabel();
-  });
+  const elapsed=(Date.now()-COLLECT_START)/1000;
+  segButtons("#techrangeseg",TFS.map(([tf,secs])=>({k:tf,label:tf,
+    title:elapsed/secs<MIN_BARS?tpl("tf_bars",{bars:Math.floor(elapsed/secs),tf}):null})),
+    k=>k===TF,setTF);
 }
 function exRangeButtons(){
   segButtons("#exseg",RANGES.map(([k,,lab])=>({k,label:T(lab)})),k=>k===EXRANGE,k=>{
@@ -556,22 +560,10 @@ function kpis(){
   +k(T("k_taker"),(isNaN(tk)?"—":tk.toFixed(1))+"%","24 h · "+fmt(t24.fills)+" "+T("k_trades"));
 }
 function tech(){
-  let c,h,l;
-  if(TECHRANGE==="tf"){
-    c=CANDLES.map(r=>r[4]);h=CANDLES.map(r=>r[2]);l=CANDLES.map(r=>r[3]);
-  }else{
-    // Bitkub's own daily history — the on-chain tape collected here only
-    // starts 2026-09-19, far short of what a year-long window needs.
-    const days=(RANGES.find(r=>r[0]===TECHRANGE)||[])[1]||30;
-    const rows=(D.dailyOhlc||[]).slice(-days);
-    c=rows.map(r=>+r[4]);h=rows.map(r=>+r[2]);l=rows.map(r=>+r[3]);
-  }
+  const c=CANDLES.map(r=>r[4]),h=CANDLES.map(r=>r[2]),l=CANDLES.map(r=>r[3]);
   const N=c.length,px=c[N-1];
   const note=$("#techsrcnote");
-  if(note){
-    if(TECHRANGE==="tf"){note.hidden=true}
-    else{note.hidden=false;note.textContent=T("tech_daily_note")}
-  }
+  if(note)note.hidden=true;
   const chip=(cl,t)=>`<span class="chip ${cl}">${t}</span>`;
   const na=`<td class="n">—</td><td>${chip("na",T("p_na"))}</td>`;
   const R=[];
@@ -687,7 +679,9 @@ function dexSelect(){
 function tDex(){
   // One size at a time: five venues across five sizes was a 25-row wall, and
   // the comparison that matters is between venues at a size you care about.
-  const rows=(D.dex||[]).filter(r=>+r.size_kub===DEXSIZE);
+  // diamon is dropped at the source now (it priced far off every other
+  // venue) — filtered here too in case a stale response still carries it.
+  const rows=(D.dex||[]).filter(r=>+r.size_kub===DEXSIZE&&r.dex!=="diamon");
   let h=`<thead><tr><th>${T("th_dex")}</th><th class="n">${T("th_out")}</th><th class="n">${T("th_px")}</th><th class="n">${T("th_vs")}</th><th>${T("th_tok")}</th></tr></thead><tbody>`;
   rows.forEach(r=>{
     const q=r.quoted!==false&&r.usdt_out!=null;
@@ -841,8 +835,14 @@ function cChain(){
   if(note)note.innerHTML=(last.fees!=null?`<b>${dmy(last.day)}</b> — ${T("ch_fees")}: ${fmt(last.fees,2)} KUB · ${T("ch_avg")}: ${avgFee(last)}<br>`:"")+gap+T("n_chain");
   chainMix(rs);
 }
-// A rolling sample of validated transactions, classified by kubscan's own
-// tx_types, aggregated over whatever days the current chart range covers.
+// The split by type still comes from a rolling sample of validated
+// transactions — kubscan has no endpoint that classifies every transaction
+// by type, sampled or not. What changed: the shares are no longer left
+// standing next to a small sample count on their own. kub_chain_activity.tx
+// is KUB Scan's own daily total (the same figure charted above, not
+// something this site derived), so the sample's shares are scaled onto that
+// real total — the legend now reads as an estimated split of the actual
+// count KUB Scan shows, not the sample size.
 function chainMix(rs){
   const box=$("#chainmix");if(!box)return;
   const from=rs[0].day,to=rs[rs.length-1].day;
@@ -850,15 +850,19 @@ function chainMix(rs){
   const tot={native:0,token:0,contract:0,other:0,n:0};
   rows.forEach(r=>{tot.native+=r.native;tot.token+=r.token;tot.contract+=r.contract;tot.other+=r.other;tot.n+=r.n});
   if(!tot.n){box.innerHTML=`<p class="note">${T("ch_mix_empty")}</p>`;return}
+  const real=rs.filter(r=>r.day>=from&&r.day<=to&&r.tx!=null).reduce((s,r)=>s+r.tx,0);
   const segs=[["native",T("ch_native"),"var(--up)",tot.native],["token",T("ch_token"),"var(--accent)",tot.token],
               ["contract",T("ch_contract"),"var(--warn)",tot.contract],["other",T("ch_other"),"#7f8694",tot.other]]
     .filter(g=>g[3]>0);
   const bar=segs.map(g=>`<i style="background:${g[2]};width:${(g[3]/tot.n*100).toFixed(2)}%"></i>`).join("");
-  const legend=segs.map(g=>
-    `<li><i style="background:${g[2]}"></i>${g[1]} · ${(g[3]/tot.n*100).toFixed(1)}%</li>`).join("");
+  const legend=segs.map(g=>{
+    const pct=g[3]/tot.n*100;
+    const est=real>0?fmt(Math.round(pct/100*real))+" · ":"";
+    return `<li><i style="background:${g[2]}"></i>${g[1]} · ${est}${pct.toFixed(1)}%</li>`;
+  }).join("");
   box.innerHTML=`<h3 style="margin:0 0 8px;font-size:12.5px;font-weight:600;color:var(--text-primary)">${T("ch_mix")}</h3>
     <div class="mixbar">${bar}</div><ul class="mixlegend">${legend}</ul>
-    <p class="note">${tpl("ch_sample_note",{n:fmt(tot.n)})}</p>`;
+    <p class="note">${real>0?tpl("ch_sample_note2",{n:fmt(tot.n),real:fmt(real)}):tpl("ch_sample_note",{n:fmt(tot.n)})}</p>`;
 }
 // Each row scores a transfer against that same address's own history, not
 // against the market — a large amount through a quiet address stands out
@@ -877,6 +881,22 @@ function anomalyFeed(){
     h+=`<tr><td>${bkk(r.ts)}</td><td><span class="chip ${cls}">${arrow} ${lbl}</span></td>
       <td>${r.label?r.label:`<span class="addr">${short(r.addr)}</span>`}</td>
       <td class="n">${fmt(r.value)}</td><td class="n">${(+r.z).toFixed(2)}</td></tr>`;
+  });
+  tbl.innerHTML=h+"</tbody>";
+}
+// Individual fills from kub_trade at or above a fixed KUB floor — real
+// executed orders, not a derived or sampled figure. The floor sits above the
+// 99th percentile of a week's trade sizes, so a handful of rows here is the
+// large end of the tape, not most of it.
+function whaleTrades(){
+  const tbl=$("#t-whale");if(!tbl)return;
+  const rows=D.whaleTrades||[];
+  if(!rows.length){tbl.innerHTML=`<tbody><tr><td>${T("whale_empty")}</td></tr></tbody>`;return}
+  let h=`<thead><tr><th>${T("th_time")}</th><th>${T("th_side")}</th><th class="n">${T("th_kub")}</th><th class="n">${T("th_rate")}</th></tr></thead><tbody>`;
+  rows.forEach(r=>{
+    const buy=r.side==="BUY",cls=buy?"up":"down";
+    h+=`<tr><td>${bkk(r.ts)}</td><td><span class="chip ${cls}">${r.side}</span></td>
+      <td class="n">${fmt(r.amount)}</td><td class="n">฿${(+r.rate).toFixed(2)}</td></tr>`;
   });
   tbl.innerHTML=h+"</tbody>";
 }
@@ -1051,7 +1071,7 @@ function health(){
 function render(){
   paintStatic();tfButtons();rangeButtons();exRangeButtons();techRangeButtons();
   kpis();tech();cSlip();cSlipT();cTaker();cSweep();
-  dexSelect();tDex();exchange();anomalyFeed();cChain();treasury();monthlyDigest();health();
+  dexSelect();tDex();exchange();anomalyFeed();whaleTrades();cChain();treasury();monthlyDigest();health();
 }
 function setTF(tf){
   TF=tf;try{localStorage.setItem("kfd-tf",tf)}catch(e){}
@@ -1082,7 +1102,6 @@ try{
   const st=localStorage.getItem("kfd-tf");if(st&&TFS.some(t=>t[0]===st))TF=st;
   const sr=localStorage.getItem("kfd-range");if(sr&&RANGES.some(r=>r[0]===sr))RANGE=sr;
   const se=localStorage.getItem("kfd-exrange");if(se&&RANGES.some(r=>r[0]===se))EXRANGE=se;
-  const st2=localStorage.getItem("kfd-techrange");if(st2&&(st2==="tf"||RANGES.some(r=>r[0]===st2)))TECHRANGE=st2;
   if(localStorage.getItem("kfd-health")==="1")$("#healthbody").hidden=false;
 }catch(e){}
 
